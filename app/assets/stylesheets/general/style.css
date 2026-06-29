@@ -1,0 +1,14 @@
+.feed-content
+{
+  overflow: auto;
+}
+
+body
+{
+  overflow: hidden;
+}
+
+.gap-none
+{
+  gap: 0px;
+}
