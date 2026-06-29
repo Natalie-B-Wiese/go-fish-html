@@ -1,4 +1,6 @@
-@import '@rolemodel/optics/dist/css/optics';
+/* @import '@rolemodel/optics/dist/css/optics'; */
+@import url('https://cdn.jsdelivr.net/npm/@rolemodel/optics@2.3.1/dist/css/optics+lucide_icons.min.css')
+
 /*
  * This is a manifest file that'll be compiled into application.css.
  *
