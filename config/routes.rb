@@ -10,7 +10,7 @@ Rails.application.routes.draw do
 
   root 'games#index'
 
-  get "pages", to: "pages#rules"
+  get "pages/rules", to: "pages#rules"
   resources :pages, only: [:index]
 
   
