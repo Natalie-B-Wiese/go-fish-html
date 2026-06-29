@@ -6,19 +6,19 @@ div.op-page__sidebar
 				| Go Fish
 	
 		div.sidebar__content.sidebar__content--start
-			a.btn.btn--no-border.btn--active href=games_url
+			a.btn.btn--no-border href=games_url class=class_names('btn--active' => (request.path==root_path||request.path==games_path))
 				i.ph.ph-puzzle-piece.icon.icon--large
 				| Games
 
-			a.btn.btn--no-border href=pages_rules_url
+			a.btn.btn--no-border href=pages_rules_url class=class_names('btn--active' => request.path.include?('rules'))
 				i.ph.ph-book-open-text.icon.icon--large
 				| Rules
 
-			a.btn.btn--no-border href=games_history_url
+			a.btn.btn--no-border href=games_history_url class=class_names('btn--active' => request.path.include?('history'))
 				i.ph.ph-clock-counter-clockwise.icon.icon--large
 				| History
 
-			a.btn.btn--no-border href=stats_url
+			a.btn.btn--no-border href=stats_url class=class_names('btn--active' => request.path.include?('stats'))
 				i.ph.ph-ranking.icon.icon--large
 				| Stats
 
