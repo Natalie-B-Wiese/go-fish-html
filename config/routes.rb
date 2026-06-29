@@ -13,7 +13,8 @@ Rails.application.routes.draw do
   get "pages/rules", to: "pages#rules"
   resources :pages, only: [:index]
 
-  
+  # Stats page ( stats#index ). Player stats (static/placeholder content for now), in a StatsController 
+  resources :stats, only: [:index]  
 
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
