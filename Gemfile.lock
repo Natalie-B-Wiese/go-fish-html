@@ -455,6 +455,7 @@ DEPENDENCIES
   rolemodel-rails!
   rspec-rails
   rspec_junit_formatter
+  rubocop
   rubocop-rails-omakase
   slim (~> 5.2)
   slim-rails (~> 4.0)
