@@ -1,5 +1,11 @@
 require 'rails_helper'
 RSpec.describe 'Stats', type: :system do
+  let(:user) {create(:user)}
+  
+  before do
+    log_user_in(user)
+  end
+
   context 'stats' do
     it 'shows the stats index' do
       visit stats_path
