@@ -58,6 +58,22 @@ RSpec.describe 'Users', type: :system do
 
     end
   end
+
+  context '/show' do
+    # Add a user profile page ( users#show ) that displays the logged-in user's info
+    let(:user) {create(:user)}
+  
+    before do
+      log_user_in(user)
+      visit users_profile_path
+    end
+
+    it 'shows the user information' do
+      expect(page.current_path).to eq users_profile_path
+      expect(page).to have_content 'Profile'
+      expect(page).to have_content user.email_address
+    end
+  end
     
 
 end

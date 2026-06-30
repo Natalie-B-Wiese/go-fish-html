@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   resources :users, only: [:new, :create]
+  get 'users/profile', to: "users#show"
   
   resource :session
   resources :passwords, param: :token
