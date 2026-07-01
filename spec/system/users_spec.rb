@@ -12,9 +12,7 @@ RSpec.describe 'Users', type: :system do
     end
 
     it 'allows user to enter an email, password, and confirmation password' do
-      fill_in "Email", with: 'natalie@example.com'
-      fill_in "Password", with: '123'
-      fill_in "Re-enter Password", with: '123'
+      create_account(email:'natalie@example.com', password:'123')
     end
 
     context 'when user is valid' do
@@ -38,12 +36,7 @@ RSpec.describe 'Users', type: :system do
       context 'when the email is already taken' do
         it 'shows the user the error' do
           existing_user = create(:user)
-
-          fill_in "Email", with: existing_user.email_address
-          fill_in "Password", with: '123'
-          fill_in "Re-enter Password", with: '123'
-          click_button 'Create Account'
-
+          create_account(email:existing_user.email_address, password:'123')
           expect(page).to have_content 'exists'
         end
       end
