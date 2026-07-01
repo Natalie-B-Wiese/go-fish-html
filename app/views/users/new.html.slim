@@ -1,6 +1,6 @@
 div.container.container--xs
-	= tag.div(flash[:alert], style: "color:red") if flash[:alert]
-	= tag.div(flash[:notice], style: "color:green") if flash[:notice]
+	= tag.div(flash[:alert], class: "flash flash--alert") if flash[:alert]
+	= tag.div(flash[:notice], class: "flash flash--notice") if flash[:notice]
 
 	h2
 		| Sign up
@@ -8,17 +8,17 @@ div.container.container--xs
 		div.form-group
 			label.form-label for="email_address"
 				| Email
-			= form.email_field :email_address, required: true, autofocus: true, placeholder: "example@gmail.com", value: params[:email_address]
+			= form.email_field :email_address, required: true, autofocus: true, placeholder: "example@gmail.com", value: params[:email_address], class: "form-control form-control--large"
 			
 		div.form-group
 			label.form-label for="password"
 				| Password
-			= form.password_field :password, required: true, maxlength: 72
+			= form.password_field :password, required: true, maxlength: 72, class: "form-control form-control--large"
 		
 		div.form-group
 			label.form-label for="password_confirmation"
 				| Re-enter Password
-			= form.password_field :password_confirmation, required: true, maxlength: 72
+			= form.password_field :password_confirmation, required: true, maxlength: 72, class: "form-control form-control--large"
 		
 		= form.submit "Create Account"
 	br

@@ -1,0 +1,12 @@
+.flash
+{
+  &.flash--alert
+  {
+    color: red;
+  }
+
+  &.flash--notice
+  {
+    color: green;
+  }
+}

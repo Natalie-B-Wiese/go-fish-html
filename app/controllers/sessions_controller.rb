@@ -11,7 +11,10 @@ class SessionsController < ApplicationController
       start_new_session_for user
       redirect_to after_authentication_url
     else
-      redirect_to new_session_path, alert: "Try another email address or password."
+      # render
+      flash.now[:alert]= "Try another email address or password."
+      render :new, layout: 'application_no_sidebar', status: :unprocessable_content
+      #redirect_to new_session_path, 
     end
   end
 

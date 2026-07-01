@@ -28,6 +28,9 @@ div.op-page__sidebar
 				i.ph.ph-user.icon.icon--large
 				| Profile
 
-			button.btn.btn--no-border
-				i.ph.ph-sign-out.icon.icon--large
-				| Log Out
+			- if authenticated?
+				= button_to session_path, method: :delete do
+					i.ph.ph-sign-out.icon.icon--large
+					| Log Out
+			- else 
+				link_to "Sign In", new_session_path
