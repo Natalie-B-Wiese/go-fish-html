@@ -3,7 +3,7 @@ RSpec.describe 'Pages', type: :system do
   let(:user) {create(:user)}
   
   before do
-    log_user_in(user)
+    sign_in_as(user)
   end
 
   context 'pages/rules' do

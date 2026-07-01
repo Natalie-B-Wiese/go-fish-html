@@ -3,12 +3,15 @@ RSpec.describe 'Games', type: :system do
   let(:user) {create(:user)}
   
   before do
-    log_user_in(user)
+    sign_in_as(user)
   end
 
   context 'games flow' do
-    it 'shows the games index' do
+    before do
       visit games_path
+    end
+    
+    it 'shows the games index' do
       expect(page).to have_content 'Your Games'
       expect(page).to have_content 'All Games'
     end

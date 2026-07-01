@@ -70,6 +70,7 @@ RSpec.describe 'Sessions', type: :system do
   describe 'logout flow' do
     before do
       log_user_in(user)
+      visit root_path
       click_button 'Log Out'
     end
 

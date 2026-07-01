@@ -3,7 +3,7 @@ RSpec.describe 'Stats', type: :system do
   let(:user) {create(:user)}
   
   before do
-    log_user_in(user)
+    sign_in_as(user)
   end
 
   context 'stats' do
