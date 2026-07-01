@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   get "games/history", to: "games#history"
-  resources :games, only: [:index]
+  resources :games, only: [:index, :new, :create]
 
   root 'games#index'
 

@@ -1,0 +1,12 @@
+div.container.container--xs
+	= tag.div(flash[:alert], class: "flash flash--alert") if flash[:alert]
+	= tag.div(flash[:notice], class: "flash flash--notice") if flash[:notice]
+
+	h2
+		| New Game
+
+	= simple_form_for @game do |f|
+		= f.input :name
+		/ = f.input :game_type
+		= f.input :player_count
+		= f.button :submit, 'Create Game'
