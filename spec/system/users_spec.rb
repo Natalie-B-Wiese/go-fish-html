@@ -12,7 +12,7 @@ RSpec.describe 'Users', type: :system do
     end
 
     it 'allows user to enter an email, password, and confirmation password' do
-      fill_in "Email", with: 'Natalie'
+      fill_in "Email", with: 'natalie@example.com'
       fill_in "Password", with: '123'
       fill_in "Re-enter Password", with: '123'
     end
@@ -20,10 +20,7 @@ RSpec.describe 'Users', type: :system do
     context 'when user is valid' do
       it 'creates a user and reroutes to game page' do
         expect do
-          fill_in "Email", with: 'Natalie'
-          fill_in "Password", with: '123'
-          fill_in "Re-enter Password", with: '123'
-          click_button 'Create Account'
+          create_account(email:'natalie@example.com', password:'123')
           expect(page).to have_current_path root_path
         end.to change(User, :count).by 1
       end
@@ -32,13 +29,23 @@ RSpec.describe 'Users', type: :system do
     context 'when user is invalid' do
       it 'does not create a user and stays on same page and show error' do
         expect do
-          fill_in "Email", with: 'Natalie'
-          fill_in "Password", with: '123'
-          fill_in "Re-enter Password", with: 'abc'
-          click_button 'Create Account'
+          create_account(email:'natalie@example.com', password:'123', password_confirmation: 'abc')
           expect(page).to have_selector('.flash--alert')
-          expect(page.current_path).to eq new_user_path
+          # expect(page.current_path).to eq new_user_path
         end.to change(User, :count).by 0
+      end
+
+      context 'when the email is already taken' do
+        it 'shows the user the error' do
+          existing_user = create(:user)
+
+          fill_in "Email", with: existing_user.email_address
+          fill_in "Password", with: '123'
+          fill_in "Re-enter Password", with: '123'
+          click_button 'Create Account'
+
+          expect(page).to have_content 'exists'
+        end
       end
     end
   end

@@ -7,4 +7,13 @@ module SigninHelper
     click_button "Sign in"
   end
 
+  def create_account(email:, password:, password_confirmation: password)
+    visit new_user_path
+
+    fill_in "Email", with: email
+    fill_in "Password", with: password
+    fill_in "Re-enter Password", with: password_confirmation
+    click_button 'Create Account'
+  end
+
 end

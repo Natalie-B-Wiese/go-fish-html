@@ -4,19 +4,21 @@ div.container.container--xs
 
 	h2
 		| Sign up
-	= form_with url: users_path do |form|
+	= form_with model: @user do |form|
 		div.form-group
-			label.form-label for="email_address"
+			label.form-label for="user_email_address"
 				| Email
 			= form.email_field :email_address, required: true, autofocus: true, placeholder: "example@gmail.com", value: params[:email_address], class: "form-control form-control--large"
-			
+		- if @user.errors[:email_address].any?
+			span = 'Email address ' + @user.errors[:email_address].to_sentence
+
 		div.form-group
-			label.form-label for="password"
+			label.form-label for="user_password"
 				| Password
 			= form.password_field :password, required: true, maxlength: 72, class: "form-control form-control--large"
 		
 		div.form-group
-			label.form-label for="password_confirmation"
+			label.form-label for="user_password_confirmation"
 				| Re-enter Password
 			= form.password_field :password_confirmation, required: true, maxlength: 72, class: "form-control form-control--large"
 		

@@ -29,7 +29,7 @@ div.op-page__sidebar
 				| Profile
 
 			- if authenticated?
-				= button_to session_path, method: :delete do
+				= button_to session_path, class: "btn btn--no-border", method: :delete do
 					i.ph.ph-sign-out.icon.icon--large
 					| Log Out
 			- else 
