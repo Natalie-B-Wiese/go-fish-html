@@ -39,6 +39,17 @@ RSpec.describe 'Games', type: :system do
         end.to change(Game, :count).by 1
       end
 
+      it 'shows the new games in the games list' do
+        create_game(name:'Cool game', player_count:2)
+        create_game(name:'Cooler game', player_count:6)
+        visit root_path
+        expect(page).to have_content 'Cool game'
+        expect(page).to have_content '1/2 Players'
+
+        expect(page).to have_content 'Cooler game'
+        expect(page).to have_content '1/6 Players'
+      end
+
     end
     
   end

@@ -1,6 +1,7 @@
+- games = Game.all
+
 div.op-page__main
 	main.op-page__main-content
-		
 		div.op-stack.gap-xl
 			div
 				header.content-header
@@ -14,29 +15,10 @@ div.op-page__main
 					div.divider
 				
 				div.op-stack.gap-sm
-					div.card.card--padded.card--condensed
-						div.flex.flex-row.justify-between.items-stretch
-							div.flex.items-center
-								| Game 2
-							div.op-split.gap-xl
-								div.flex.items-center
-									| This Game is Full
-								button.btn
-									| Play Now
-									i.ph.ph-arrow-fat-line-right.icon.icon--large
-								
-				
-					div.card.card--padded.card--condensed
-						div.flex.flex-row.justify-between.items-stretch
-							div.flex.items-center
-								| Game 2
-							div.op-split.gap-xl
-								div.flex.items-center
-									| 2/3 Players
-								button.btn
-									| Play Now
-									i.ph.ph-arrow-fat-line-right.icon.icon--large
-								
+					/ game = Game.all
+					- games.each do |game|
+						/ TODO: make current player count accurate for game
+						= render 'game_card', name: game.name, current_player_count: 1, desired_player_count: game.player_count
 			div
 				header.content-header
 					div.content-header__details

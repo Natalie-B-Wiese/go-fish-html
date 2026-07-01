@@ -1,0 +1,23 @@
+/ Locals it needs: 
+/ name: a string
+/ current_player_count
+/ desired_player_count
+
+- is_full=current_player_count>=desired_player_count
+
+div.card.card--padded.card--condensed
+	div.flex.flex-row.justify-between.items-stretch
+		div.flex.items-center
+			| #{name}
+		div.op-split.gap-xl
+			div.flex.items-center
+				| #{current_player_count}/#{desired_player_count} Players
+				/ TODO: display game full message if the game is full
+				/| This Game is Full
+			button.btn
+				/ TODO: disable play button if the game is full
+				/ TODO: if player is not in this game, make it be a Join button
+				/ TODO: if player is in the game and the game is not full, make it a disabled Waiting button
+				/ TODO: otherwise it will just say Play Now which will start the game (if it has not been started yet and route to game page)
+				| Play Now
+				i.ph.ph-arrow-fat-line-right.icon.icon--large
