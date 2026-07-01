@@ -8,7 +8,7 @@ class UsersController < ApplicationController
       redirect_to root_path
     else
       flash.now[:alert]="There was a problem signing up."
-      render :new, status: :unprocessable_content
+      render :new, layout: 'application_no_sidebar', status: :unprocessable_content
     end
   end
 
