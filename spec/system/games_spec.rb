@@ -58,9 +58,46 @@ RSpec.describe 'Games', type: :system do
         expect(page).to have_content 'Cooler game'
         expect(page).to have_content '1/6 Players'
       end
-
     end
-    
+  end
+
+  context 'join game flow' do
+    before do
+      create_game(name:'Cool game', player_count:3)
+    end
+
+    context 'when game does not have all players' do
+      it 'shows the players ratio' do
+        expect(page).to have_content '1/3 Players'
+      end
+      
+      context 'when player is already in game' do
+        it 'it shows disabled waiting button' do
+          expect(page).to have_button('Waiting for more players...', disabled: true)
+        end
+      end
+      
+      context 'when player is not in the game' do
+        let(:user2) {create(:user, email_address: 'abc@example.com')}
+        before do
+          sign_out
+          sign_in_as(user2)
+          visit games_path
+        end
+
+        it 'shows the game and a Join button' do
+          expect(page).to have_content 'Cool game'
+          expect(page).to have_button 'Join'
+        end
+
+        xit 'allows player to join the game' do
+          click_on('Join')
+          visit games_path
+          expect(page).to have_content '2/3 Players'
+        end
+      end   
+    end
+
   end
 
   context '/games/history' do

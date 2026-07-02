@@ -15,10 +15,9 @@ div.op-page__main
 					div.divider
 				
 				div.op-stack.gap-sm
-					/ game = Game.all
 					- games.each do |game|
 						/ TODO: make current player count accurate for game
-						= render 'game_card', name: game.name, current_player_count: 1, desired_player_count: game.player_count
+						= render 'game_card', game: game, is_in_game: Player.exists?(user_id: Current.user.id, game_id: game.id)
 			div
 				header.content-header
 					div.content-header__details
@@ -27,25 +26,5 @@ div.op-page__main
 					div.divider
 				
 				div.op-stack.gap-sm
-					div.card.card--padded.card--condensed
-						div.flex.flex-row.justify-between.items-stretch
-							div.flex.items-center
-								| Game 2
-							div.op-split.gap-xl
-								div.flex.items-center
-									| 1/5 Players
-								button.btn
-									| Join
-									i.ph.ph-user-plus.icon.icon--large
-								
-					div.card.card--padded.card--condensed
-						div.flex.flex-row.justify-between.items-stretch
-							div.flex.items-center
-								| Game 1
-							div.op-split.gap-xl
-								div.flex.items-center
-									| 2/3 Players
-								button.btn
-									| Join
-									i.ph.ph-user-plus.icon.icon--large
+					/ TODO: show games of player
 								
