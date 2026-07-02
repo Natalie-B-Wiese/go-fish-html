@@ -1,9 +1,11 @@
 - games = Game.all
+- games_in = games.select {|game| game.players.any? { |player| player.user_id == Current.user.id }}
+- games_not_in = games - games_in
 
 div.op-page__main
 	main.op-page__main-content
 		div.op-stack.gap-xl
-			div
+			div.my-games
 				header.content-header
 					div.content-header__details
 						h2.content-header__title
@@ -15,12 +17,9 @@ div.op-page__main
 					div.divider
 				
 				div.op-stack.gap-sm
-					- games.each do |game|
-						- num_joined_players = (Player.where(game_id: game.id)).count
-						- is_in_game=Player.exists?(user_id: Current.user.id, game_id: game.id)
-						- next if num_joined_players>=game.player_count && !is_in_game
-						= render 'game_card', game: game, num_joined_players: num_joined_players, is_in_game: is_in_game
-			div
+					- games_in.each do |game|
+						= render 'game_card', game: game, is_in_game: true
+			div.all-games
 				header.content-header
 					div.content-header__details
 						h2.content-header__title
@@ -28,5 +27,8 @@ div.op-page__main
 					div.divider
 				
 				div.op-stack.gap-sm
-					/ TODO: show games of player
+					- games_not_in.each do |game|
+						- next if game.players.count>=game.player_count
+						
+						= render 'game_card', game: game, is_in_game: false
 								

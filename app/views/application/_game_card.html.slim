@@ -1,9 +1,9 @@
 / Locals it needs: 
 / game: a Game object
 / is_in_game: a boolean of whether this player is in the game or not
-/ num_joined_players
 
 - current_player_count=(Player.where(game_id: game.id)).count
+- num_joined_players=game.players.count
 - is_full=num_joined_players>=game.player_count
 
 div.card.card--padded.card--condensed

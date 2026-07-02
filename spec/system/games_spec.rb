@@ -48,15 +48,26 @@ RSpec.describe 'Games', type: :system do
         end.to change(Player, :count).by 1
       end
 
-      it 'shows the new games in the games list' do
+      it 'shows the new games in the my games list only' do
         create_game(name:'Cool game', player_count:2)
         create_game(name:'Cooler game', player_count:6)
         visit root_path
-        expect(page).to have_content 'Cool game'
-        expect(page).to have_content '1/2 Players'
 
-        expect(page).to have_content 'Cooler game'
-        expect(page).to have_content '1/6 Players'
+        within('.my-games') do
+          expect(page).to have_content 'Cool game'
+          expect(page).to have_content '1/2 Players'
+
+          expect(page).to have_content 'Cooler game'
+          expect(page).to have_content '1/6 Players'
+        end
+
+        within('.all-games') do
+          expect(page).to_not have_content 'Cool game'
+          expect(page).to_not have_content '1/2 Players'
+
+          expect(page).to_not have_content 'Cooler game'
+          expect(page).to_not have_content '1/6 Players'
+        end
       end
     end
   end
@@ -85,16 +96,32 @@ RSpec.describe 'Games', type: :system do
           visit games_path
         end
 
-        it 'shows the game and a Join button' do
-          expect(page).to have_content 'Cool game'
-          expect(page).to have_button 'Join'
+        it 'shows the game and a Join button inside all games panel only' do
+          within('.all-games') do
+            expect(page).to have_content 'Cool game'
+            expect(page).to have_button 'Join'
+          end
+
+          within('.my-games') do
+            expect(page).to_not have_content 'Cool game'
+            expect(page).to_not have_button 'Join'
+          end
+
         end
 
         it 'allows player to join the game and returns to games page' do
           expect do
             click_on('Join')
             expect(page.current_path).to eq(games_path)
-            expect(page).to have_content '2/3 Players'
+            
+            within('.all-games') do
+              expect(page).to_not have_content '2/3 Players'
+            end
+
+            within('.my-games') do
+              expect(page).to have_content '2/3 Players'
+            end
+            
           end.to change(Player, :count).by 1
         end
       end   
