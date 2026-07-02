@@ -6,7 +6,10 @@ class GamesController < ApplicationController
   def create
     @game=Game.new(game_params)
     if @game.save
-      # TODO: add user to the game
+      user= Current.user
+      Player.create!(user_id: user.id, game_id: @game.id)
+
+      # Player.all(user_id: @user.id)
       
       redirect_to root_url
     else

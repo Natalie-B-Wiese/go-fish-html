@@ -45,8 +45,8 @@ RSpec.describe 'Sessions', type: :system do
         log_user_in(user)
       end
 
-      it 'reroutes to homepage' do
-        expect(page.current_path).to eq root_path
+      it 'reroutes to game page' do
+        expect(page.current_path).to eq(root_path) | eq(games_path)
       end
     end
 

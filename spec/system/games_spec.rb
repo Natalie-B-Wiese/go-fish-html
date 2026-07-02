@@ -42,6 +42,12 @@ RSpec.describe 'Games', type: :system do
         end.to change(Game, :count).by 1
       end
 
+      it 'creates a player and reroutes to root path' do
+        expect do
+          create_game(name:'Game 1', player_count:2)
+        end.to change(Player, :count).by 1
+      end
+
       it 'shows the new games in the games list' do
         create_game(name:'Cool game', player_count:2)
         create_game(name:'Cooler game', player_count:6)
