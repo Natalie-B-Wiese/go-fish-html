@@ -168,6 +168,59 @@ RSpec.describe 'Games', type: :system do
     end
   end
 
+  context 'show and start game flow' do
+    let(:game) {Game.find_by(name: 'Game 1')}
+    let(:user2) {create(:user, email_address: 'abc@example.com')}
+    let(:user3) {create(:user, email_address: 'xyz@example.com')}
+    before do
+      create_game(name:'Game 1', player_count:3)
+      sign_out
+      sign_in_as(user2)
+      visit games_path
+      click_on('Join')
+      visit show_game_path(game.id)
+    end
+
+    it 'shows the game name' do
+      expect(page).to have_content 'Game 1'
+    end
+    
+    it 'shows only the players in that game' do
+      expect(page).to have_content user.email_address
+      expect(page).to have_content user2.email_address
+
+      expect(page).to_not have_content user3.email_address
+    end
+
+    context 'before game is full' do
+      it 'game is not started' do
+        expect(game).to_not be_started
+      end
+    end
+
+    context 'when game is full' do
+      before do
+        sign_out
+        sign_in_as(user3)
+        visit games_path
+        click_on('Join')
+        visit show_game_path(game.id)
+      end
+
+      it 'starts the game and only starts it once' do
+        #expect(game).to be_started
+        expect(game.reload).to be_started
+        started_at=Game.find(game.id).started_at
+
+        sleep(2)
+        visit show_game_path(game.id)
+        expect(game.reload.started_at).to eq started_at
+      end
+    end
+
+
+  end
+
   context '/games/history' do
     it 'shows the history' do
       visit games_history_path

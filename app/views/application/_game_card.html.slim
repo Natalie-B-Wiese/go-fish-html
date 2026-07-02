@@ -2,20 +2,16 @@
 / game: a Game object
 / is_in_game: a boolean of whether this player is in the game or not
 
-- current_player_count=(Player.where(game_id: game.id)).count
-- num_joined_players=game.players.count
-- is_full=num_joined_players>=game.player_count
-
 div.card.card--padded.card--condensed
 	div.flex.flex-row.justify-between.items-stretch
 		div.flex.items-center
 			| #{game.name}
 		div.op-split.gap-xl
 			div.flex.items-center
-				| #{num_joined_players}/#{game.player_count} Players
+				| #{game.num_joined_players}/#{game.player_count} Players
 			- if is_in_game 
-				button.btn disabled=!is_full				
-					- if is_full==true
+				button.btn disabled=!game.full?				
+					- if game.full?
 						| Play Now
 						i.ph.ph-arrow-fat-line-right.icon.icon--large
 					- else 

@@ -15,4 +15,25 @@ class Game < ApplicationRecord
 
   # returns all games that are not finished:
   # Game.where.not(status: :finished)
+  def started?
+    !!(!started_at.nil?)
+  end
+
+  def full?
+    return num_joined_players>=player_count
+  end
+
+  def start!
+    update!(started_at: Time.zone.now)
+  end
+
+  def num_joined_players
+    # num_joined_players=(Player.where(game_id: game.id)).count
+    players.count
+  end
+
+  def self.all_with_user(user_id=Current.user.id)
+    Game.all.select {|game| game.players.any? { |player| player.user_id == user_id }}
+  end
+
 end
