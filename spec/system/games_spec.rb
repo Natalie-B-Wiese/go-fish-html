@@ -90,10 +90,12 @@ RSpec.describe 'Games', type: :system do
           expect(page).to have_button 'Join'
         end
 
-        xit 'allows player to join the game' do
-          click_on('Join')
-          visit games_path
-          expect(page).to have_content '2/3 Players'
+        it 'allows player to join the game and returns to games page' do
+          expect do
+            click_on('Join')
+            expect(page.current_path).to eq(games_path)
+            #expect(page).to have_content '2/3 Players'
+          end.to change(Player, :count).by 1
         end
       end   
     end

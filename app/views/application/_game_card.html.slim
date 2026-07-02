@@ -24,6 +24,6 @@ div.card.card--padded.card--condensed
 						| Waiting for more players...
 
 			- else 
-				button.btn			
+				= button_to join_game_path(game.id), method: :get, class: "btn" do
 					| Join
 					i.ph.ph-user-plus.icon.icon--large
