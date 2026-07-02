@@ -1,10 +1,10 @@
 / Locals it needs: 
 / game: a Game object
 / is_in_game: a boolean of whether this player is in the game or not
+/ num_joined_players
 
 - current_player_count=(Player.where(game_id: game.id)).count
-- desired_player_count=game.player_count
-- is_full=current_player_count>=desired_player_count
+- is_full=num_joined_players>=game.player_count
 
 div.card.card--padded.card--condensed
 	div.flex.flex-row.justify-between.items-stretch
@@ -12,9 +12,7 @@ div.card.card--padded.card--condensed
 			| #{game.name}
 		div.op-split.gap-xl
 			div.flex.items-center
-				| #{current_player_count}/#{desired_player_count} Players
-				/ TODO: display game full message if the game is full
-				/| This Game is Full
+				| #{num_joined_players}/#{game.player_count} Players
 			- if is_in_game 
 				button.btn disabled=!is_full				
 					- if is_full==true

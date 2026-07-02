@@ -94,12 +94,51 @@ RSpec.describe 'Games', type: :system do
           expect do
             click_on('Join')
             expect(page.current_path).to eq(games_path)
-            #expect(page).to have_content '2/3 Players'
+            expect(page).to have_content '2/3 Players'
           end.to change(Player, :count).by 1
         end
       end   
     end
 
+    context 'when game is full' do
+      let(:user2) {create(:user, email_address: 'abc@example.com')}
+      let(:user3) {create(:user, email_address: 'xyz@example.com')}
+      before do
+        sign_out
+        sign_in_as(user2)
+        visit games_path
+        click_on('Join')
+
+        sign_out
+        sign_in_as(user3)
+        visit games_path
+        click_on('Join')
+        visit games_path
+      end
+      
+      it 'shows players ratio' do
+        expect(page).to have_content '3/3 Players'
+      end
+      
+      context 'when player is already in game' do
+        it 'it shows enabled Play Now button' do
+          expect(page).to have_button('Play Now')
+        end
+      end
+      
+      context 'when player is not in the game' do
+        let(:user4) {create(:user, email_address: 'wasd@example.com')}
+        before do
+          sign_out
+          sign_in_as(user4)
+          visit games_path
+        end
+
+        it 'does not show the game' do
+          expect(page).to_not have_content 'Cool game'
+        end
+      end   
+    end
   end
 
   context '/games/history' do

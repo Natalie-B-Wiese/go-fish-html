@@ -16,8 +16,10 @@ div.op-page__main
 				
 				div.op-stack.gap-sm
 					- games.each do |game|
-						/ TODO: make current player count accurate for game
-						= render 'game_card', game: game, is_in_game: Player.exists?(user_id: Current.user.id, game_id: game.id)
+						- num_joined_players = (Player.where(game_id: game.id)).count
+						- is_in_game=Player.exists?(user_id: Current.user.id, game_id: game.id)
+						- next if num_joined_players>=game.player_count && !is_in_game
+						= render 'game_card', game: game, num_joined_players: num_joined_players, is_in_game: is_in_game
 			div
 				header.content-header
 					div.content-header__details
