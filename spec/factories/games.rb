@@ -4,6 +4,7 @@ FactoryBot.define do
     player_count { 2 }
     started_at { nil }
     ended_at { nil }
+    association :winner, factory: :player, strategy: :null
 
     trait :started do
       started_at {Time.zone.now}
@@ -11,6 +12,23 @@ FactoryBot.define do
 
     trait :completed do
       ended_at {Time.zone.now}
+    end
+
+    # create :completed_game, :with_users_and_winner, users: [user1, user2, user3], user_won: user2
+    trait :with_users_and_winner do
+      transient do
+        users {[]}
+        user_won {nil}
+      end
+
+      after(:create) do |game, evaluator|
+        player_count=evaluator.users.count
+        evaluator.users.each do |user|
+          player=create(:player, game: game, user: user)
+          game.winner=player if user==evaluator.user_won
+        end
+        game.reload
+      end
     end
 
     # create :game, :with_users, users: [user1, user2, user3]

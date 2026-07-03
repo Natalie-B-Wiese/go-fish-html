@@ -215,10 +215,52 @@ RSpec.describe 'Games', type: :system do
 
   end
 
+  context 'games page' do
+    let!(:game1) {create :completed_game, :with_users_and_winner, name: 'Finished Game', users: [user1, user2], user_won: user2}
+
+    it 'does not show games already finished' do
+      visit games_path
+      expect(page).to_not have_content 'Finished Game'
+    end
+  end
+
   context '/games/history' do
-    it 'shows the history' do
+    let!(:game1) {create :completed_game, :with_users_and_winner, name: 'Game 1', users: [user1, user2], user_won: user2}
+    let!(:game2) {create :completed_game, :with_users_and_winner, name: 'Game no user1', users: [user2, user3], user_won: user3}
+    let!(:game3) {create :game, :with_users, name: 'Unfinished Game', users: [user1, user2, user3]}
+    let!(:game4) {create :completed_game, :with_users_and_winner, name: 'Game 4', users: [user1, user3], user_won: user3}
+
+    before do
       visit games_history_path
+    end
+
+    it 'shows the history' do  
       expect(page).to have_content 'History'
+      expect(page.current_path).to eq games_history_path
+    end
+
+    it 'shows only finished games belonging to user' do
+      # the user right now is user 1
+      expect(page).to have_content 'Game 1'
+      expect(page).to have_content 'Game 4'
+
+      expect(page).to_not have_content 'Game no user1'
+      expect(page).to_not have_content 'Unfinished Game'
+    end
+
+    it 'shows who played' do
+      expect(page).to have_content user1.email_address+", "+user2.email_address
+      expect(page).to have_content user1.email_address+", "+user3.email_address
+    end
+
+    it 'shows when it was finished' do
+      expect(page).to have_content game1.ended_at.strftime("%b %d, %Y")
+      expect(page).to have_content game4.ended_at.strftime("%b %d, %Y")
+    end
+
+    it 'show the winner' do
+      expect(page).to have_content(user2.email_address).twice
+      expect(page).to have_content(user3.email_address).twice
     end
   end
 end

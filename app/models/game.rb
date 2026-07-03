@@ -24,5 +24,9 @@ class Game < ApplicationRecord
   def num_joined_players
     players.count
   end
+
+  def finished?
+    (!ended_at.nil?)
+  end
   
 end

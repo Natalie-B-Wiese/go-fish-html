@@ -1,5 +1,5 @@
-- games = Game.all
-- games_in = Current.user.games
+- games = Game.all.reject(&:finished?)
+- games_in = Current.user.games.reject(&:finished?)
 - games_not_in = games - games_in
 
 div.op-page__main
