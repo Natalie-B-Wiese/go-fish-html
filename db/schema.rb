@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_02_145209) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_03_032014) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,6 +21,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_02_145209) do
     t.integer "player_count"
     t.datetime "started_at"
     t.datetime "updated_at", null: false
+    t.bigint "winner_id"
+    t.index ["winner_id"], name: "index_games_on_winner_id"
   end
 
   create_table "players", force: :cascade do |t|
@@ -50,6 +52,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_02_145209) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "games", "players", column: "winner_id"
   add_foreign_key "players", "games"
   add_foreign_key "players", "users"
   add_foreign_key "sessions", "users"

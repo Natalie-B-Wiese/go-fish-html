@@ -11,11 +11,14 @@ require 'bcrypt'
 
 def create_user(email:, password:)
   password_digest=BCrypt::Password.create(password)
-  user=User.find_by(email_address: email, password_digest: password_digest)
-  unless user
+  user=User.find_by(email_address: email)
+
+  if user
+    user.password_digest = password_digest
+    user.save!
+  else
     user=User.create!(email_address: email, password: password, password_confirmation: password) 
   end
-  user
 end
 
 spiderman=create_user(email: 'spiderman@example.com', password: 'spiders_rock!')
@@ -25,24 +28,40 @@ ironman=create_user(email: 'ironman@example.com', password: 'stark')
 
 
 # full started game
-no_clowns_game=Game.find_or_create_by!(name: "No Clowns Allowed Game", player_count: 3, started_at: DateTime.new(2026,6,3,1,1,5))
+no_clowns_game=Game.find_or_create_by!(name: "No Clowns Allowed Game") do |game|
+  game.player_count= 3
+  game.started_at= DateTime.new(2026,6,3,1,1,5)
+end
+
 Player.find_or_create_by!(user: batman, game: no_clowns_game)
 Player.find_or_create_by!(user: spiderman, game: no_clowns_game)
 Player.find_or_create_by!(user: ironman, game: no_clowns_game)
 
 # not full game (needs 2 more players)
-villains_only=Game.find_or_create_by!(name: "Villains Only Game", player_count: 3)
+villains_only=Game.find_or_create_by!(name: "Villains Only Game") do |game|
+  game.player_count= 3
+end
 Player.find_or_create_by!(user: joker, game: villains_only)
 
 # not full game (needs 1 more player)
-everyone_game=Game.find_or_create_by!(name: "Everyone", player_count: 4)
+everyone_game=Game.find_or_create_by!(name: "Everyone Game") do |game|
+  game.player_count=4
+end
 Player.find_or_create_by!(user: spiderman, game: everyone_game)
 Player.find_or_create_by!(user: batman, game: everyone_game)
 Player.find_or_create_by!(user: ironman, game: everyone_game)
 Player.find_or_create_by!(user: joker, game: everyone_game)
 
 # full game that is finished where Batman wins
-# TODO: make batman win
-batman_wins_game=Game.find_or_create_by!(name: "Batman vs Joker Game", player_count: 2, started_at: DateTime.new(2001,2,2,1,1,5), ended_at: DateTime.new(2001,2,4,2,2,6))
-Player.find_or_create_by!(user: batman, game: batman_wins_game)
+batman_wins_game=Game.find_or_create_by!(name: "Batman vs Joker Game") do |game|
+  game.player_count=2
+  game.started_at= DateTime.new(2001,2,2,1,1,5)
+  game.ended_at= DateTime.new(2001,2,4,2,2,6)
+end
+batman_wins_game.save!
+
+batman_win_player=Player.find_or_create_by!(user: batman, game: batman_wins_game)
 Player.find_or_create_by!(user: joker, game: batman_wins_game)
+
+batman_wins_game.winner_id=batman_win_player.id
+batman_wins_game.save!
