@@ -38,7 +38,7 @@ RSpec.describe 'Games', type: :system do
         create_game(name:'Game 1', player_count:2)
       end
 
-      it 'creates a game and reroutes to root path' do
+      it 'creates a game and reroutes to that game\'s show path' do
         expect do
           create_game(name:'Game 1', player_count:2)
           expect(page).to have_current_path root_path
@@ -77,11 +77,11 @@ RSpec.describe 'Games', type: :system do
 
   context 'join game flow' do
     let(:game1_name) {'Cool game'}
+    let!(:game) {create :game, :with_users, name: game1_name, player_count: 3, users: [user1]}
     
 
     context 'when game does not have all players' do
       before do
-        create :game, :with_users, name: game1_name, player_count: 3, users: [user1]
         visit games_path
       end
       
@@ -90,8 +90,13 @@ RSpec.describe 'Games', type: :system do
       end
       
       context 'when player is already in game' do
-        it 'it shows disabled waiting button' do
-          expect(page).to have_button('Waiting for more players...', disabled: true)
+        it 'it shows view button' do
+          expect(page).to have_button('View')
+        end
+
+        it 'clicking on button allows player to view the game' do
+          click_on('View')
+          expect(page.current_path).to eq show_game_path(game.id)
         end
       end
       
@@ -115,11 +120,12 @@ RSpec.describe 'Games', type: :system do
 
         end
 
-        it 'allows player to join the game and returns to games page' do
+        it 'allows player to join the game and goes to show path' do
           expect do
             click_on('Join')
-            expect(page.current_path).to eq(games_path)
+            expect(page.current_path).to eq show_game_path(game.id)
             
+            visit root_path
             within('.all-games') do
               expect(page).to_not have_content '2/3 Players'
             end
@@ -134,10 +140,9 @@ RSpec.describe 'Games', type: :system do
     end
 
     context 'when game is full' do
+      let!(:game) {create :game, :with_users, name: game1_name, player_count: 3, users: [user1, user2, user3]}
       
       before do
-        create :game, :with_users, name: game1_name, player_count: 3, users: [user1, user2, user3]
-
         sign_out
         sign_in_as(user3)
         visit games_path
@@ -150,6 +155,11 @@ RSpec.describe 'Games', type: :system do
       context 'when player is already in game' do
         it 'it shows enabled Play Now button' do
           expect(page).to have_button('Play Now')
+        end
+
+        it 'when clicked on play now, it allows player to view the game' do
+          click_on 'Play Now'
+          expect(page.current_path).to eq show_game_path(game.id)
         end
       end
       
@@ -195,6 +205,14 @@ RSpec.describe 'Games', type: :system do
       it 'game is not started' do
         expect(game).to_not be_started
       end
+
+      it 'shows waiting message' do
+        expect(page).to have_content 'Waiting'
+      end
+
+      it 'does not show game started message' do
+        expect(page).to_not have_content 'started'
+      end
     end
 
     context 'when game is full' do
@@ -210,8 +228,15 @@ RSpec.describe 'Games', type: :system do
         visit show_game_path(full_game.id)
         expect(full_game.reload.started_at).to eq started_at
       end
-    end
 
+      it 'shows game started message' do
+        expect(page).to have_content 'started'
+      end
+
+      it 'does not show waiting message' do
+        expect(page).to_not have_content 'Waiting'
+      end
+    end
 
   end
 

@@ -1,8 +1,22 @@
 - game = Game.find(params[:id])
-- users_in_game=User.all.select{|user| game.players.map(&:user_id).include?(user.id)}
-div.op-page__main
+- users_in_game=game.users
+.op-page__main
 	main.op-page__main-content
-		h2 #{game.name}
-		- users_in_game.each do |user|
+		.op-stack.gap-xl
+			header.content-header
+				h2
+					| #{game.name}
+				div.divider
+
+			- users_in_game.each do |user|
+				p 
+					| #{user.email_address}
+
 			p 
-				| #{user.email_address}
+				- if game.full?
+					p 
+						| All players have joined. This game is started!
+
+				- else
+					p 
+						| Waiting for more players to join...

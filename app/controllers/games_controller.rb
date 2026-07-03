@@ -26,10 +26,9 @@ class GamesController < ApplicationController
 
     # TODO: don't let them join a game that is full
 
-    # don't let them join in a game they are already in
+    # prevents user from joining a game they are already in
     if Player.create(user: Current.user, game: game)
-      # TODO: redirect them to a show page that isn't started but shows the players
-      redirect_to games_url
+      redirect_to show_game_path(game.id)
     else
       flash.now[:alert]="There was a problem joining a game."
       render :index, status: :unprocessable_content
