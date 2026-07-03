@@ -1,3 +1,9 @@
+- user=Current.user
+- finished_games=Current.user.games.where.not(ended_at: nil)
+- win_count=finished_games.count{|game| game.winner.user==user}
+- lose_count=finished_games.count-win_count
+- win_percentage=(win_count.to_f/finished_games.count)*100
+
 .op-page__main
 	main.op-page__main-content
 		.op-stack.gap-xl
@@ -6,16 +12,13 @@
 					| Stats
 				div.divider
 			.op-stack.gap-sm.items-center
-				.op-split
-					p
-						| 1 losses
-					p
-						| 0 wins
+				div.ratio-bar.ratio-bar--flipped
+					div.ratio-bar__bar
+						div.ratio-bar__fill style="width: #{win_percentage}%;"
+					div.ratio-bar__footer
+						span
+							| #{lose_count} losses
+						span
+							| #{win_count} wins
 				p
-					| Games Played: 1
-				p
-					| Total Books Created: 20
-				p
-					| Average Books Per Game: 4
-				p
-					| Highest Game Book Count: 8
+					| Games Played: #{finished_games.count}

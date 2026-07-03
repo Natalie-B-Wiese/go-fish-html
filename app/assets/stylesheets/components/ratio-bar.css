@@ -1,0 +1,44 @@
+.ratio-bar {
+    --bar-height: calc(8 * var(--op-size-unit)); /* 32 px */
+    --bar-width: calc(50 * var(--op-size-unit)); /* 200 px */
+
+    width: var(--bar-width);
+    display: flex;
+    flex-flow: column;
+    
+    .ratio-bar__bar
+    {
+        display: flex;
+        height: var(--bar-height);
+
+        border: var(--op-border-width) solid var(--op-color-border);
+        background-color: var(--op-color-neutral-minus-eight);
+
+        .ratio-bar__fill
+        {
+            border-right: var(--op-border-width) solid var(--op-color-border);
+            background-color: var(--op-color-primary-plus-two);
+        }
+    }
+
+    .ratio-bar__footer
+    {
+        display: flex;
+        justify-content: space-between;
+        padding: var(--op-space-scale-unit);
+    }
+
+    &.ratio-bar--flipped
+    {
+        .ratio-bar__bar
+        {
+            justify-content: flex-end;
+            .ratio-bar__fill
+            {
+                border-right: none;
+                border-left: var(--op-border-width) solid var(--op-color-border);
+            }
+        }
+    }
+
+}
