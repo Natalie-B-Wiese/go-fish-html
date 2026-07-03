@@ -2,7 +2,7 @@ class Game < ApplicationRecord
   has_many :players
   has_many :users, through: :players
 
-  has_one :winner, class_name: 'Player'
+  belongs_to :winner, class_name: 'Player', optional: true
 
   validates :name, uniqueness: {case_sensitive: true, message: "A game with that name already exists!"}
   validates :name, presence: true

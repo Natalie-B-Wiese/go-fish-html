@@ -22,10 +22,10 @@ FactoryBot.define do
       end
 
       after(:create) do |game, evaluator|
-        player_count=evaluator.users.count
+        game.player_count=evaluator.users.count
         evaluator.users.each do |user|
           player=create(:player, game: game, user: user)
-          game.winner=player if user==evaluator.user_won
+          game.update!(winner: player) if user==evaluator.user_won
         end
         game.reload
       end
