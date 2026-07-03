@@ -65,3 +65,33 @@ Player.find_or_create_by!(user: joker, game: batman_wins_game)
 
 batman_wins_game.winner_id=batman_win_player.id
 batman_wins_game.save!
+
+
+spiderman_wins_game=Game.find_or_create_by!(name: "Cool Game") do |game|
+  game.player_count=3
+  game.started_at= DateTime.new(2020,8,20)
+  game.ended_at= DateTime.new(2020,8,21)
+end
+spiderman_wins_game.save!
+
+Player.find_or_create_by!(user: ironman, game: spiderman_wins_game)
+spiderman_win_player=Player.find_or_create_by!(user: spiderman, game: spiderman_wins_game)
+Player.find_or_create_by!(user: batman, game: spiderman_wins_game)
+
+spiderman_wins_game.winner_id=spiderman_win_player.id
+spiderman_wins_game.save!
+
+large_finished_game=Game.find_or_create_by!(name: "Big Game") do |game|
+  game.player_count=4
+  game.started_at= DateTime.new(2018,3,2)
+  game.ended_at= DateTime.new(2018,4,6)
+end
+large_finished_game.save!
+
+Player.find_or_create_by!(user: ironman, game: large_finished_game)
+Player.find_or_create_by!(user: spiderman, game: large_finished_game)
+large_win_player=Player.find_or_create_by!(user: batman, game: large_finished_game)
+Player.find_or_create_by!(user: joker, game: large_finished_game)
+
+large_finished_game.winner_id=large_win_player.id
+large_finished_game.save!
