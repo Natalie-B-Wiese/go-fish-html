@@ -1,9 +1,12 @@
 require 'rails_helper'
 RSpec.describe 'Games', type: :system do
-  let(:user) {create(:user)}
+  let!(:user1) {create(:user1)}
+  let!(:user2) {create(:user2)}
+  let!(:user3) {create(:user3)}
+  let!(:user4) {create(:user4)}
   
   before do
-    sign_in_as(user)
+    sign_in_as(user1)
   end
 
   context 'games flow' do
@@ -73,11 +76,15 @@ RSpec.describe 'Games', type: :system do
   end
 
   context 'join game flow' do
-    before do
-      create_game(name:'Cool game', player_count:3)
-    end
+    let(:game1_name) {'Cool game'}
+    
 
     context 'when game does not have all players' do
+      before do
+        create :game, :with_users, name: game1_name, player_count: 3, users: [user1]
+        visit games_path
+      end
+      
       it 'shows the players ratio' do
         expect(page).to have_content '1/3 Players'
       end
@@ -88,8 +95,7 @@ RSpec.describe 'Games', type: :system do
         end
       end
       
-      context 'when player is not in the game' do
-        let(:user2) {create(:user, email_address: 'abc@example.com')}
+      context 'when player is not in the game' do   
         before do
           sign_out
           sign_in_as(user2)
@@ -98,12 +104,12 @@ RSpec.describe 'Games', type: :system do
 
         it 'shows the game and a Join button inside all games panel only' do
           within('.all-games') do
-            expect(page).to have_content 'Cool game'
+            expect(page).to have_content game1_name
             expect(page).to have_button 'Join'
           end
 
           within('.my-games') do
-            expect(page).to_not have_content 'Cool game'
+            expect(page).to_not have_content game1_name
             expect(page).to_not have_button 'Join'
           end
 
@@ -128,18 +134,12 @@ RSpec.describe 'Games', type: :system do
     end
 
     context 'when game is full' do
-      let(:user2) {create(:user, email_address: 'abc@example.com')}
-      let(:user3) {create(:user, email_address: 'xyz@example.com')}
+      
       before do
-        sign_out
-        sign_in_as(user2)
-        visit games_path
-        click_on('Join')
+        create :game, :with_users, name: game1_name, player_count: 3, users: [user1, user2, user3]
 
         sign_out
         sign_in_as(user3)
-        visit games_path
-        click_on('Join')
         visit games_path
       end
       
@@ -154,7 +154,6 @@ RSpec.describe 'Games', type: :system do
       end
       
       context 'when player is not in the game' do
-        let(:user4) {create(:user, email_address: 'wasd@example.com')}
         before do
           sign_out
           sign_in_as(user4)
@@ -162,31 +161,31 @@ RSpec.describe 'Games', type: :system do
         end
 
         it 'does not show the game' do
-          expect(page).to_not have_content 'Cool game'
+          expect(page).to_not have_content game1_name
         end
       end   
     end
   end
 
   context 'show and start game flow' do
-    let(:game) {Game.find_by(name: 'Game 1')}
-    let(:user2) {create(:user, email_address: 'abc@example.com')}
-    let(:user3) {create(:user, email_address: 'xyz@example.com')}
+    let(:game_name) {"Eddie's Game"}
+    let(:game) {Game.find_by(name: game_name)}
+
+    let(:full_game_name) {"Penelope's Game"}
+    let(:full_game) {Game.find_by(name: full_game_name)}
+
     before do
-      create_game(name:'Game 1', player_count:3)
-      sign_out
-      sign_in_as(user2)
-      visit games_path
-      click_on('Join')
+      create :game, :with_users, name: game_name, player_count: 3, users: [user1, user2]
+      create :game, :with_users, name: full_game_name, player_count: 3, users: [user1, user2, user3]
       visit show_game_path(game.id)
     end
 
     it 'shows the game name' do
-      expect(page).to have_content 'Game 1'
+      expect(page).to have_content game_name
     end
     
     it 'shows only the players in that game' do
-      expect(page).to have_content user.email_address
+      expect(page).to have_content user1.email_address
       expect(page).to have_content user2.email_address
 
       expect(page).to_not have_content user3.email_address
@@ -200,21 +199,16 @@ RSpec.describe 'Games', type: :system do
 
     context 'when game is full' do
       before do
-        sign_out
-        sign_in_as(user3)
-        visit games_path
-        click_on('Join')
-        visit show_game_path(game.id)
+        visit show_game_path(full_game.id)
       end
 
       it 'starts the game and only starts it once' do
-        #expect(game).to be_started
-        expect(game.reload).to be_started
-        started_at=Game.find(game.id).started_at
+        expect(full_game.reload).to be_started
+        started_at=Game.find(full_game.id).started_at
 
-        sleep(2)
-        visit show_game_path(game.id)
-        expect(game.reload.started_at).to eq started_at
+        sleep(1)
+        visit show_game_path(full_game.id)
+        expect(full_game.reload.started_at).to eq started_at
       end
     end
 
