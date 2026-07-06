@@ -11,6 +11,12 @@ class Game < ApplicationRecord
 
   validates :player_count, comparison: { greater_than: 1, less_than_or_equal_to: 6}
 
+  def find_go_fish_player_by_user_id(user_id)
+    return nil if go_fish.nil?
+    
+    go_fish.players.find{|player| player.user_id==user_id}
+  end
+
   def started?
     !!(!started_at.nil?)
   end

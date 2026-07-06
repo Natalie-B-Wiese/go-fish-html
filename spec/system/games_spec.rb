@@ -239,32 +239,42 @@ RSpec.describe 'Games', type: :system do
         expect(page).to_not have_content 'Waiting'
       end
 
-      it 'has accordions of other players only' do
-        player1_accordions = elements_within_parent(parent_selector: '.players', element_index: 0, element_selector: '.accordion')
-        expect(player1_accordions[0]).to have_content(user2.email_address)
-        expect(player1_accordions[1]).to have_content(user3.email_address)
-        
-        sign_out
-        sign_in_as(user2)
-        visit show_game_path(full_game.id)
-        player2_accordions = elements_within_parent(parent_selector: '.players', element_index: 0, element_selector: '.accordion')
-        expect(player2_accordions[0]).to have_content(user1.email_address)
-        expect(player2_accordions[1]).to have_content(user3.email_address)
-      end
+      context 'when game is started' do
+        before do
+          full_game.reload
+          visit show_game_path(full_game.id)
+        end
 
-      xit 'deals the cards to the players' do
-        within '.game-view__hand' do
-          player1_card_count=find_all('.playing-card').count
-          player2_accordion_card_count = elements_within_parent(parent_selector: '.accordion',
-                                                              element_index: 0, element_selector: '.playing-card').count
-          player3_accordion_card_count = elements_within_parent(parent_selector: '.accordion',
-                                                              element_index: 1, element_selector: '.playing-card').count
+        it 'has accordions of other players only' do
+          player1_accordions = elements_within_parent(parent_selector: '.players', element_index: 0, element_selector: '.accordion')
+          expect(player1_accordions[0]).to have_content(user2.email_address)
+          expect(player1_accordions[1]).to have_content(user3.email_address)
+          
+          sign_out
+          sign_in_as(user2)
+          visit show_game_path(full_game.id)
+          player2_accordions = elements_within_parent(parent_selector: '.players', element_index: 0, element_selector: '.accordion')
+          expect(player2_accordions[0]).to have_content(user1.email_address)
+          expect(player2_accordions[1]).to have_content(user3.email_address)
+        end
 
-          expect(player1_card_count).to eq Game::SMALL_GAME_CARDS
-          expect(player2_card_count).to eq Game::SMALL_GAME_CARDS
-          expect(player3_card_count).to eq Game::SMALL_GAME_CARDS
+        it 'deals the cards to the players' do
+          within '.game-view__hand' do
+            player1_card_count=find_all('.playing-card').count
+            expect(player1_card_count).to eq GoFish::Game::SMALL_GAME_CARDS
+          end
+          
+          player2_card_count = elements_within_parent(parent_selector: '.accordion',
+                                    element_index: 0, element_selector: '.playing-card').count
+          player3_card_count = elements_within_parent(parent_selector: '.accordion',
+                                    element_index: 1, element_selector: '.playing-card').count
+
+          expect(player2_card_count).to eq GoFish::Game::SMALL_GAME_CARDS
+          expect(player3_card_count).to eq GoFish::Game::SMALL_GAME_CARDS
         end
       end
+
+      
 
       # it 'shows whose turn it is' do
       #   expect(session1).to have_content('Your Turn')
