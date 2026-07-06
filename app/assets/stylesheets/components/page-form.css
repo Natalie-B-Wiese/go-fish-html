@@ -1,0 +1,27 @@
+.page-form
+{
+    background-color: var(--op-color-primary-plus-five);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .page-form__form
+    {
+        width: calc(120 * var(--op-size-unit)); /* 400 px */
+        border: var(--op-border-width) solid var(--op-color-border);
+        padding-inline: var(--op-space-3x-large);
+        padding-block: var(--op-space-large);
+        background-color: var(--op-color-primary-plus-max);
+
+        h2
+        {
+            text-align: center;
+        }
+
+        input[type="submit"] {
+            margin-bottom: var(--op-space-small);
+        }
+    }
+
+    
+}

@@ -1,9 +1,9 @@
-div.container.container--xs
-  = tag.div(flash[:alert], class: "flash flash--alert") if flash[:alert]
-	= tag.div(flash[:notice], class: "flash flash--notice") if flash[:notice]
-
+div.page-form__form
   h2
 		| Log in
+
+  = tag.div(flash[:alert], class: "flash flash--alert") if flash[:alert]
+	= tag.div(flash[:notice], class: "flash flash--notice") if flash[:notice]
 
   = simple_form_for :session, url: session_path do |f|
 		= f.input :email_address

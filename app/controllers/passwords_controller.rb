@@ -4,7 +4,7 @@ class PasswordsController < ApplicationController
   rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_password_path, alert: "Try again later." }
 
   def new
-    render layout: 'application_no_sidebar'
+    render layout: 'application_form'
   end
 
   def create

@@ -1,9 +1,11 @@
-div.container.container--xs
+div.page-form__form
+	h2
+		| Sign up
+
 	= tag.div(flash[:alert], class: "flash flash--alert") if flash[:alert]
 	= tag.div(flash[:notice], class: "flash flash--notice") if flash[:notice]
 
-	h2
-		| Sign up
+	
 
 	= simple_form_for @user do |f|
 		= f.input :email_address
@@ -32,6 +34,6 @@ div.container.container--xs
 	/ 	= form.submit "Create Account"
 	/ br
 
-	div 
+	div
 		| Already have an account? 
 		= link_to "Sign in", new_session_path
