@@ -4,6 +4,8 @@ class Game < ApplicationRecord
 
   belongs_to :winner, class_name: 'Player', optional: true
 
+  serialize :go_fish, coder: GoFish
+
   validates :name, uniqueness: {case_sensitive: true, message: "A game with that name already exists!"}
   validates :name, presence: true
 
@@ -19,6 +21,10 @@ class Game < ApplicationRecord
 
   def start!
     update!(started_at: Time.zone.now)
+
+    # self.go_fish = GoFish.new(users.map { |u| GoFish::Player.new(u.id) })
+    # go_fish.deal!
+    # save!
   end
 
   def num_joined_players

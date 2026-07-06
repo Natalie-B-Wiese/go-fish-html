@@ -48,4 +48,13 @@ RSpec.describe Game, type: :model do
       end
     end
   end
+
+  xdescribe 'serialization round trip ' do
+    # original = GoFish.new(players)
+    # original.deal!
+    # json = GoFish.dump(original)
+    # restored = GoFish.load(json)
+    
+    # restored should have the same players, same cards, same turn
+  end
 end

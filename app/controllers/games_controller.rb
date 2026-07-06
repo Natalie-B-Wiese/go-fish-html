@@ -4,10 +4,15 @@ class GamesController < ApplicationController
   end
 
   def show
-    game=Game.find(params[:id])
+    @game=Game.find(params[:id])
 
-    if (game.full? && !game.started?)
-      game.start!
+    if (@game.full? && !@game.started?)
+      @game.start!
+    end
+
+    respond_to do |format|
+      format.html
+      format.json { render json: @game.as_json(current_user) }
     end
   end
 
