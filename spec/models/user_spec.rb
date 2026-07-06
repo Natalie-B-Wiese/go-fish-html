@@ -13,7 +13,7 @@ RSpec.describe User, type: :model do
       it 'is not valid' do
         user1=create(:user1)
         sleep(1)
-        user2=build(:user1)
+        user2=build(:user, email_address: user1.email_address)
         expect(user1).to be_valid
         expect(user2).to_not be_valid
       end

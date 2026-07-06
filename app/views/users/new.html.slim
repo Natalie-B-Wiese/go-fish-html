@@ -8,6 +8,7 @@ div.page-form__form
 	
 
 	= simple_form_for @user do |f|
+		= f.input :name
 		= f.input :email_address
 		= f.input :password
 		= f.input :password_confirmation

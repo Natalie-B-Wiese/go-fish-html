@@ -9,7 +9,7 @@
 #   end
 require 'bcrypt'
 
-def create_user(email:, password:)
+def create_user(name:, email:, password:)
   password_digest=BCrypt::Password.create(password)
   user=User.find_by(email_address: email)
 
@@ -17,14 +17,14 @@ def create_user(email:, password:)
     user.password_digest = password_digest
     user.save!
   else
-    user=User.create!(email_address: email, password: password, password_confirmation: password) 
+    user=User.create!(name: name, email_address: email, password: password, password_confirmation: password) 
   end
 end
 
-spiderman=create_user(email: 'spiderman@example.com', password: 'spiders_rock!')
-batman=create_user(email: 'batman@example.com', password: 'batmobile')
-joker=create_user(email: 'joker@example.com', password: 'batman')
-ironman=create_user(email: 'ironman@example.com', password: 'stark')
+spiderman=create_user(name: 'spiderman', email: 'spiderman@example.com', password: 'spiders_rock!')
+batman=create_user(name: 'batman', email: 'batman@example.com', password: 'batmobile')
+joker=create_user(name: 'joker', email: 'joker@example.com', password: 'batman')
+ironman=create_user(name: 'iron man', email: 'ironman@example.com', password: 'stark')
 
 
 # full started game

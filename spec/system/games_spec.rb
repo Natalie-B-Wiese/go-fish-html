@@ -203,10 +203,10 @@ RSpec.describe 'Games', type: :system do
     end
     
     it 'shows only the players in that game' do
-      expect(page).to have_content user1.email_address
-      expect(page).to have_content user2.email_address
+      expect(page).to have_content user1.name
+      expect(page).to have_content user2.name
 
-      expect(page).to_not have_content user3.email_address
+      expect(page).to_not have_content user3.name
     end
 
     context 'before game is full' do
@@ -247,15 +247,15 @@ RSpec.describe 'Games', type: :system do
 
         it 'has accordions of other players only' do
           player1_accordions = elements_within_parent(parent_selector: '.players', element_index: 0, element_selector: '.accordion')
-          expect(player1_accordions[0]).to have_content(user2.email_address)
-          expect(player1_accordions[1]).to have_content(user3.email_address)
+          expect(player1_accordions[0]).to have_content(user2.name)
+          expect(player1_accordions[1]).to have_content(user3.name)
           
           sign_out
           sign_in_as(user2)
           visit show_game_path(full_game.id)
           player2_accordions = elements_within_parent(parent_selector: '.players', element_index: 0, element_selector: '.accordion')
-          expect(player2_accordions[0]).to have_content(user1.email_address)
-          expect(player2_accordions[1]).to have_content(user3.email_address)
+          expect(player2_accordions[0]).to have_content(user1.name)
+          expect(player2_accordions[1]).to have_content(user3.name)
         end
 
         it 'deals the cards to the players' do
