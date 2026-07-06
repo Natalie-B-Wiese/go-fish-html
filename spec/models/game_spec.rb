@@ -55,7 +55,8 @@ RSpec.describe Game, type: :model do
       original = GoFish::Game.new(players)
       original.deal!
       json = GoFish::Game.dump(original)
-      restored = GoFish::Game.load(json)
+      
+      restored = GoFish::Game.load(json.as_json)
 
       # restored should have the same players, same cards, same turn
       expect(restored).to eq original

@@ -21,7 +21,6 @@ class Game < ApplicationRecord
 
   def start!
     update!(started_at: Time.zone.now)
-
     self.go_fish = GoFish::Game.new(users.map { |u| GoFish::Player.new(u.id) })
     go_fish.deal!
     save!

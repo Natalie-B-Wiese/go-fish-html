@@ -55,10 +55,16 @@ class Card
     "#{rank_to_s.downcase}_of_#{suit.downcase}.png"
   end
 
-  def as_json
+  def as_json(*)
     {
       'rank' => rank,
       'suit' => suit
     }
+  end
+
+  def self.from_json(json)
+    # makes it not care whether json uses string or keys to index
+
+    self.new(json["rank"], json["suit"])
   end
 end

@@ -1,5 +1,6 @@
 - game = Game.find(params[:id])
 - users_in_game=game.users
+- my_user=Current.user
 
 div.panel.panel--padded.game-view__game-board
 	header.panel__header.gap-xs
@@ -11,7 +12,7 @@ div.panel.panel--padded.game-view__game-board
 
 		- if game.full?
 			// make one of these for each player (excluding own player)
-			- (users_in_game-[Current.user]).each do |opponent|
+			- (users_in_game-[my_user]).each do |opponent|
 				div.players__hand.op-stack.gap-xs
 					= render 'player_accordion', user: opponent
 		- else 

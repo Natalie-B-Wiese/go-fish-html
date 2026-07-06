@@ -252,25 +252,19 @@ RSpec.describe 'Games', type: :system do
         expect(player2_accordions[1]).to have_content(user3.email_address)
       end
 
-      # it 'shows the player cards in the hand' do
-      #   within '.game-view__hand' do
-      #     expect(find_all('.playing-card').count).to eq Game::SMALL_GAME_CARDS
-      #   end
-      # end
+      xit 'deals the cards to the players' do
+        within '.game-view__hand' do
+          player1_card_count=find_all('.playing-card').count
+          player2_accordion_card_count = elements_within_parent(parent_selector: '.accordion',
+                                                              element_index: 0, element_selector: '.playing-card').count
+          player3_accordion_card_count = elements_within_parent(parent_selector: '.accordion',
+                                                              element_index: 1, element_selector: '.playing-card').count
 
-      # it 'shows the correct number of card images in each player accordion hand' do
-      #   player1_accordion_card_count = elements_within_parent(session: session2, parent_selector: '.accordion',
-      #                                                         element_index: 0, element_selector: '.playing-card').count
-      #   expect(player1_accordion_card_count).to eq Game::SMALL_GAME_CARDS
-
-      #   player2_accordion_card_count = elements_within_parent(session: session1, parent_selector: '.accordion',
-      #                                                         element_index: 0, element_selector: '.playing-card').count
-      #   expect(player2_accordion_card_count).to eq Game::SMALL_GAME_CARDS
-
-      #   player3_accordion_card_count = elements_within_parent(session: session1, parent_selector: '.accordion',
-      #                                                         element_index: 1, element_selector: '.playing-card').count
-      #   expect(player3_accordion_card_count).to eq Game::SMALL_GAME_CARDS
-      # end
+          expect(player1_card_count).to eq Game::SMALL_GAME_CARDS
+          expect(player2_card_count).to eq Game::SMALL_GAME_CARDS
+          expect(player3_card_count).to eq Game::SMALL_GAME_CARDS
+        end
+      end
 
       # it 'shows whose turn it is' do
       #   expect(session1).to have_content('Your Turn')

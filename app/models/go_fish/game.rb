@@ -1,18 +1,28 @@
 module GoFish
   class Game
-    attr_reader :players
+    SMALL_GAME_CARDS = 7
+    BIG_GAME_CARDS = 5
 
-    def initialize(players)
+    attr_reader :players, :deck
+
+    def initialize(players, deck: Deck.new)
       @players=players
+      @deck = deck
     end
 
     def deal!
-      # TODO: make it deal the cards
+      deck.shuffle
+      if players.length <= 3
+        deal_cards_to_players(SMALL_GAME_CARDS)
+      else
+        deal_cards_to_players(BIG_GAME_CARDS)
+      end
     end
 
-    def as_json(*)
+    def as_json
       {
-        players: players.map(&:as_json)
+        players: players.map(&:as_json),
+        deck: deck.as_json
       }
       # {
       # players: players.map(&:as_json),
@@ -23,15 +33,14 @@ module GoFish
 
     def ==(other)
       return false if other.nil?
-      
-      players==other.players
+      as_json==other.as_json
     end
 
-    def self.from_json(json)
-      # makes it not care whether json uses string or keys to index
-      json=json.with_indifferent_access
+    def self.from_json(json)      
+      json_players=json["players"].map { |player_json| GoFish::Player.from_json(player_json) }
+      json_deck=Deck.from_json(json["deck"])
 
-      self.new(json["players"].map { |player_json| GoFish::Player.from_json(player_json) })
+      self.new(json_players, deck: json_deck)
     end
 
     def self.load(json)
@@ -42,6 +51,16 @@ module GoFish
     def self.dump(obj)
       obj.as_json
     end 
+
+    private
+
+    def deal_cards_to_players(num_cards_to_deal)
+      num_cards_to_deal.times do
+        players.each do |player|
+          player.add_card(deck.take_top_card)
+        end
+      end
+    end
 
   end
 end
