@@ -1,22 +1,23 @@
 - game = Game.find(params[:id])
 - users_in_game=game.users
-.op-page__main
-	main.op-page__main-content
-		.op-stack.gap-xl
-			header.content-header
-				h2
-					| #{game.name}
-				div.divider
+
+div.panel.panel--padded.game-view__game-board
+	header.panel__header.gap-xs
+		button.btn.btn--no-border.btn--icon.btn--small
+			i.ph.ph-caret-left.icon.icon--large
+		h2 #{game.name}
+	div.panel__content.op-stack.gap-xs.players
+		h3 Players
+
+		- if game.full?
+			// make one of these for each player (excluding own player)
+			- (users_in_game-[Current.user]).each do |opponent|
+				div.players__hand.op-stack.gap-xs
+					= render 'player_accordion', user: opponent
+		- else 
+			p 
+				| Waiting for more players to join...
 
 			- users_in_game.each do |user|
 				p 
 					| #{user.email_address}
-
-			p 
-				- if game.full?
-					p 
-						| All players have joined. This game is started!
-
-				- else
-					p 
-						| Waiting for more players to join...

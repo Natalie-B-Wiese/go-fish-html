@@ -11,7 +11,7 @@ class GamesController < ApplicationController
     end
 
     respond_to do |format|
-      format.html
+      format.html {render layout: 'application_game'}
       format.json { render json: @game.as_json(current_user) }
     end
   end

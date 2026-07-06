@@ -4,6 +4,14 @@ RSpec.describe 'Games', type: :system do
   let!(:user2) {create(:user2)}
   let!(:user3) {create(:user3)}
   let!(:user4) {create(:user4)}
+
+  def elements_within_parent(parent_selector:, element_index:, element_selector:)
+    parent = page.find_all(parent_selector)[element_index]
+    parent.find_all(element_selector)
+    page.within parent do
+      return page.find_all(element_selector, visible: :all)
+    end
+  end
   
   before do
     sign_in_as(user1)
@@ -210,9 +218,7 @@ RSpec.describe 'Games', type: :system do
         expect(page).to have_content 'Waiting'
       end
 
-      it 'does not show game started message' do
-        expect(page).to_not have_content 'started'
-      end
+      # TODO: does not show other stuff
     end
 
     context 'when game is full' do
@@ -229,13 +235,111 @@ RSpec.describe 'Games', type: :system do
         expect(full_game.reload.started_at).to eq started_at
       end
 
-      it 'shows game started message' do
-        expect(page).to have_content 'started'
-      end
-
       it 'does not show waiting message' do
         expect(page).to_not have_content 'Waiting'
       end
+
+      it 'has accordions of other players only' do
+        player1_accordions = elements_within_parent(parent_selector: '.players', element_index: 0, element_selector: '.accordion')
+        expect(player1_accordions[0]).to have_content(user2.email_address)
+        expect(player1_accordions[1]).to have_content(user3.email_address)
+        
+        sign_out
+        sign_in_as(user2)
+        visit show_game_path(full_game.id)
+        player2_accordions = elements_within_parent(parent_selector: '.players', element_index: 0, element_selector: '.accordion')
+        expect(player2_accordions[0]).to have_content(user1.email_address)
+        expect(player2_accordions[1]).to have_content(user3.email_address)
+      end
+
+      # it 'shows the player cards in the hand' do
+      #   within '.game-view__hand' do
+      #     expect(find_all('.playing-card').count).to eq Game::SMALL_GAME_CARDS
+      #   end
+      # end
+
+      # it 'shows the correct number of card images in each player accordion hand' do
+      #   player1_accordion_card_count = elements_within_parent(session: session2, parent_selector: '.accordion',
+      #                                                         element_index: 0, element_selector: '.playing-card').count
+      #   expect(player1_accordion_card_count).to eq Game::SMALL_GAME_CARDS
+
+      #   player2_accordion_card_count = elements_within_parent(session: session1, parent_selector: '.accordion',
+      #                                                         element_index: 0, element_selector: '.playing-card').count
+      #   expect(player2_accordion_card_count).to eq Game::SMALL_GAME_CARDS
+
+      #   player3_accordion_card_count = elements_within_parent(session: session1, parent_selector: '.accordion',
+      #                                                         element_index: 1, element_selector: '.playing-card').count
+      #   expect(player3_accordion_card_count).to eq Game::SMALL_GAME_CARDS
+      # end
+
+      # it 'shows whose turn it is' do
+      #   expect(session1).to have_content('Your Turn')
+      #   expect(session2).to have_content("Player 1's Turn")
+      #   expect(session3).to have_content("Player 1's Turn")
+      # end
+
+      # it 'does not have any feed bubbles in the feed' do
+      #   session1.within '.feed-content' do
+      #     expect(session1.find_all('.feed-bubble').count).to eq 0
+      #   end
+      # end
+
+      # it 'has correct player dropdown options' do
+      #   dropdown_options1 = session1.find_field('Player').all('option').map(&:text)
+      #   expect(dropdown_options1).to eq ['Player 2', 'Player 3']
+
+      #   dropdown_options2 = session2.find_field('Player').all('option').map(&:text)
+      #   expect(dropdown_options2).to eq ['Player 1', 'Player 3']
+
+      #   dropdown_options3 = session3.find_field('Player').all('option').map(&:text)
+      #   expect(dropdown_options3).to eq ['Player 1', 'Player 2']
+      # end
+
+      # it 'has correct rank dropdown options' do
+      #   game.players[0].cards = [Card.new('2', 'Spades'), Card.new('5', 'Hearts')]
+      #   game.players[1].cards = [Card.new('3', 'Spades'), Card.new('6', 'Hearts'), Card.new('8', 'Spades')]
+      #   session1.visit '/'
+      #   session2.visit '/'
+
+      #   dropdown_options1 = session1.find_field('Rank').all('option').map(&:text)
+      #   expect(dropdown_options1).to eq %w[2 5]
+
+      #   dropdown_options2 = session2.find_field('Rank').all('option').map(&:text)
+      #   expect(dropdown_options2).to eq %w[3 6 8]
+      # end
+
+      # it 'sorts the ranks in rank dropdown' do
+      #   game.players[0].cards = [Card.new('5', 'Hearts'), Card.new('A', 'Spades'),
+      #                           Card.new('2', 'Spades'), Card.new('8', 'Spades')]
+      #   session1.visit '/'
+
+      #   dropdown_options1 = session1.find_field('Rank').all('option').map(&:text)
+      #   expect(dropdown_options1).to eq %w[2 5 8 A]
+      # end
+
+      # it 'does not duplicate ranks in dropdown' do
+      #   game = Server.game
+      #   game.players[0].cards = [Card.new('5', 'Hearts'), Card.new('2', 'Spades'),
+      #                           Card.new('5', 'Clubs'), Card.new('5', 'Spades')]
+      #   session1.visit '/'
+
+      #   dropdown_options1 = session1.find_field('Rank').all('option').map(&:text)
+      #   expect(dropdown_options1).to eq %w[2 5]
+      # end
+
+      # it 'shows how many cards each player has in accordion' do
+      #   expect(session1).to have_content("Cards: #{Game::SMALL_GAME_CARDS}")
+      #   expect(session2).to have_content("Cards: #{Game::SMALL_GAME_CARDS}")
+      #   expect(session3).to have_content("Cards: #{Game::SMALL_GAME_CARDS}")
+      # end
+
+      # it 'enables request button only for current player' do
+      #   expect(session1).to have_button('Request', disabled: false)
+      #   expect(session2).to have_button('Request', disabled: true)
+      #   expect(session3).to have_button('Request', disabled: true)
+      # end
+
+
     end
 
   end
