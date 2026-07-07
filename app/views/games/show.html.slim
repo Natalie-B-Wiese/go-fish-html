@@ -66,5 +66,6 @@ div.game-view__books.panel.panel--secondary
 			h2 Books
 		div.panel__content
 			div.cards-stacked.flex
-				- my_player.books.each do |book|
-					= image_tag "cards/#{book.to_image_name}", class: "playing-card playing-card--sm"
+				- unless my_player.nil?
+					- my_player.books.each do |book|
+						= image_tag "cards/#{book.to_image_name}", class: "playing-card playing-card--sm"

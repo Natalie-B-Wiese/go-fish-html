@@ -123,7 +123,7 @@ RSpec.describe GoFish::Game, type: :model do
         end
       end
 
-      xcontext 'when player can make a book' do
+      context 'when player can make a book' do
         let(:rank) { 'A' }
 
         before do
@@ -138,7 +138,7 @@ RSpec.describe GoFish::Game, type: :model do
         let!(:card4) { player2.cards[1] }
 
         it 'takes from both opponent and player' do
-          game.play_turn(rank: rank, opponent: opponent)
+          game.play_turn(rank_requested: rank, opponent_user_id: opponent.user_id)
           expect(player1.cards).to_not include card1
           expect(player1.cards).to_not include card2
           expect(player1.cards).to_not include card3
@@ -151,13 +151,13 @@ RSpec.describe GoFish::Game, type: :model do
         end
 
         it 'makes a book' do
-          game.play_turn(rank: rank, opponent: opponent)
+          game.play_turn(rank_requested: rank, opponent_user_id: opponent.user_id)
           expect(player1.book_count).to eq 1
           expect(opponent.book_count).to eq 0
         end
 
         it 'returns the correct turn result' do
-          result = game.play_turn(rank: rank, opponent: opponent)
+          result = game.play_turn(rank_requested: rank, opponent_user_id: opponent.user_id)
           expect(result.current_user_id).to eq player1.user_id
           expect(result.opponent_user_id).to eq opponent.user_id
           expect(result.rank_requested).to eq rank
@@ -168,7 +168,7 @@ RSpec.describe GoFish::Game, type: :model do
         end
 
         it 'does not switch turns' do
-          game.play_turn(rank: rank, opponent: opponent)
+          game.play_turn(rank_requested: rank, opponent_user_id: opponent.user_id)
           expect(game.current_go_fish_player).to eq player1
         end
       end
@@ -432,11 +432,7 @@ RSpec.describe GoFish::Game, type: :model do
   end
 
   xdescribe '#winning_player' do
-    let(:player1) {  Player.new('Jeff') }
-    let(:player2) {  Player.new('Bob') }
-    let(:user3) { Player.new('Billy') }
     let(:players) { [player1, player2, player3] }
-
     let(:game) { described_class.new(players) }
 
     context 'when one player has most books' do
@@ -455,9 +451,9 @@ RSpec.describe GoFish::Game, type: :model do
 
     context 'when there is a tie' do
       before do
-        player1.books = [Book.new('8'), Book.new('5'), Book.new('2')]
-        player2.books = [Book.new('5'), Book.new('3'), Book.new('4')]
-        player3.books = [Book.new('A')]
+        player1.books = [GoFish::Book.new('8'), GoFish::Book.new('5'), GoFish::Book.new('2')]
+        player2.books = [GoFish::Book.new('5'), GoFish::Book.new('3'), GoFish::Book.new('4')]
+        player3.books = [GoFish::Book.new('A')]
       end
 
       it 'returns user with most book and highest value book' do
