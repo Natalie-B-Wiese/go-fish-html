@@ -38,9 +38,9 @@ div.panel.panel--padded.game-view__game-board
 
 	.panel__content.op-stack.flex-grow-1.gap-none
 		.feed-content.op-stack.gap-xs.flex-grow-1
-			/ - game.feed.each do |turn_action|
-				/ == slim :'_feed_bubble', locals: { turn_action: turn_action }
-
+			- unless game.go_fish.nil?
+				- game.go_fish.feed.each do |turn_action|
+					= render 'feed_bubble', turn_action: turn_action
 		- unless my_player.nil?
 			= render 'request_card_form', game: game, is_my_turn: is_my_turn, my_ranks: my_player.card_ranks , opponents: opponents
 

@@ -72,7 +72,7 @@ module GoFish
     end
 
     def self.from_json(json)
-      json_cards=json["cards_received_opponent"].map { |card_json| Card.from_json(card_json) }
+      json_cards= json["cards_received_opponent"].nil? ? [] : json["cards_received_opponent"].map { |card_json| Card.from_json(card_json) }
 
       
       self.new(current_user_id:json["current_user_id"], opponent_user_id: json["opponent_user_id"],

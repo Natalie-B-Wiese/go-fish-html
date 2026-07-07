@@ -186,32 +186,40 @@ RSpec.describe 'Games', type: :system do
   end
 
   context 'show and start game flow' do
-    let(:game_name) {"Eddie's Game"}
-    let(:game) {Game.find_by(name: game_name)}
+    let(:unfull_game_name) {"Eddie's Game"}
+    let(:unfull_game) {Game.find_by(name: unfull_game_name)}
 
     let(:full_game_name) {"Penelope's Game"}
     let(:full_game) {Game.find_by(name: full_game_name)}
 
     before do
-      create :game, :with_users, name: game_name, player_count: 3, users: [user1, user2]
+      create :game, :with_users, name: unfull_game_name, player_count: 3, users: [user1, user2]
       create :game, :with_users, name: full_game_name, player_count: 3, users: [user1, user2, user3]
-      visit show_game_path(game.id)
     end
 
     it 'shows the game name' do
-      expect(page).to have_content game_name
+      visit show_game_path(unfull_game.id)
+      expect(page).to have_content unfull_game_name
+
+      visit show_game_path(full_game.id)
+      expect(page).to have_content full_game_name
     end
     
     it 'shows only the players in that game' do
+      visit show_game_path(unfull_game.id)
+
       expect(page).to have_content user1.name
       expect(page).to have_content user2.name
-
       expect(page).to_not have_content user3.name
     end
 
     context 'before game is full' do
+      before do
+        visit show_game_path(unfull_game.id)
+      end
+
       it 'game is not started' do
-        expect(game).to_not be_started
+        expect(unfull_game).to_not be_started
       end
 
       it 'shows waiting message' do
@@ -327,16 +335,17 @@ RSpec.describe 'Games', type: :system do
           expect(page).to have_button('Play', disabled: true)
         end
 
-        xcontext 'when current player clicks on Play button' do
+        context 'when current player clicks on play button' do
           before do
             page.click_on 'Play'
+            full_game.reload
           end
 
           it 'stays on current game show page' do
             expect(page).to have_current_path show_game_path(full_game.id)
           end
 
-          it 'preforms the move' do
+          xit 'preforms the move' do
             page.within '.game-view__hand' do
               expect(page.find_all('.playing-card').count).to_not eq GoFish::Game::SMALL_GAME_CARDS
             end
@@ -347,13 +356,13 @@ RSpec.describe 'Games', type: :system do
               expect(page.find_all('.feed-bubble').count).to eq 3
             end
           end
-        end
 
+        end
+        
       end
     end
   end
 
-  
   
   context 'games page' do
     let!(:game1) {create :completed_game, :with_users_and_winner, name: 'Finished Game', users: [user1, user2], user_won: user2}

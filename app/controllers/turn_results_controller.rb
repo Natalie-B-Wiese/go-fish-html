@@ -3,15 +3,12 @@ class TurnResultsController < ApplicationController
     game_id=turn_result_params[:game_id]
     game=Game.find(game_id)
 
-    
+    game.go_fish.play_turn(current_user_id: Current.user.id, opponent_user_id: turn_result_params[:player],
+                          rank_requested: turn_result_params[:rank])
+    game.save!
 
-    # result=game.go_fish.play_turn(rank: params[turn_result: [:rank]], turn_result: [opponent: params[:player]])
-
-    # turn_result=GoFish::TurnResult.new(game_params)
-
-    # if @game.save && Player.create(user: Current.user, game: @game)  
-    #   redirect_to games_path
-    # end
+    # TODO: only redirect if successful and user can view the game?
+    redirect_to show_game_path(game_id)
 
   end
 
