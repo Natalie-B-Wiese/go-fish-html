@@ -73,11 +73,11 @@ module GoFish
 
     def self.from_json(json)
       json_cards= json["cards_received_opponent"].nil? ? [] : json["cards_received_opponent"].map { |card_json| Card.from_json(card_json) }
-
+      json_deck_card=json["card_received_deck"].nil? ? nil : Card.from_json(json["card_received_deck"])
       
       self.new(current_user_id:json["current_user_id"], opponent_user_id: json["opponent_user_id"],
               rank_requested: json["rank_requested"], cards_received_opponent: json_cards,
-              card_received_deck: Card.from_json(json["card_received_deck"]),
+              card_received_deck: json_deck_card,
               was_book_made: json["was_book_made"])
     end
 
