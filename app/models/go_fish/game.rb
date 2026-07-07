@@ -3,11 +3,12 @@ module GoFish
     SMALL_GAME_CARDS = 7
     BIG_GAME_CARDS = 5
 
-    attr_reader :players, :deck
+    attr_reader :players, :deck, :current_player_index
 
-    def initialize(players, deck: Deck.new)
+    def initialize(players, deck: Deck.new, current_player_index: 0)
       @players=players
       @deck = deck
+      @current_player_index=current_player_index
     end
 
     def deal!
@@ -22,13 +23,9 @@ module GoFish
     def as_json
       {
         players: players.map(&:as_json),
-        deck: deck.as_json
+        deck: deck.as_json,
+        current_player_index: current_player_index
       }
-      # {
-      # players: players.map(&:as_json),
-      # current_player_index: @index,
-      # deck: deck.as_json
-      # }
     end
 
     def ==(other)
@@ -40,7 +37,7 @@ module GoFish
       json_players=json["players"].map { |player_json| GoFish::Player.from_json(player_json) }
       json_deck=Deck.from_json(json["deck"])
 
-      self.new(json_players, deck: json_deck)
+      self.new(json_players, deck: json_deck, current_player_index: json["current_player_index"])
     end
 
     def self.load(json)

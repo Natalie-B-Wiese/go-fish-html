@@ -2,6 +2,8 @@
 - users_in_game=game.users
 - my_user=Current.user
 - my_player=game.find_go_fish_player_by_user_id(my_user.id)
+- current_go_fish_user = game.current_go_fish_user
+- is_my_turn=current_go_fish_user==my_user
 
 div.panel.panel--padded.game-view__game-board
 	header.panel__header.gap-xs
@@ -23,6 +25,27 @@ div.panel.panel--padded.game-view__game-board
 			- users_in_game.each do |user|
 				p 
 					| #{user.name}
+
+
+.game-view__game-feed.panel.panel--padded.panel--primary
+	header.panel__header.op-split
+		h2 Game Feed
+		- if is_my_turn
+			.badge.badge--primary Your Turn
+		- else
+			.badge.badge--primary #{current_go_fish_user.name}'s Turn
+
+	/ .panel__content.op-stack.flex-grow-1.gap-none
+		/ .feed-content.op-stack.gap-xs.flex-grow-1
+			/ - game.feed.each do |turn_action|
+				/ == slim :'_feed_bubble', locals: { turn_action: turn_action }
+
+		/ - if my_player.out_of_cards?
+			/ == slim :'_take_deck_form', locals: { is_my_turn: is_my_turn}
+		/ - else
+			/ == slim :'_request_card_form', locals: { is_my_turn: is_my_turn, my_player: my_player, opponents: opponents}
+
+
 
 
 div.game-view__hand.panel.panel--secondary

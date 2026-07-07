@@ -17,6 +17,11 @@ class Game < ApplicationRecord
     go_fish.players.find{|player| player.user_id==user_id}
   end
 
+  def current_go_fish_user
+    index=go_fish.nil? ? 0 : go_fish.current_player_index
+    users[index]
+  end
+
   def started?
     !!(!started_at.nil?)
   end

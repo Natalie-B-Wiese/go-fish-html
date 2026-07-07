@@ -272,80 +272,62 @@ RSpec.describe 'Games', type: :system do
           expect(player2_card_count).to eq GoFish::Game::SMALL_GAME_CARDS
           expect(player3_card_count).to eq GoFish::Game::SMALL_GAME_CARDS
         end
+
+        it 'shows whose turn it is' do
+          expect(page).to have_content('Your Turn')
+
+          sign_out
+          sign_in_as(user2)
+          visit show_game_path(full_game.id)
+          expect(page).to have_content("#{user1.name}'s Turn")
+        end
+
+        xit 'does not have any feed bubbles in the feed' do
+          within '.feed-content' do
+            expect(find_all('.feed-bubble').count).to eq 0
+          end
+        end
+
+        xit 'has correct player dropdown options' do
+          dropdown_options1 = page.find_field('Player').all('option').map(&:text)
+          expect(dropdown_options1).to eq [user2.name, user3.name]
+
+          sign_out
+          sign_in_as(user2)
+          visit show_game_path(full_game.id)
+
+          dropdown_options2 = page.find_field('Player').all('option').map(&:text)
+          expect(dropdown_options2).to eq [user1.name, user3.name]
+        end
+
+        xit 'has correct rank dropdown options' do
+          p1_card_ranks=full_game.go_fish.players[0].cards.map(&:rank).uniq
+          dropdown_options1 = page.find_field('Rank').all('option').map(&:text)
+          expect(dropdown_options1).to match_array(p1_card_ranks)
+
+          sign_out
+          sign_in_as(user2)
+          visit show_game_path(full_game.id)
+          p2_card_ranks=full_game.go_fish.players[1].cards.map(&:rank).uniq
+          dropdown_options2 = page.find_field('Rank').all('option').map(&:text)
+          expect(dropdown_options2).to match_array(p2_card_ranks)
+        end
+
+        xit 'enables Play button only for current player' do
+          expect(page).to have_button('Play', disabled: false)
+
+          sign_out
+          sign_in_as(user2)
+          visit show_game_path(full_game.id)
+          expect(page).to have_button('Play', disabled: true)
+
+          sign_out
+          sign_in_as(user3)
+          visit show_game_path(full_game.id)
+          expect(page).to have_button('Play', disabled: true)
+        end
       end
-
-      
-
-      # it 'shows whose turn it is' do
-      #   expect(session1).to have_content('Your Turn')
-      #   expect(session2).to have_content("Player 1's Turn")
-      #   expect(session3).to have_content("Player 1's Turn")
-      # end
-
-      # it 'does not have any feed bubbles in the feed' do
-      #   session1.within '.feed-content' do
-      #     expect(session1.find_all('.feed-bubble').count).to eq 0
-      #   end
-      # end
-
-      # it 'has correct player dropdown options' do
-      #   dropdown_options1 = session1.find_field('Player').all('option').map(&:text)
-      #   expect(dropdown_options1).to eq ['Player 2', 'Player 3']
-
-      #   dropdown_options2 = session2.find_field('Player').all('option').map(&:text)
-      #   expect(dropdown_options2).to eq ['Player 1', 'Player 3']
-
-      #   dropdown_options3 = session3.find_field('Player').all('option').map(&:text)
-      #   expect(dropdown_options3).to eq ['Player 1', 'Player 2']
-      # end
-
-      # it 'has correct rank dropdown options' do
-      #   game.players[0].cards = [Card.new('2', 'Spades'), Card.new('5', 'Hearts')]
-      #   game.players[1].cards = [Card.new('3', 'Spades'), Card.new('6', 'Hearts'), Card.new('8', 'Spades')]
-      #   session1.visit '/'
-      #   session2.visit '/'
-
-      #   dropdown_options1 = session1.find_field('Rank').all('option').map(&:text)
-      #   expect(dropdown_options1).to eq %w[2 5]
-
-      #   dropdown_options2 = session2.find_field('Rank').all('option').map(&:text)
-      #   expect(dropdown_options2).to eq %w[3 6 8]
-      # end
-
-      # it 'sorts the ranks in rank dropdown' do
-      #   game.players[0].cards = [Card.new('5', 'Hearts'), Card.new('A', 'Spades'),
-      #                           Card.new('2', 'Spades'), Card.new('8', 'Spades')]
-      #   session1.visit '/'
-
-      #   dropdown_options1 = session1.find_field('Rank').all('option').map(&:text)
-      #   expect(dropdown_options1).to eq %w[2 5 8 A]
-      # end
-
-      # it 'does not duplicate ranks in dropdown' do
-      #   game = Server.game
-      #   game.players[0].cards = [Card.new('5', 'Hearts'), Card.new('2', 'Spades'),
-      #                           Card.new('5', 'Clubs'), Card.new('5', 'Spades')]
-      #   session1.visit '/'
-
-      #   dropdown_options1 = session1.find_field('Rank').all('option').map(&:text)
-      #   expect(dropdown_options1).to eq %w[2 5]
-      # end
-
-      # it 'shows how many cards each player has in accordion' do
-      #   expect(session1).to have_content("Cards: #{Game::SMALL_GAME_CARDS}")
-      #   expect(session2).to have_content("Cards: #{Game::SMALL_GAME_CARDS}")
-      #   expect(session3).to have_content("Cards: #{Game::SMALL_GAME_CARDS}")
-      # end
-
-      # it 'enables request button only for current player' do
-      #   expect(session1).to have_button('Request', disabled: false)
-      #   expect(session2).to have_button('Request', disabled: true)
-      #   expect(session3).to have_button('Request', disabled: true)
-      # end
-
-
     end
-
   end
 
   context 'games page' do

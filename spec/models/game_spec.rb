@@ -52,7 +52,8 @@ RSpec.describe Game, type: :model do
   describe 'serialization round trip ' do
     it 'can dump and restore data' do
       players=[GoFish::Player.new(1), GoFish::Player.new(2)]
-      original = GoFish::Game.new(players)
+      current_player_index=1
+      original = GoFish::Game.new(players, current_player_index: current_player_index)
       original.deal!
       json = GoFish::Game.dump(original)
       
