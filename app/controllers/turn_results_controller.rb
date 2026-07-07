@@ -3,8 +3,7 @@ class TurnResultsController < ApplicationController
     game_id=turn_result_params[:game_id]
     game=Game.find(game_id)
 
-    game.go_fish.play_turn(current_user_id: Current.user.id, opponent_user_id: turn_result_params[:player],
-                          rank_requested: turn_result_params[:rank])
+    game.go_fish.play_turn(opponent_user_id: Integer(turn_result_params[:player]), rank_requested: turn_result_params[:rank])
     game.save!
 
     # TODO: only redirect if successful and user can view the game?

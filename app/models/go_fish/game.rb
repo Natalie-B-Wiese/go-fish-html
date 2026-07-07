@@ -58,11 +58,46 @@ module GoFish
       obj.as_json
     end 
 
-    def play_turn(current_user_id:, opponent_user_id:, rank_requested: )
-      feed.push(TurnResult.new(current_user_id: Current.user.id, opponent_user_id: opponent_user_id, rank_requested: rank_requested))
+    def play_turn(opponent_user_id:, rank_requested: )
+      turn_result = TurnResult.new(current_user_id: current_user_id, opponent_user_id: opponent_user_id, rank_requested: rank_requested)
+      preform_move(turn_result)
+      # try_make_book(turn_result) if turn_result.rank_received
+
+      switch_turn unless turn_result.go_again?
+
+      feed.push(turn_result)
+
+      turn_result
+    end
+
+    def current_go_fish_player
+      player_from_user_id(current_user_id)
+    end
+
+    def request_deck_card(turn_result = TurnResult.new(current_user_id: current_user_id))
+      unless deck.empty?
+        card_taken = deck.take_top_card
+        turn_result.card_received_deck = card_taken
+        current_go_fish_player.add_card(card_taken)
+      end
+
+      turn_result
     end
 
     private
+    
+    def switch_turn
+      self.current_player_index += 1
+      self.current_player_index = 0 if current_player_index >= players.length
+    end
+    
+    def current_user_id
+      players[current_player_index].user_id
+    end
+
+    def player_from_user_id(user_id)
+      players.find{|player| player.user_id==user_id}
+    end
 
     def deal_cards_to_players(num_cards_to_deal)
       num_cards_to_deal.times do
@@ -71,6 +106,19 @@ module GoFish
         end
       end
     end
+
+    def preform_move(turn_result)
+      opponent=player_from_user_id(turn_result.opponent_user_id)
+
+      cards_taken_from_opponent = opponent.take_cards_with_rank(turn_result.rank_requested)
+
+      if cards_taken_from_opponent.empty?
+        request_deck_card(turn_result)
+      else
+        turn_result.cards_received_opponent = cards_taken_from_opponent
+        current_go_fish_player.add_cards(cards_taken_from_opponent)
+      end
+    end    
 
   end
 end

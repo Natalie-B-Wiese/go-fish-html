@@ -345,7 +345,7 @@ RSpec.describe 'Games', type: :system do
             expect(page).to have_current_path show_game_path(full_game.id)
           end
 
-          xit 'preforms the move' do
+          it 'preforms the move' do
             page.within '.game-view__hand' do
               expect(page.find_all('.playing-card').count).to_not eq GoFish::Game::SMALL_GAME_CARDS
             end

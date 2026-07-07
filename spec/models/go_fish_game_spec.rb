@@ -1,10 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe GoFish::Game, type: :model do
-  let!(:player1) { GoFish::Player.new(1) }
-  let!(:player2) { GoFish::Player.new(2) }
-  let!(:player3) { GoFish::Player.new(3) }
-  let!(:player4) { GoFish::Player.new(4) }
+  let!(:user1) {create :user1}
+  let!(:user2) {create :user2}
+  let!(:user3) {create :user3}
+  let!(:user4) {create :user4}
+
+  let!(:player1) { GoFish::Player.new(user1.id) }
+  let!(:player2) { GoFish::Player.new(user2.id) }
+  let!(:player3) { GoFish::Player.new(user3.id) }
+  let!(:player4) { GoFish::Player.new(user4.id) }
 
   describe '#deal!' do
     context 'with 2 or 3 players' do
@@ -45,8 +50,8 @@ RSpec.describe GoFish::Game, type: :model do
     end
   end
 
-  xdescribe '#play_turn' do
-    let(:game) { Game.new([player1, player2, player3]) }
+  describe '#play_turn' do
+    let!(:game) { described_class.new([player1, player2, player3], current_player_index: 0) }
 
     context 'when opponent has that card' do
       before do
@@ -59,15 +64,15 @@ RSpec.describe GoFish::Game, type: :model do
         let(:opponent) { player3 }
         let(:taken_card) { Card.new(rank, 'Diamonds') }
         it 'takes from opponent and gives to player' do
-          game.play_turn(rank: rank, opponent: opponent)
+          game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
           expect(player1.cards).to include taken_card
           expect(opponent.cards).to_not include taken_card
         end
 
         it 'returns the correct turn result' do
-          result = game.play_turn(rank: rank, opponent: opponent)
-          expect(result.current_player).to eq player1
-          expect(result.opponent_player).to eq opponent
+          result = game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+          expect(result.current_user_id).to eq player1.user_id
+          expect(result.opponent_user_id).to eq opponent.user_id
           expect(result.rank_requested).to eq rank
           expect(result.cards_received_opponent).to eq [taken_card]
           expect(result.card_received_deck).to be_nil
@@ -76,8 +81,8 @@ RSpec.describe GoFish::Game, type: :model do
         end
 
         it 'does not switch turns' do
-          game.play_turn(rank: rank, opponent: opponent)
-          expect(game.current_player).to eq player1
+          result = game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+          expect(game.current_player_index).to eq 0
         end
       end
 
@@ -93,7 +98,7 @@ RSpec.describe GoFish::Game, type: :model do
         let!(:taken_card2) { opponent.cards[1] }
 
         it 'takes from opponent and gives to player' do
-          game.play_turn(rank: rank, opponent: opponent)
+          game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
           expect(player1.cards).to include taken_card1
           expect(player1.cards).to include taken_card2
 
@@ -102,9 +107,9 @@ RSpec.describe GoFish::Game, type: :model do
         end
 
         it 'returns the correct turn result' do
-          result = game.play_turn(rank: rank, opponent: opponent)
-          expect(result.current_player).to eq player1
-          expect(result.opponent_player).to eq opponent
+          result = game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+          expect(result.current_user_id).to eq player1.user_id
+          expect(result.opponent_user_id).to eq opponent.user_id
           expect(result.rank_requested).to eq rank
           expect(result.cards_received_opponent).to eq [taken_card1, taken_card2]
           expect(result.card_received_deck).to be_nil
@@ -113,12 +118,12 @@ RSpec.describe GoFish::Game, type: :model do
         end
 
         it 'does not switch turns' do
-          game.play_turn(rank: rank, opponent: opponent)
-          expect(game.current_player).to eq player1
+          game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+          expect(game.current_player_index).to eq 0
         end
       end
 
-      context 'when player can make a book' do
+      xcontext 'when player can make a book' do
         let(:rank) { 'A' }
 
         before do
@@ -153,8 +158,8 @@ RSpec.describe GoFish::Game, type: :model do
 
         it 'returns the correct turn result' do
           result = game.play_turn(rank: rank, opponent: opponent)
-          expect(result.current_player).to eq player1
-          expect(result.opponent_player).to eq opponent
+          expect(result.current_user_id).to eq player1.user_id
+          expect(result.opponent_user_id).to eq opponent.user_id
           expect(result.rank_requested).to eq rank
           expect(result.cards_received_opponent).to eq [card3, card4]
           expect(result.card_received_deck).to be_nil
@@ -164,7 +169,7 @@ RSpec.describe GoFish::Game, type: :model do
 
         it 'does not switch turns' do
           game.play_turn(rank: rank, opponent: opponent)
-          expect(game.current_player).to eq player1
+          expect(game.current_go_fish_player).to eq player1
         end
       end
     end
@@ -186,15 +191,16 @@ RSpec.describe GoFish::Game, type: :model do
         end
 
         it 'takes from top of deck and gives to player' do
-          game.play_turn(rank: rank, opponent: opponent)
+          game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
           expect(player1.cards).to include taken_card
           expect(game.deck.cards).to_not include taken_card
         end
 
         it 'returns the correct turn result' do
-          result = game.play_turn(rank: rank, opponent: opponent)
-          expect(result.current_player).to eq player1
-          expect(result.opponent_player).to eq opponent
+          result = game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+          
+          expect(result.current_user_id).to eq player1.user_id
+          expect(result.opponent_user_id).to eq opponent.user_id
           expect(result.rank_requested).to eq rank
           expect(result.cards_received_opponent).to be_empty
           expect(result.card_received_deck).to eq taken_card
@@ -203,12 +209,12 @@ RSpec.describe GoFish::Game, type: :model do
         end
 
         it 'does not switch turns' do
-          game.play_turn(rank: rank, opponent: opponent)
-          expect(game.current_player).to eq player1
+          game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+          expect(game.current_go_fish_player).to eq player1
         end
       end
 
-      context 'when player can make a book' do
+      xcontext 'when player can make a book' do
         let(:rank) { 'A' }
 
         before do
@@ -235,7 +241,7 @@ RSpec.describe GoFish::Game, type: :model do
 
         it 'does not switch turns' do
           game.play_turn(rank: rank, opponent: opponent)
-          expect(game.current_player).to eq player1
+          expect(game.current_go_fish_player).to eq player1
         end
       end
     end
@@ -258,15 +264,15 @@ RSpec.describe GoFish::Game, type: :model do
         end
 
         it 'takes from top of deck and gives to player' do
-          game.play_turn(rank: rank, opponent: opponent)
+          game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
           expect(player1.cards).to include taken_card
           expect(game.deck.cards).to_not include taken_card
         end
 
         it 'returns the correct turn result' do
-          result = game.play_turn(rank: rank, opponent: opponent)
-          expect(result.current_player).to eq player1
-          expect(result.opponent_player).to eq opponent
+          result = game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+          expect(result.current_user_id).to eq player1.user_id
+          expect(result.opponent_user_id).to eq opponent.user_id
           expect(result.rank_requested).to eq rank
           expect(result.cards_received_opponent).to be_empty
           expect(result.card_received_deck).to eq taken_card
@@ -275,12 +281,12 @@ RSpec.describe GoFish::Game, type: :model do
         end
 
         it 'switches turns' do
-          game.play_turn(rank: rank, opponent: opponent)
-          expect(game.current_player).to eq player2
+          game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+          expect(game.current_go_fish_player).to eq player2
         end
       end
 
-      context 'when player can make a book' do
+      xcontext 'when player can make a book' do
         let(:rank) { 'A' }
         let(:taken_card) { Card.new(other_rank, 'Clubs') }
 
@@ -291,15 +297,15 @@ RSpec.describe GoFish::Game, type: :model do
         end
 
         it 'makes a book' do
-          game.play_turn(rank: rank, opponent: opponent)
+          game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
           expect(player1.book_count).to eq 1
           expect(opponent.book_count).to eq 0
         end
 
         it 'returns the correct turn result' do
-          result = game.play_turn(rank: rank, opponent: opponent)
-          expect(result.current_player).to eq player1
-          expect(result.opponent_player).to eq opponent
+          result = game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+          expect(result.current_user_id).to eq player1.user_id
+          expect(result.opponent_user_id).to eq opponent.user_id
           expect(result.rank_requested).to eq rank
           expect(result.cards_received_opponent).to be_empty
           expect(result.card_received_deck).to eq taken_card
@@ -308,8 +314,8 @@ RSpec.describe GoFish::Game, type: :model do
         end
 
         it 'switches turns' do
-          game.play_turn(rank: rank, opponent: opponent)
-          expect(game.current_player).to_not eq player1
+          game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+          expect(game.current_go_fish_player).to_not eq player1
         end
       end
     end
@@ -324,9 +330,9 @@ RSpec.describe GoFish::Game, type: :model do
         game.deck.cards = []
       end
       it 'returns the correct turn result' do
-        result = game.play_turn(rank: rank, opponent: opponent)
-        expect(result.current_player).to eq player1
-        expect(result.opponent_player).to eq opponent
+        result = game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+        expect(result.current_user_id).to eq player1.user_id
+        expect(result.opponent_user_id).to eq opponent.user_id
         expect(result.rank_requested).to eq rank
         expect(result.cards_received_opponent).to be_empty
         expect(result.card_received_deck).to be_nil
@@ -335,13 +341,13 @@ RSpec.describe GoFish::Game, type: :model do
       end
 
       it 'switches turns' do
-        game.play_turn(rank: rank, opponent: opponent)
-        expect(game.current_player).to eq player2
+        game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+        expect(game.current_go_fish_player).to eq player2
       end
     end
   end
 
-  xdescribe '#request_deck_card' do
+  describe '#request_deck_card' do
     let(:players) { [player1, player2] }
 
     let(:game) { described_class.new(players) }
@@ -359,8 +365,8 @@ RSpec.describe GoFish::Game, type: :model do
 
       it 'returns the correct turn result' do
         result = game.request_deck_card
-        expect(result.current_player).to eq player1
-        expect(result.opponent_player).to be_nil
+        expect(result.current_user_id).to eq player1.user_id
+        expect(result.opponent_user_id).to be_nil
         expect(result.rank_requested).to be_nil
         expect(result.cards_received_opponent).to be_empty
         expect(result.card_received_deck).to be_nil
@@ -387,8 +393,8 @@ RSpec.describe GoFish::Game, type: :model do
 
       it 'returns the correct turn result' do
         result = game.request_deck_card
-        expect(result.current_player).to eq player1
-        expect(result.opponent_player).to be_nil
+        expect(result.current_user_id).to eq player1.user_id
+        expect(result.opponent_user_id).to be_nil
         expect(result.rank_requested).to be_nil
         expect(result.cards_received_opponent).to be_empty
         expect(result.card_received_deck).to eq card_taken
@@ -416,8 +422,8 @@ RSpec.describe GoFish::Game, type: :model do
 
       it 'returns the correct turn result' do
         result = game.request_deck_card
-        expect(result.current_player).to eq player2
-        expect(result.opponent_player).to be_nil
+        expect(result.current_user_id).to eq player2.user_id
+        expect(result.opponent_user_id).to be_nil
         expect(result.rank_requested).to be_nil
         expect(result.cards_received_opponent).to be_empty
         expect(result.card_received_deck).to eq card_taken

@@ -77,6 +77,7 @@ module GoFish
       
       self.new(current_user_id:json["current_user_id"], opponent_user_id: json["opponent_user_id"],
               rank_requested: json["rank_requested"], cards_received_opponent: json_cards,
+              card_received_deck: Card.from_json(json["card_received_deck"]),
               was_book_made: json["was_book_made"])
     end
 
