@@ -132,7 +132,7 @@ RSpec.describe GoFish::Player, type: :model do
     end
   end
 
-  xdescribe '#try_make_book' do
+  describe '#try_make_book' do
     let(:possible_rank) { 'A' }
     let(:impossible_rank) { '5' }
 
@@ -148,12 +148,13 @@ RSpec.describe GoFish::Player, type: :model do
     end
 
     context 'when book possible' do
-      it 'removes those cards from player' do
+      it 'removes only those cards from player' do
         card_count_before = player.cards.length
 
         player.try_make_book(possible_rank)
-        expect(player.cards.length).to eq card_count_before - Book::SIZE
-        expect(player.includes_card_with_rank?(possible_rank)).to be false
+        expect(player.cards.length).to eq card_count_before - GoFish::Book::SIZE
+        expect(player.cards.map(&:rank)).to_not include possible_rank
+        expect(player.cards.map(&:rank)).to include impossible_rank
       end
 
       it 'adds the book to books array' do
@@ -180,7 +181,8 @@ RSpec.describe GoFish::Player, type: :model do
 
         player.try_make_book(impossible_rank)
         expect(player.cards.length).to eq card_count_before
-        expect(player.includes_card_with_rank?(possible_rank)).to be true
+        expect(player.cards.map(&:rank)).to include possible_rank
+        expect(player.cards.map(&:rank)).to include impossible_rank
       end
 
       it 'does not add a book to array' do

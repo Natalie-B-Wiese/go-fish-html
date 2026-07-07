@@ -214,7 +214,7 @@ RSpec.describe GoFish::Game, type: :model do
         end
       end
 
-      xcontext 'when player can make a book' do
+      context 'when player can make a book' do
         let(:rank) { 'A' }
 
         before do
@@ -223,15 +223,15 @@ RSpec.describe GoFish::Game, type: :model do
         end
 
         it 'makes a book' do
-          game.play_turn(rank: rank, opponent: opponent)
+          game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
           expect(player1.book_count).to eq 1
           expect(opponent.book_count).to eq 0
         end
 
         it 'returns the correct turn result' do
-          result = game.play_turn(rank: rank, opponent: opponent)
-          expect(result.current_player).to eq player1
-          expect(result.opponent_player).to eq opponent
+          result = game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+          expect(result.current_user_id).to eq player1.user_id
+          expect(result.opponent_user_id).to eq opponent.user_id
           expect(result.rank_requested).to eq rank
           expect(result.cards_received_opponent).to be_empty
           expect(result.card_received_deck).to eq taken_card
@@ -240,7 +240,7 @@ RSpec.describe GoFish::Game, type: :model do
         end
 
         it 'does not switch turns' do
-          game.play_turn(rank: rank, opponent: opponent)
+          game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
           expect(game.current_go_fish_player).to eq player1
         end
       end
@@ -286,7 +286,7 @@ RSpec.describe GoFish::Game, type: :model do
         end
       end
 
-      xcontext 'when player can make a book' do
+      context 'when player can make a book' do
         let(:rank) { 'A' }
         let(:taken_card) { Card.new(other_rank, 'Clubs') }
 

@@ -91,6 +91,16 @@ module GoFish
       was_book_made==other.was_book_made)
     end
 
+    def rank_received
+      if went_fish? && card_received_deck
+        card_received_deck.rank
+      elsif !cards_received_opponent.empty?
+        cards_received_opponent.first.rank
+      else
+        nil
+      end
+    end
+
     private
     def current_user_name
       User.find(current_user_id).name
@@ -127,14 +137,6 @@ module GoFish
       "#{current_user_name} #{TAKE_DECK} #{card_str} from the deck. "
     end
 
-    def rank_received
-      if went_fish? && card_received_deck
-        card_received_deck.rank
-      elsif !cards_received_opponent.empty?
-        cards_received_opponent.first.rank
-      else
-        nil
-      end
-    end
+    
   end
 end

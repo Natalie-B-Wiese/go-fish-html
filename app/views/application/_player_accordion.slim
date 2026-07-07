@@ -17,7 +17,7 @@ details.accordion
 			div
 				| Books:#{' '}
 				span
-					/ strong #{player.book_count}
+					strong #{player.book_count}
 
 	div.accordion__content
 		div.flex.flex-row.flex-no-wrap.justify-between
@@ -25,5 +25,5 @@ details.accordion
 				- cards.each do |card|
 					= image_tag "cards/playing-card-back.jpg", class: "playing-card playing-card--sm"
 			div.flex.cards-stacked
-				/ - player.books.each do |book|
-				/ 	img.playing-card.playing-card--sm src="/images/cards/#{book.to_image_name}"
+				- player.books.each do |book|
+				 	img.playing-card.playing-card--sm src="/cards/#{book.to_image_name}"

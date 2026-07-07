@@ -61,7 +61,7 @@ module GoFish
     def play_turn(opponent_user_id:, rank_requested: )
       turn_result = TurnResult.new(current_user_id: current_user_id, opponent_user_id: opponent_user_id, rank_requested: rank_requested)
       preform_move(turn_result)
-      # try_make_book(turn_result) if turn_result.rank_received
+      try_make_book(turn_result) if turn_result.rank_received
 
       switch_turn unless turn_result.go_again?
 
@@ -85,7 +85,7 @@ module GoFish
     end
 
     private
-    
+
     def switch_turn
       self.current_player_index += 1
       self.current_player_index = 0 if current_player_index >= players.length
@@ -97,6 +97,11 @@ module GoFish
 
     def player_from_user_id(user_id)
       players.find{|player| player.user_id==user_id}
+    end
+
+    def try_make_book(turn_result)
+      book_made = current_go_fish_player.try_make_book(turn_result.rank_received)
+      turn_result.was_book_made = true if book_made
     end
 
     def deal_cards_to_players(num_cards_to_deal)
