@@ -4,6 +4,7 @@
 - my_player=game.find_go_fish_player_by_user_id(my_user.id)
 - current_go_fish_user = game.current_go_fish_user
 - is_my_turn=current_go_fish_user==my_user
+- opponents=users_in_game-[my_user]
 
 div.panel.panel--padded.game-view__game-board
 	header.panel__header.gap-xs
@@ -15,7 +16,7 @@ div.panel.panel--padded.game-view__game-board
 
 		- if game.full?
 			// make one of these for each player (excluding own player)
-			- (users_in_game-[my_user]).each do |opponent|
+			- opponents.each do |opponent|
 				div.players__hand.op-stack.gap-xs
 					= render 'player_accordion', user: opponent, player: game.find_go_fish_player_by_user_id(opponent.id)
 		- else 
@@ -35,14 +36,17 @@ div.panel.panel--padded.game-view__game-board
 		- else
 			.badge.badge--primary #{current_go_fish_user.name}'s Turn
 
-	/ .panel__content.op-stack.flex-grow-1.gap-none
-		/ .feed-content.op-stack.gap-xs.flex-grow-1
+	.panel__content.op-stack.flex-grow-1.gap-none
+		.feed-content.op-stack.gap-xs.flex-grow-1
 			/ - game.feed.each do |turn_action|
 				/ == slim :'_feed_bubble', locals: { turn_action: turn_action }
 
-		/ - if my_player.out_of_cards?
-			/ == slim :'_take_deck_form', locals: { is_my_turn: is_my_turn}
-		/ - else
+		- unless my_player.nil?
+			= render 'request_card_form', is_my_turn: is_my_turn, my_ranks: my_player.card_ranks , opponents: opponents
+
+		/- if my_player.out_of_cards?
+		/	= render 'take_deck_form', is_my_turn: is_my_turn
+		/- else
 			/ == slim :'_request_card_form', locals: { is_my_turn: is_my_turn, my_player: my_player, opponents: opponents}
 
 

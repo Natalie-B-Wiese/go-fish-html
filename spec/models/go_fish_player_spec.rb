@@ -23,6 +23,18 @@ RSpec.describe GoFish::Player, type: :model do
     end
   end
 
+  describe '#card_ranks' do
+    it 'returns an array of ranks' do
+      player.add_cards([Card.new('3', 'Spades'), Card.new('5', 'Hearts'), Card.new('A', 'Diamonds')])
+      expect(player.card_ranks).to eq ['3', '5', 'A']
+    end
+
+    it 'ignores duplicates' do
+      player.add_cards([Card.new('3', 'Spades'), Card.new('3', 'Hearts'), Card.new('5', 'Diamonds')])
+      expect(player.card_ranks).to eq ['3', '5']
+    end
+  end
+
   xdescribe '#take_cards_with_rank' do
     let(:card1) { Card.new('A', 'Diamonds') }
     let(:card2) { Card.new('2', 'Diamonds') }

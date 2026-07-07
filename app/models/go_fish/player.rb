@@ -35,5 +35,9 @@ module GoFish
       card_array.each { |card| add_card(card) }
     end
 
+    def card_ranks
+      cards.map(&:rank).uniq
+    end
+
   end
 end

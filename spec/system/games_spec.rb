@@ -282,13 +282,7 @@ RSpec.describe 'Games', type: :system do
           expect(page).to have_content("#{user1.name}'s Turn")
         end
 
-        xit 'does not have any feed bubbles in the feed' do
-          within '.feed-content' do
-            expect(find_all('.feed-bubble').count).to eq 0
-          end
-        end
-
-        xit 'has correct player dropdown options' do
+        it 'has correct player dropdown options' do
           dropdown_options1 = page.find_field('Player').all('option').map(&:text)
           expect(dropdown_options1).to eq [user2.name, user3.name]
 
@@ -300,20 +294,20 @@ RSpec.describe 'Games', type: :system do
           expect(dropdown_options2).to eq [user1.name, user3.name]
         end
 
-        xit 'has correct rank dropdown options' do
-          p1_card_ranks=full_game.go_fish.players[0].cards.map(&:rank).uniq
+        it 'has correct rank dropdown options' do
+          p1_card_ranks=full_game.go_fish.players[0].card_ranks
           dropdown_options1 = page.find_field('Rank').all('option').map(&:text)
           expect(dropdown_options1).to match_array(p1_card_ranks)
 
           sign_out
           sign_in_as(user2)
           visit show_game_path(full_game.id)
-          p2_card_ranks=full_game.go_fish.players[1].cards.map(&:rank).uniq
+          p2_card_ranks=full_game.go_fish.players[1].card_ranks
           dropdown_options2 = page.find_field('Rank').all('option').map(&:text)
           expect(dropdown_options2).to match_array(p2_card_ranks)
         end
 
-        xit 'enables Play button only for current player' do
+        it 'enables Play button only for current player' do
           expect(page).to have_button('Play', disabled: false)
 
           sign_out
@@ -330,6 +324,12 @@ RSpec.describe 'Games', type: :system do
     end
   end
 
+  xit 'does not have any feed bubbles in the feed' do
+    within '.feed-content' do
+      expect(find_all('.feed-bubble').count).to eq 0
+    end
+  end
+  
   context 'games page' do
     let!(:game1) {create :completed_game, :with_users_and_winner, name: 'Finished Game', users: [user1, user2], user_won: user2}
 
