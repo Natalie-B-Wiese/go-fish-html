@@ -42,7 +42,7 @@ div.panel.panel--padded.game-view__game-board
 				/ == slim :'_feed_bubble', locals: { turn_action: turn_action }
 
 		- unless my_player.nil?
-			= render 'request_card_form', is_my_turn: is_my_turn, my_ranks: my_player.card_ranks , opponents: opponents
+			= render 'request_card_form', game: game, is_my_turn: is_my_turn, my_ranks: my_player.card_ranks , opponents: opponents
 
 		/- if my_player.out_of_cards?
 		/	= render 'take_deck_form', is_my_turn: is_my_turn

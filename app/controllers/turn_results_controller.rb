@@ -1,9 +1,11 @@
 class TurnResultsController < ApplicationController
   def create
-    game_id=params[:game_id]
+    game_id=turn_result_params[:game_id]
     game=Game.find(game_id)
 
-    result=game.go_fish.play_turn(rank: params[:rank], opponent: params[:player])
+    
+
+    # result=game.go_fish.play_turn(rank: params[turn_result: [:rank]], turn_result: [opponent: params[:player]])
 
     # turn_result=GoFish::TurnResult.new(game_params)
 
