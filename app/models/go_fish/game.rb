@@ -3,7 +3,9 @@ module GoFish
     SMALL_GAME_CARDS = 7
     BIG_GAME_CARDS = 5
 
-    attr_reader :players, :deck, :current_player_index
+    attr_reader :players, :deck
+
+    attr_accessor :current_player_index
 
     def initialize(players, deck: Deck.new, current_player_index: 0)
       @players=players

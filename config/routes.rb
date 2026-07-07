@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   
   get "games/:id", to: 'games#show', as: "show_game"
   
+  resources :turn_results, only: [:create]
 
   root 'games#index'
 

@@ -2,22 +2,25 @@
 / opponents (an array of User objects)
 / my_ranks (an array of card ranks Player object)
 / is_my_turn (a boolean)
+/ game_id
 
-form.game-actions.op-stack.items-stretch.gap-sm action="/request-card" method="POST"
+= simple_form_for :turn_result, url: turn_results_path, html: { class: "game-actions op-stack items-stretch.gap-sm" } do |f|
 	.game-actions__options.op-split.items-stretch.gap-sm
-		.form-group.flex-grow-1
-			label.form-label[for="opponent_name"]
-				| Player
-			select#opponent_name.form-control.form-control--large name="opponent_name"
-				- opponents.each do |opponent|
-					option=opponent.name
-		.form-group.flex-grow-1
-			label.form-label[for="rank"]
-				| Card Rank
-			select#rank.form-control.form-control--large name="rank"
-				- my_ranks.each do |card_rank|
-					option #{card_rank}
+		= f.input :player,
+		as: :select, 
+		collection: opponents,
+		selected: opponents.first,
+		wrapper_html: { class: 'flex-grow-1'}
+
+		= f.input :rank,
+		as: :select, 
+		collection: my_ranks,
+		selected: my_ranks.first,
+		wrapper_html: { class: 'flex-grow-1'}
+
+		f.input :game_id, as: :hidden, input_html: { value: game_id }
+
 	- if is_my_turn
-		button.btn.btn--primary type="submit" Play
-	- else
-		button.btn.btn--primary type="submit" disabled="disabled" Play
+		= f.button :submit, 'Play'
+	- else 
+		= f.button :submit, 'Play', disabled: true

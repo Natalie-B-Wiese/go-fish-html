@@ -235,6 +235,12 @@ RSpec.describe 'Games', type: :system do
         expect(full_game.reload.started_at).to eq started_at
       end
 
+      it 'does not have any feed bubbles in the feed' do
+        within '.feed-content' do
+          expect(find_all('.feed-bubble').count).to eq 0
+        end
+      end
+
       it 'does not show waiting message' do
         expect(page).to_not have_content 'Waiting'
       end
@@ -320,15 +326,34 @@ RSpec.describe 'Games', type: :system do
           visit show_game_path(full_game.id)
           expect(page).to have_button('Play', disabled: true)
         end
+
+        xcontext 'when current player clicks on Play button' do
+          before do
+            page.click_on 'Play'
+          end
+
+          it 'stays on current game show page' do
+            expect(page).to have_current_path show_game_path(full_game.id)
+          end
+
+          it 'preforms the move' do
+            page.within '.game-view__hand' do
+              expect(page.find_all('.playing-card').count).to_not eq GoFish::Game::SMALL_GAME_CARDS
+            end
+          end
+
+          it 'posts 3 messages in the feed' do
+            page.within '.feed-content' do
+              expect(page.find_all('.feed-bubble').count).to eq 3
+            end
+          end
+        end
+
       end
     end
   end
 
-  xit 'does not have any feed bubbles in the feed' do
-    within '.feed-content' do
-      expect(find_all('.feed-bubble').count).to eq 0
-    end
-  end
+  
   
   context 'games page' do
     let!(:game1) {create :completed_game, :with_users_and_winner, name: 'Finished Game', users: [user1, user2], user_won: user2}

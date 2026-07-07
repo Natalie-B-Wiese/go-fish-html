@@ -39,5 +39,18 @@ module GoFish
       cards.map(&:rank).uniq
     end
 
+    def take_cards_with_rank(rank)
+      cards_taken = cards_with_rank(rank)
+      self.cards -= cards_taken
+      cards_taken
+    end
+
+    
+    private
+
+    def cards_with_rank(rank)
+      cards.select { |card| card.rank == rank }
+    end
+
   end
 end

@@ -35,7 +35,7 @@ RSpec.describe GoFish::Player, type: :model do
     end
   end
 
-  xdescribe '#take_cards_with_rank' do
+  describe '#take_cards_with_rank' do
     let(:card1) { Card.new('A', 'Diamonds') }
     let(:card2) { Card.new('2', 'Diamonds') }
     let(:card3) { Card.new('3', 'Diamonds') }

@@ -46,8 +46,7 @@ RSpec.describe GoFish::Game, type: :model do
   end
 
   xdescribe '#play_turn' do
-    let(:players) { [player1, player2, player3] }
-    let(:game) { Game.new(players) }
+    let(:game) { Game.new([player1, player2, player3]) }
 
     context 'when opponent has that card' do
       before do
