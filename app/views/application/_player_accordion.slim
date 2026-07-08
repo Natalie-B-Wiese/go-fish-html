@@ -26,4 +26,4 @@ details.accordion
 					= image_tag "cards/playing-card-back.jpg", class: "playing-card playing-card--sm"
 			div.flex.cards-stacked
 				- player.books.each do |book|
-				 	img.playing-card.playing-card--sm src="/cards/#{book.to_image_name}"
+					= image_tag "cards/#{book.to_image_name}", class: "playing-card playing-card--sm"

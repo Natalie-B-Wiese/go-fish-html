@@ -40,7 +40,7 @@ div.game-view__hand.panel.panel--secondary
 	div.panel__content
 		div.cards-stacked.flex.margin-top-md
 			- my_player.cards.each do |card|
-				img.playing-card.playing-card--lg.playing-card--hover src="/images/cards/#{card.to_image_name}"
+				= image_tag "cards/#{card.to_image_name}", class: "playing-card playing-card--lg playing-card--hover"
 
 div.game-view__books.panel.panel--secondary
 	header.panel__header
@@ -48,4 +48,4 @@ div.game-view__books.panel.panel--secondary
 	div.panel__content
 		div.cards-stacked.flex
 			- my_player.books.each do |book|
-				img.playing-card.playing-card--sm src="/images/cards/#{book.to_image_name}"
+				= image_tag "cards/#{book.to_image_name}", class: "playing-card playing-card--sm"
