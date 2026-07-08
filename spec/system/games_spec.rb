@@ -302,31 +302,6 @@ RSpec.describe 'Games', type: :system do
           expect(page).to have_content("#{user1.name}'s Turn")
         end
 
-        it 'has correct player dropdown options' do
-          dropdown_options1 = page.find_field('Player').all('option').map(&:text)
-          expect(dropdown_options1).to eq [user2.name, user3.name]
-
-          sign_out
-          sign_in_as(user2)
-          visit show_game_path(full_game.id)
-
-          dropdown_options2 = page.find_field('Player').all('option').map(&:text)
-          expect(dropdown_options2).to eq [user1.name, user3.name]
-        end
-
-        it 'has correct rank dropdown options' do
-          p1_card_ranks=full_game.go_fish.players[0].card_ranks
-          dropdown_options1 = page.find_field('Rank').all('option').map(&:text)
-          expect(dropdown_options1).to match_array(p1_card_ranks)
-
-          sign_out
-          sign_in_as(user2)
-          visit show_game_path(full_game.id)
-          p2_card_ranks=full_game.go_fish.players[1].card_ranks
-          dropdown_options2 = page.find_field('Rank').all('option').map(&:text)
-          expect(dropdown_options2).to match_array(p2_card_ranks)
-        end
-
         it 'enables Play button only for current player' do
           expect(page).to have_button('Play', disabled: false)
 
@@ -341,30 +316,140 @@ RSpec.describe 'Games', type: :system do
           expect(page).to have_button('Play', disabled: true)
         end
 
-        context 'when current player clicks on play button' do
-          before do
-            page.click_on 'Play'
-            full_game.reload
+        context 'when player has cards' do
+          it 'has correct player dropdown options' do
+            dropdown_options1 = page.find_field('Player').all('option').map(&:text)
+            expect(dropdown_options1).to eq [user2.name, user3.name]
+
+            sign_out
+            sign_in_as(user2)
+            visit show_game_path(full_game.id)
+
+            dropdown_options2 = page.find_field('Player').all('option').map(&:text)
+            expect(dropdown_options2).to eq [user1.name, user3.name]
           end
 
-          it 'stays on current game show page' do
-            expect(page).to have_current_path show_game_path(full_game.id)
+          it 'has correct rank dropdown options' do
+            p1_card_ranks=full_game.go_fish.players[0].card_ranks
+            dropdown_options1 = page.find_field('Rank').all('option').map(&:text)
+            expect(dropdown_options1).to match_array(p1_card_ranks)
+
+            sign_out
+            sign_in_as(user2)
+            visit show_game_path(full_game.id)
+            p2_card_ranks=full_game.go_fish.players[1].card_ranks
+            dropdown_options2 = page.find_field('Rank').all('option').map(&:text)
+            expect(dropdown_options2).to match_array(p2_card_ranks)
           end
 
-          it 'preforms the move' do
-            page.within '.game-view__hand' do
-              expect(page.find_all('.playing-card').count).to_not eq GoFish::Game::SMALL_GAME_CARDS
+          context 'when current player clicks on play button' do
+            before do
+              page.click_on 'Play'
+              full_game.reload
             end
-          end
 
-          it 'posts 3 messages in the feed' do
-            page.within '.feed-content' do
-              expect(page.find_all('.feed-bubble').count).to eq 3
+            it 'stays on current game show page' do
+              expect(page).to have_current_path show_game_path(full_game.id)
+            end
+
+            it 'preforms the move' do
+              page.within '.game-view__hand' do
+                expect(page.find_all('.playing-card').count).to_not eq GoFish::Game::SMALL_GAME_CARDS
+              end
+            end
+
+            it 'posts 3 messages in the feed' do
+              page.within '.feed-content' do
+                expect(page.find_all('.feed-bubble').count).to eq 3
+              end
             end
           end
 
         end
+
         
+
+        context 'when current player is out of cards' do
+          before do
+            full_game.go_fish.players.first.cards=[]
+            full_game.save!
+            full_game.reload
+            visit show_game_path(full_game.id)
+          end
+
+          it 'does not have dropdown for player' do
+            expect(page).to_not have_select('Player')
+          end
+
+          it 'does not have dropdown for rank' do
+            expect(page).to_not have_select('Rank')
+          end
+
+          context 'when current player clicks on play button and deck has cards' do
+            before do
+              page.click_on 'Play'
+              full_game.reload
+              visit show_game_path(full_game.id)
+            end
+
+            it 'stays on current game show page' do
+              expect(page).to have_current_path show_game_path(full_game.id)
+            end
+
+            it 'draws from the deck' do
+              page.within '.game-view__hand' do
+                expect(page.find_all('.playing-card').count).to_not eq GoFish::Game::SMALL_GAME_CARDS
+              end
+            end
+
+            it 'posts 2 messages in the feed' do
+              page.within '.feed-content' do
+                expect(page.find_all('.feed-bubble').count).to eq 2
+              end
+            end
+
+            it 'allows player to go again' do
+              expect(page).to have_button('Play', disabled: false)
+            end
+          end
+
+          context 'when current player clicks on play button and deck has no cards' do
+            before do
+              full_game.go_fish.deck.cards=[]
+              full_game.save!
+              full_game.reload
+              visit show_game_path(full_game.id)
+
+              page.click_on 'Play'
+              full_game.reload
+              visit show_game_path(full_game.id)
+            end
+
+            it 'stays on current game show page' do
+              expect(page).to have_current_path show_game_path(full_game.id)
+            end
+
+            it 'does not get a card' do
+              page.within '.game-view__hand' do
+                expect(page.find_all('.playing-card').count).to eq 0
+              end
+            end
+
+            it 'posts 2 messages in the feed' do
+              page.within '.feed-content' do
+                expect(page.find_all('.feed-bubble').count).to eq 2
+              end
+            end
+
+            it 'switches to next player' do
+              expect(page).to have_button('Play', disabled: true)
+              sign_out
+              sign_in_as(user2)
+              visit show_game_path(full_game.id)
+              expect(page).to have_button('Play', disabled: false)
+            end
+          end
+        end
       end
 
       context 'when game is over' do

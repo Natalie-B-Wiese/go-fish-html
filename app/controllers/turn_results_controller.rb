@@ -3,7 +3,10 @@ class TurnResultsController < ApplicationController
     game_id=turn_result_params[:game_id]
     game=Game.find(game_id)
 
-    game.go_fish.play_turn(opponent_user_id: Integer(turn_result_params[:player]), rank_requested: turn_result_params[:rank])
+    # opponent user id and rank requested is nil when player is out of cards and drawing from deck
+    opponent_user_id = turn_result_params[:player].nil? ? nil : Integer(turn_result_params[:player])
+
+    game.go_fish.play_turn(opponent_user_id: opponent_user_id, rank_requested: turn_result_params[:rank])
     game.save!
 
     # TODO: only redirect if successful and user can view the game?

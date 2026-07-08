@@ -59,7 +59,7 @@ module GoFish
       obj.as_json
     end 
 
-    def play_turn(opponent_user_id:, rank_requested: )
+    def play_turn(opponent_user_id: nil, rank_requested: nil)
       turn_result = TurnResult.new(current_user_id: current_user_id, opponent_user_id: opponent_user_id, rank_requested: rank_requested)
       preform_move(turn_result)
       try_make_book(turn_result) if turn_result.rank_received
@@ -75,15 +75,7 @@ module GoFish
       player_from_user_id(current_user_id)
     end
 
-    def request_deck_card(turn_result = TurnResult.new(current_user_id: current_user_id))
-      unless deck.empty?
-        card_taken = deck.take_top_card
-        turn_result.card_received_deck = card_taken
-        current_go_fish_player.add_card(card_taken)
-      end
-
-      turn_result
-    end
+    
 
     # the player currently in the lead
     def winning_player
@@ -99,6 +91,16 @@ module GoFish
     end
 
     private
+    def request_deck_card(turn_result = TurnResult.new(current_user_id: current_user_id))
+      unless deck.empty?
+        card_taken = deck.take_top_card
+        turn_result.card_received_deck = card_taken
+        current_go_fish_player.add_card(card_taken)
+      end
+
+      turn_result
+    end
+
     def total_book_count
       players.inject(0) { |sum, player| sum + player.book_count }
     end
@@ -142,6 +144,14 @@ module GoFish
     end
 
     def preform_move(turn_result)
+      if turn_result.opponent_user_id.nil? && turn_result.rank_requested.nil?
+        request_deck_card(turn_result)
+      else
+        preform_take_from_opponent_move(turn_result)
+      end
+    end  
+    
+    def preform_take_from_opponent_move(turn_result)
       opponent=player_from_user_id(turn_result.opponent_user_id)
 
       cards_taken_from_opponent = opponent.take_cards_with_rank(turn_result.rank_requested)
@@ -152,7 +162,7 @@ module GoFish
         turn_result.cards_received_opponent = cards_taken_from_opponent
         current_go_fish_player.add_cards(cards_taken_from_opponent)
       end
-    end    
+    end
 
   end
 end
