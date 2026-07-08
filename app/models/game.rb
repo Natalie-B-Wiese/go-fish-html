@@ -23,7 +23,11 @@ class Game < ApplicationRecord
   end
 
   def started?
-    !!(!started_at.nil?)
+    !started_at.nil?
+  end
+
+  def ended?
+    !ended_at.nil?
   end
 
   def full?
@@ -37,6 +41,11 @@ class Game < ApplicationRecord
     save!
   end
 
+  def end!
+    update!(ended_at: Time.zone.now, winner: players.find_by(user_id: go_fish.winning_player.user_id))
+    save!
+  end
+
   def num_joined_players
     players.count
   end
@@ -44,5 +53,9 @@ class Game < ApplicationRecord
   def finished?
     (!ended_at.nil?)
   end
+
+  def game_over?
+    go_fish.game_over?
+  end  
   
 end

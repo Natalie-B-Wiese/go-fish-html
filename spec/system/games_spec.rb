@@ -12,6 +12,12 @@ RSpec.describe 'Games', type: :system do
       return page.find_all(element_selector, visible: :all)
     end
   end
+
+  def add_books_to_player(player, num_books = 1)
+    num_books.times do
+      player.books += [GoFish::Book.new('4')]
+    end
+  end
   
   before do
     sign_in_as(user1)
@@ -360,6 +366,47 @@ RSpec.describe 'Games', type: :system do
         end
         
       end
+
+      context 'when game is over' do
+        let(:winning_player) {full_game.go_fish.players.first}
+        before do
+          # ensures game is started
+          full_game.reload
+          visit show_game_path(full_game.id)
+
+          # add the books
+          add_books_to_player(full_game.go_fish.players.first, GoFish::Game::BOOKS_TO_WIN)
+          full_game.save!
+
+          full_game.reload
+          visit show_game_path(full_game.id)
+          full_game.reload
+        end
+
+        it 'records the winner' do
+          expect(full_game.winner).to_not be_nil
+          expect(full_game.winner.user_id).to eq winning_player.user_id
+        end
+
+        it 'records an ended at date only once' do
+          ended_at=full_game.ended_at
+          expect(ended_at).to_not be_nil
+
+          sleep(3)
+
+          full_game.reload
+          visit show_game_path(full_game.id)
+          full_game.reload
+          expect(full_game.ended_at).to eq ended_at
+        end
+
+        it 'reroutes to history page' do
+          expect(page.current_path).to eq games_history_path
+        end
+
+
+      end
+
     end
   end
 
@@ -413,3 +460,5 @@ RSpec.describe 'Games', type: :system do
     end
   end
 end
+
+  

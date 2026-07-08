@@ -2,6 +2,7 @@ module GoFish
   class Game
     SMALL_GAME_CARDS = 7
     BIG_GAME_CARDS = 5
+    BOOKS_TO_WIN=BOOKS_TO_WIN = (Card::SUITS.length * Card::RANKS.length) / Book::SIZE
 
     attr_reader :players, :deck, :feed
 
@@ -84,7 +85,35 @@ module GoFish
       turn_result
     end
 
+    # the player currently in the lead
+    def winning_player
+      winning_players = players_with_most_books
+
+      return winning_players[0] if winning_players.length == 1
+
+      player_with_biggest_value_book(winning_players)
+    end
+
+    def game_over?
+      total_book_count == BOOKS_TO_WIN
+    end
+
     private
+    def total_book_count
+      players.inject(0) { |sum, player| sum + player.book_count }
+    end
+
+    def players_with_most_books
+      players.select { |player| player.book_count == most_books }
+    end
+
+    def player_with_biggest_value_book(players_array)
+      players_array.max_by(&:biggest_book_value)
+    end
+
+    def most_books
+      players.max_by(&:book_count).book_count
+    end
 
     def switch_turn
       self.current_player_index += 1

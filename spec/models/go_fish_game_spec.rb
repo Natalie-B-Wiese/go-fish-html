@@ -11,6 +11,12 @@ RSpec.describe GoFish::Game, type: :model do
   let!(:player3) { GoFish::Player.new(user3.id) }
   let!(:player4) { GoFish::Player.new(user4.id) }
 
+  def add_books_to_player(player, num_books = 1)
+    num_books.times do
+      player.books += [GoFish::Book.new('4')]
+    end
+  end
+
   describe '#deal!' do
     context 'with 2 or 3 players' do
       let(:players) { [player1, player2] }
@@ -431,15 +437,15 @@ RSpec.describe GoFish::Game, type: :model do
     end
   end
 
-  xdescribe '#winning_player' do
+  describe '#winning_player' do
     let(:players) { [player1, player2, player3] }
     let(:game) { described_class.new(players) }
 
     context 'when one player has most books' do
       before do
         player1.books = []
-        player2.books = [Book.new('5'), Book.new('2'), Book.new('10')]
-        player3.books = [Book.new('A')]
+        player2.books = [GoFish::Book.new('5'), GoFish::Book.new('2'), GoFish::Book.new('10')]
+        player3.books = [GoFish::Book.new('A')]
       end
 
       it 'returns that player' do
@@ -459,6 +465,35 @@ RSpec.describe GoFish::Game, type: :model do
       it 'returns user with most book and highest value book' do
         result = game.winning_player
         expect(result).to eq player1
+      end
+    end
+  end
+
+  describe '#game_over?' do
+  let!(:game) { described_class.new([player1, player2]) }
+  # def game_over?
+  #   book_count == BOOKS_TO_WIN
+  # end
+    context 'when not all books have been won' do
+      before do
+        add_books_to_player(player1, 5)
+        add_books_to_player(player2, 3)
+      end
+
+      it 'returns false' do
+        expect(game).to_not be_game_over
+      end
+    end
+
+    context 'when all books have been won' do
+      let(:p1_books) {5}
+      before do
+        add_books_to_player(player1, p1_books)
+        add_books_to_player(player2, GoFish::Game::BOOKS_TO_WIN-p1_books)
+      end
+
+      it 'returns true' do
+        expect(game).to be_game_over
       end
     end
   end

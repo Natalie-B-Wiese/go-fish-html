@@ -62,6 +62,12 @@ module GoFish
       book
     end
 
+    def biggest_book_value
+      return 0 if books.empty?
+
+      return books.max_by(&:value).value      
+    end
+
     
     private
 

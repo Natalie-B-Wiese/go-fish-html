@@ -192,6 +192,48 @@ RSpec.describe GoFish::Player, type: :model do
     end
   end
 
+  describe '#biggest_book_value' do
+    context 'when there are no books' do
+      before do
+        player.books=[]
+      end
+
+      it 'returns 0' do
+        result=player.biggest_book_value
+        expect(result).to eq 0
+      end
+    end
+
+    context 'when there is 1 book' do
+      let(:biggest_rank){'5'}
+      let(:biggest_value) {Card.rank_to_value(biggest_rank)}
+
+      before do
+        player.books=[GoFish::Book.new(biggest_rank)]
+      end
+
+      it 'returns that book value' do
+        result=player.biggest_book_value
+        expect(result).to eq biggest_value
+      end
+    end
+
+    context 'when there are multiple books' do
+      let(:biggest_rank){'A'}
+      let(:biggest_value) {Card.rank_to_value(biggest_rank)}
+
+      before do
+        player.books=[GoFish::Book.new('2'), GoFish::Book.new(biggest_rank), GoFish::Book.new('8')]
+      end
+
+      it 'returns the biggest book value' do
+        result=player.biggest_book_value
+        expect(result).to eq biggest_value
+      end
+    end
+
+  end
+
   xdescribe '#cards_to_s' do
     context 'when hand is empty' do
       it 'shows empty cards message' do
