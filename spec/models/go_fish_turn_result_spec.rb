@@ -1,9 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe GoFish::TurnResult, type: :model do
-
-  let!(:user) {create(:user1)}
-  let!(:opponent) {create(:user2)}
+  let!(:user) { create(:user1) }
+  let!(:opponent) { create(:user2) }
 
   let(:rank_requested) { '4' }
   let(:other_rank) { '3' }
@@ -58,7 +57,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
     context 'when player made a request and receives from opponent' do
       let(:turn_result) do
         described_class.new(current_user_id: user.id, opponent_user_id: opponent.id,
-                       rank_requested: rank_requested, cards_received_opponent: [Card.new(rank_requested, 'Spades')])
+                       rank_requested: rank_requested, cards_received_opponent: [ Card.new(rank_requested, 'Spades') ])
       end
 
       it 'returns receive from opponent message' do
@@ -70,7 +69,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
     context 'when player made a request and receives multiple cards from opponent' do
       let(:turn_result) do
         described_class.new(current_user_id: user.id, opponent_user_id: opponent.id,
-                       rank_requested: rank_requested, cards_received_opponent: [Card.new(rank_requested, 'Spades'), Card.new(rank_requested, 'Hearts')])
+                       rank_requested: rank_requested, cards_received_opponent: [ Card.new(rank_requested, 'Spades'), Card.new(rank_requested, 'Hearts') ])
       end
 
       it 'returns receive from opponent message' do
@@ -150,7 +149,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
       context 'when was_book_made is false' do
         let(:turn_result) do
           described_class.new(current_user_id: user.id, opponent_user_id: opponent.id,
-                         rank_requested: rank_requested, cards_received_opponent: [Card.new(rank_requested, 'Spades')])
+                         rank_requested: rank_requested, cards_received_opponent: [ Card.new(rank_requested, 'Spades') ])
         end
 
         it 'returns go again message' do
@@ -172,7 +171,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
       context 'when was_book_made is true' do
         let(:turn_result) do
           described_class.new(current_user_id: user.id, opponent_user_id: opponent.id,
-                         rank_requested: rank_requested, cards_received_opponent: [Card.new(rank_requested, 'Spades')], was_book_made: true)
+                         rank_requested: rank_requested, cards_received_opponent: [ Card.new(rank_requested, 'Spades') ], was_book_made: true)
         end
 
         it 'returns go again message' do
@@ -310,6 +309,6 @@ RSpec.describe GoFish::TurnResult, type: :model do
       json = turn_result.as_json
       restored = GoFish::TurnResult.from_json(json)
       expect(restored).to eq turn_result
-    end  
+    end
   end
 end

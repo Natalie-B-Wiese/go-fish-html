@@ -15,5 +15,4 @@ module SigninHelper
     fill_in "Password confirmation", with: password_confirmation
     click_button 'Create Account'
   end
-
 end

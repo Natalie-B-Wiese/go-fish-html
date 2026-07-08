@@ -42,10 +42,10 @@ module GoFish
       feed==other.feed)
     end
 
-    def self.from_json(json)      
+    def self.from_json(json)
       json_players=json["players"].map { |player_json| GoFish::Player.from_json(player_json) }
       json_deck=Deck.from_json(json["deck"])
-      json_feed=json["feed"].map {|turn_result_json| GoFish::TurnResult.from_json(turn_result_json)}
+      json_feed=json["feed"].map { |turn_result_json| GoFish::TurnResult.from_json(turn_result_json) }
 
       self.new(json_players, deck: json_deck, current_player_index: json["current_player_index"], feed: json_feed)
     end
@@ -57,7 +57,7 @@ module GoFish
 
     def self.dump(obj)
       obj.as_json
-    end 
+    end
 
     def play_turn(opponent_user_id: nil, rank_requested: nil)
       turn_result = TurnResult.new(current_user_id: current_user_id, opponent_user_id: opponent_user_id, rank_requested: rank_requested)
@@ -75,7 +75,7 @@ module GoFish
       player_from_user_id(current_user_id)
     end
 
-    
+
 
     # the player currently in the lead
     def winning_player
@@ -121,13 +121,13 @@ module GoFish
       self.current_player_index += 1
       self.current_player_index = 0 if current_player_index >= players.length
     end
-    
+
     def current_user_id
       players[current_player_index].user_id
     end
 
     def player_from_user_id(user_id)
-      players.find{|player| player.user_id==user_id}
+      players.find { |player| player.user_id==user_id }
     end
 
     def try_make_book(turn_result)
@@ -149,8 +149,8 @@ module GoFish
       else
         preform_take_from_opponent_move(turn_result)
       end
-    end  
-    
+    end
+
     def preform_take_from_opponent_move(turn_result)
       opponent=player_from_user_id(turn_result.opponent_user_id)
 
@@ -163,6 +163,5 @@ module GoFish
         current_go_fish_player.add_cards(cards_taken_from_opponent)
       end
     end
-
   end
 end

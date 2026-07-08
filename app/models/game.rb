@@ -2,19 +2,19 @@ class Game < ApplicationRecord
   has_many :players
   has_many :users, through: :players
 
-  belongs_to :winner, class_name: 'Player', optional: true
+  belongs_to :winner, class_name: "Player", optional: true
 
   serialize :go_fish, coder: GoFish::Game
 
-  validates :name, uniqueness: {case_sensitive: true, message: "A game with that name already exists!"}
+  validates :name, uniqueness: { case_sensitive: true, message: "A game with that name already exists!" }
   validates :name, presence: true
 
-  validates :player_count, comparison: { greater_than: 1, less_than_or_equal_to: 6}
+  validates :player_count, comparison: { greater_than: 1, less_than_or_equal_to: 6 }
 
   def find_go_fish_player_by_user_id(user_id)
     return nil if go_fish.nil?
-    
-    go_fish.players.find{|player| player.user_id==user_id}
+
+    go_fish.players.find { |player| player.user_id==user_id }
   end
 
   def current_go_fish_user
@@ -31,7 +31,7 @@ class Game < ApplicationRecord
   end
 
   def full?
-    return num_joined_players>=player_count
+    num_joined_players>=player_count
   end
 
   def start!
@@ -56,8 +56,7 @@ class Game < ApplicationRecord
 
   def game_over?
     return false if go_fish.nil?
-    
+
     go_fish.game_over?
-  end  
-  
+  end
 end

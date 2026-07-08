@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 group :development do
-  gem 'rolemodel-rails', github: 'RoleModel/rolemodel_rails'
+  gem "rolemodel-rails", github: "RoleModel/rolemodel_rails"
 end
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
@@ -28,7 +28,7 @@ gem "bcrypt", "~> 3.1.7"
 
 gem "rubocop"
 
-gem 'simple_form'
+gem "simple_form"
 
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
-  resources :users, only: [:new, :create]
-  get 'users/profile', to: "users#show"
-  
+  resources :users, only: [ :new, :create ]
+  get "users/profile", to: "users#show"
+
   resource :session
   resources :passwords, param: :token
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
@@ -11,20 +11,20 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   get "games/history", to: "games#history"
-  resources :games, only: [:index, :new, :create]
-  
-  post "games/:id/join", to: 'games#join', as: "join_game"
-  post "games/:id/play", to: 'games#play', as: "play_turn"
+  resources :games, only: [ :index, :new, :create ]
 
-  get "games/:id", to: 'games#show', as: "show_game"
-  
-  root 'games#index'
+  post "games/:id/join", to: "games#join", as: "join_game"
+  post "games/:id/play", to: "games#play", as: "play_turn"
+
+  get "games/:id", to: "games#show", as: "show_game"
+
+  root "games#index"
 
   get "pages/rules", to: "pages#rules"
-  resources :pages, only: [:index]
+  resources :pages, only: [ :index ]
 
-  # Stats page ( stats#index ). Player stats (static/placeholder content for now), in a StatsController 
-  resources :stats, only: [:index]  
+  # Stats page ( stats#index ). Player stats (static/placeholder content for now), in a StatsController
+  resources :stats, only: [ :index ]
 
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)

@@ -65,15 +65,14 @@ module GoFish
     def biggest_book_value
       return 0 if books.empty?
 
-      return books.max_by(&:value).value      
+      books.max_by(&:value).value
     end
 
-    
+
     private
 
     def cards_with_rank(rank)
       cards.select { |card| card.rank == rank }
     end
-
   end
 end

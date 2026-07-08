@@ -1,7 +1,7 @@
 require 'rails_helper'
 RSpec.describe 'Pages', type: :system do
-  let(:user) {create(:user)}
-  
+  let(:user) { create(:user) }
+
   before do
     sign_in_as(user)
   end
@@ -12,5 +12,4 @@ RSpec.describe 'Pages', type: :system do
       expect(page).to have_content 'Rules'
     end
   end
-  
 end

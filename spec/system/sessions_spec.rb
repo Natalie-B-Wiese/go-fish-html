@@ -1,6 +1,6 @@
 require 'rails_helper'
 RSpec.describe 'Sessions', type: :system do
-  let(:user) {create(:user)}
+  let(:user) { create(:user) }
 
   describe 'login ui' do
     before do
@@ -31,10 +31,8 @@ RSpec.describe 'Sessions', type: :system do
         expect(page.current_path).to eq new_password_path
       end
     end
-
-    
   end
-  
+
   describe 'login flow' do
     before do
       visit new_session_path
@@ -79,7 +77,5 @@ RSpec.describe 'Sessions', type: :system do
       visit games_path
       expect(page.current_path).to eq new_session_path
     end
-
   end
-
 end

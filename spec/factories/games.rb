@@ -1,24 +1,24 @@
 FactoryBot.define do
   factory :game do
-    name {'Game 1'}
+    name { 'Game 1' }
     player_count { 2 }
     started_at { nil }
     ended_at { nil }
     association :winner, factory: :player, strategy: :null
 
     trait :started do
-      started_at {Time.zone.now}
+      started_at { Time.zone.now }
     end
 
     trait :completed do
-      ended_at {Time.zone.now}
+      ended_at { Time.zone.now }
     end
 
     # create :completed_game, :with_users_and_winner, users: [user1, user2, user3], user_won: user2
     trait :with_users_and_winner do
       transient do
-        users {[]}
-        user_won {nil}
+        users { [] }
+        user_won { nil }
       end
 
       after(:create) do |game, evaluator|
@@ -34,7 +34,7 @@ FactoryBot.define do
     # create :game, :with_users, users: [user1, user2, user3]
     trait :with_users do
       transient do
-        users {[]}
+        users { [] }
       end
 
       after(:create) do |game, evaluator|
@@ -45,8 +45,8 @@ FactoryBot.define do
       end
     end
 
-    factory :started_game, traits: [:started]
-    factory :completed_game, traits: [:started, :completed]
+    factory :started_game, traits: [ :started ]
+    factory :completed_game, traits: [ :started, :completed ]
 
     # games in different states with players attached:
     # waiting game
@@ -54,7 +54,7 @@ FactoryBot.define do
     # started game
 
     # create(:game_with_users, joined_users: [create :bob_user, create :jeff_user])
-    
+
     # create(:game_with_players, joined_player_count: 2)
     # factory :game_with_players do
     #   transient do
@@ -68,6 +68,5 @@ FactoryBot.define do
     #     game.reload
     #   end
     # end
-
   end
 end

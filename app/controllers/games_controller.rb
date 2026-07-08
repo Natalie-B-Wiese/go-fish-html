@@ -6,14 +6,14 @@ class GamesController < ApplicationController
   def show
     @game=Game.find(params[:id])
 
-    @game.start! if (@game.full? && !@game.started?)
+    @game.start! if @game.full? && !@game.started?
 
     if @game.game_over?
       @game.end! unless @game.ended?
       redirect_to games_history_path
     else
       respond_to do |format|
-        format.html {render layout: 'application_game'}
+        format.html { render layout: "application_game" }
         format.json { render json: @game.as_json(current_user) }
       end
     end
@@ -21,7 +21,7 @@ class GamesController < ApplicationController
 
   def create
     @game=Game.new(game_params)
-    if @game.save && Player.create(user: Current.user, game: @game)  
+    if @game.save && Player.create(user: Current.user, game: @game)
       redirect_to root_url
     else
       flash.now[:alert]="There was a problem creating a game."
@@ -55,9 +55,8 @@ class GamesController < ApplicationController
 
     # TODO: only redirect if successful and user can view the game?
     redirect_to show_game_path(game_id)
-
   end
-  
+
 
   private
 
@@ -66,6 +65,6 @@ class GamesController < ApplicationController
   end
 
   def turn_result_params
-    params.expect(turn_result: [:player, :rank, :game_id])
+    params.expect(turn_result: [ :player, :rank, :game_id ])
   end
 end

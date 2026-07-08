@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Player, type: :model do
-  let(:game) {create :game}
-  let(:user) {create :user}
+  let(:game) { create :game }
+  let(:user) { create :user }
 
   it 'allows a player to join only once' do
     valid_player=build(:player, game:, user:)
@@ -13,7 +13,4 @@ RSpec.describe Player, type: :model do
     expect(invalid_player).to_not be_valid
     expect(invalid_player.errors.full_messages.to_sentence).to include('You already joined the game')
   end
-
-
-
 end

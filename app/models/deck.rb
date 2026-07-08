@@ -1,17 +1,17 @@
-require_relative 'card'
+require_relative "card"
 
 # holds a deck of cards
 class Deck
   attr_accessor :cards
 
-  def initialize(cards=sorted_deck)
+  def initialize(cards = sorted_deck)
     @cards = cards
   end
 
   def ==(other)
       return false if other.nil?
 
-      return as_json==other.as_json   
+      as_json==other.as_json
   end
 
   def as_json

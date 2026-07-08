@@ -1,9 +1,9 @@
 require 'rails_helper'
 RSpec.describe 'Games', type: :system do
-  let!(:user1) {create(:user1)}
-  let!(:user2) {create(:user2)}
-  let!(:user3) {create(:user3)}
-  let!(:user4) {create(:user4)}
+  let!(:user1) { create(:user1) }
+  let!(:user2) { create(:user2) }
+  let!(:user3) { create(:user3) }
+  let!(:user4) { create(:user4) }
 
   def elements_within_parent(parent_selector:, element_index:, element_selector:)
     parent = page.find_all(parent_selector)[element_index]
@@ -15,10 +15,10 @@ RSpec.describe 'Games', type: :system do
 
   def add_books_to_player(player, num_books = 1)
     num_books.times do
-      player.books += [GoFish::Book.new('4')]
+      player.books += [ GoFish::Book.new('4') ]
     end
   end
-  
+
   before do
     sign_in_as(user1)
   end
@@ -27,7 +27,7 @@ RSpec.describe 'Games', type: :system do
     before do
       visit games_path
     end
-    
+
     it 'shows the games index' do
       expect(page).to have_content 'Your Games'
       expect(page).to have_content 'All Games'
@@ -37,7 +37,7 @@ RSpec.describe 'Games', type: :system do
       before do
         click_on('New Game')
       end
-      
+
       it 'shows the new game page' do
         expect(page).to have_content 'New Game'
         expect(page).to have_button 'Create Game'
@@ -49,25 +49,25 @@ RSpec.describe 'Games', type: :system do
   context 'games creation flow' do
     context 'when input is valid' do
       it 'allows user to fill out and submit form' do
-        create_game(name:'Game 1', player_count:2)
+        create_game(name: 'Game 1', player_count: 2)
       end
 
       it 'creates a game and reroutes to that game\'s show path' do
         expect do
-          create_game(name:'Game 1', player_count:2)
+          create_game(name: 'Game 1', player_count: 2)
           expect(page).to have_current_path root_path
         end.to change(Game, :count).by 1
       end
 
       it 'creates a player and reroutes to root path' do
         expect do
-          create_game(name:'Game 1', player_count:2)
+          create_game(name: 'Game 1', player_count: 2)
         end.to change(Player, :count).by 1
       end
 
       it 'shows the new games in the my games list only' do
-        create_game(name:'Cool game', player_count:2)
-        create_game(name:'Cooler game', player_count:6)
+        create_game(name: 'Cool game', player_count: 2)
+        create_game(name: 'Cooler game', player_count: 6)
         visit root_path
 
         within('.my-games') do
@@ -90,19 +90,19 @@ RSpec.describe 'Games', type: :system do
   end
 
   context 'join game flow' do
-    let(:game1_name) {'Cool game'}
-    let!(:game) {create :game, :with_users, name: game1_name, player_count: 3, users: [user1]}
-    
+    let(:game1_name) { 'Cool game' }
+    let!(:game) { create :game, :with_users, name: game1_name, player_count: 3, users: [ user1 ] }
+
 
     context 'when game does not have all players' do
       before do
         visit games_path
       end
-      
+
       it 'shows the players ratio' do
         expect(page).to have_content '1/3 Players'
       end
-      
+
       context 'when player is already in game' do
         it 'it shows view button' do
           expect(page).to have_button('View')
@@ -113,8 +113,8 @@ RSpec.describe 'Games', type: :system do
           expect(page.current_path).to eq show_game_path(game)
         end
       end
-      
-      context 'when player is not in the game' do   
+
+      context 'when player is not in the game' do
         before do
           sign_out
           sign_in_as(user2)
@@ -131,14 +131,13 @@ RSpec.describe 'Games', type: :system do
             expect(page).to_not have_content game1_name
             expect(page).to_not have_button 'Join'
           end
-
         end
 
         it 'allows player to join the game and goes to show path' do
           expect do
             click_on('Join')
             expect(page.current_path).to eq show_game_path(game)
-            
+
             visit root_path
             within('.all-games') do
               expect(page).to_not have_content '2/3 Players'
@@ -147,25 +146,24 @@ RSpec.describe 'Games', type: :system do
             within('.my-games') do
               expect(page).to have_content '2/3 Players'
             end
-            
           end.to change(Player, :count).by 1
         end
-      end   
+      end
     end
 
     context 'when game is full' do
-      let!(:game) {create :game, :with_users, name: game1_name, player_count: 3, users: [user1, user2, user3]}
-      
+      let!(:game) { create :game, :with_users, name: game1_name, player_count: 3, users: [ user1, user2, user3 ] }
+
       before do
         sign_out
         sign_in_as(user3)
         visit games_path
       end
-      
+
       it 'shows players ratio' do
         expect(page).to have_content '3/3 Players'
       end
-      
+
       context 'when player is already in game' do
         it 'it shows enabled Play Now button' do
           expect(page).to have_button('Play Now')
@@ -176,7 +174,7 @@ RSpec.describe 'Games', type: :system do
           expect(page.current_path).to eq show_game_path(game)
         end
       end
-      
+
       context 'when player is not in the game' do
         before do
           sign_out
@@ -187,20 +185,20 @@ RSpec.describe 'Games', type: :system do
         it 'does not show the game' do
           expect(page).to_not have_content game1_name
         end
-      end   
+      end
     end
   end
 
   context 'show and start game flow' do
-    let(:unfull_game_name) {"Eddie's Game"}
-    let(:unfull_game) {Game.find_by(name: unfull_game_name)}
+    let(:unfull_game_name) { "Eddie's Game" }
+    let(:unfull_game) { Game.find_by(name: unfull_game_name) }
 
-    let(:full_game_name) {"Penelope's Game"}
-    let(:full_game) {Game.find_by(name: full_game_name)}
+    let(:full_game_name) { "Penelope's Game" }
+    let(:full_game) { Game.find_by(name: full_game_name) }
 
     before do
-      create :game, :with_users, name: unfull_game_name, player_count: 3, users: [user1, user2]
-      create :game, :with_users, name: full_game_name, player_count: 3, users: [user1, user2, user3]
+      create :game, :with_users, name: unfull_game_name, player_count: 3, users: [ user1, user2 ]
+      create :game, :with_users, name: full_game_name, player_count: 3, users: [ user1, user2, user3 ]
     end
 
     it 'shows the game name' do
@@ -210,7 +208,7 @@ RSpec.describe 'Games', type: :system do
       visit show_game_path(full_game)
       expect(page).to have_content full_game_name
     end
-    
+
     it 'shows only the players in that game' do
       visit show_game_path(unfull_game)
 
@@ -269,7 +267,7 @@ RSpec.describe 'Games', type: :system do
           player1_accordions = elements_within_parent(parent_selector: '.players', element_index: 0, element_selector: '.accordion')
           expect(player1_accordions[0]).to have_content(user2.name)
           expect(player1_accordions[1]).to have_content(user3.name)
-          
+
           sign_out
           sign_in_as(user2)
           visit show_game_path(full_game)
@@ -283,7 +281,7 @@ RSpec.describe 'Games', type: :system do
             player1_card_count=find_all('.playing-card').count
             expect(player1_card_count).to eq GoFish::Game::SMALL_GAME_CARDS
           end
-          
+
           player2_card_count = elements_within_parent(parent_selector: '.accordion',
                                     element_index: 0, element_selector: '.playing-card').count
           player3_card_count = elements_within_parent(parent_selector: '.accordion',
@@ -319,14 +317,14 @@ RSpec.describe 'Games', type: :system do
         context 'when player has cards' do
           it 'has correct player dropdown options' do
             dropdown_options1 = page.find_field('Player').all('option').map(&:text)
-            expect(dropdown_options1).to eq [user2.name, user3.name]
+            expect(dropdown_options1).to eq [ user2.name, user3.name ]
 
             sign_out
             sign_in_as(user2)
             visit show_game_path(full_game)
 
             dropdown_options2 = page.find_field('Player').all('option').map(&:text)
-            expect(dropdown_options2).to eq [user1.name, user3.name]
+            expect(dropdown_options2).to eq [ user1.name, user3.name ]
           end
 
           it 'has correct rank dropdown options' do
@@ -364,10 +362,9 @@ RSpec.describe 'Games', type: :system do
               end
             end
           end
-
         end
 
-        
+
 
         context 'when current player is out of cards' do
           before do
@@ -453,7 +450,7 @@ RSpec.describe 'Games', type: :system do
       end
 
       context 'when game is over' do
-        let(:winning_player) {full_game.go_fish.players.first}
+        let(:winning_player) { full_game.go_fish.players.first }
         before do
           # ensures game is started
           full_game.reload
@@ -488,16 +485,13 @@ RSpec.describe 'Games', type: :system do
         it 'reroutes to history page' do
           expect(page.current_path).to eq games_history_path
         end
-
-
       end
-
     end
   end
 
-  
+
   context 'games page' do
-    let!(:game1) {create :completed_game, :with_users_and_winner, name: 'Finished Game', users: [user1, user2], user_won: user2}
+    let!(:game1) { create :completed_game, :with_users_and_winner, name: 'Finished Game', users: [ user1, user2 ], user_won: user2 }
 
     it 'does not show games already finished' do
       visit games_path
@@ -506,16 +500,16 @@ RSpec.describe 'Games', type: :system do
   end
 
   context '/games/history' do
-    let!(:game1) {create :completed_game, :with_users_and_winner, name: 'Game 1', users: [user1, user2], user_won: user2}
-    let!(:game2) {create :completed_game, :with_users_and_winner, name: 'Game no user1', users: [user2, user3], user_won: user3}
-    let!(:game3) {create :game, :with_users, name: 'Unfinished Game', users: [user1, user2, user3]}
-    let!(:game4) {create :completed_game, :with_users_and_winner, name: 'Game 4', users: [user1, user3], user_won: user3}
+    let!(:game1) { create :completed_game, :with_users_and_winner, name: 'Game 1', users: [ user1, user2 ], user_won: user2 }
+    let!(:game2) { create :completed_game, :with_users_and_winner, name: 'Game no user1', users: [ user2, user3 ], user_won: user3 }
+    let!(:game3) { create :game, :with_users, name: 'Unfinished Game', users: [ user1, user2, user3 ] }
+    let!(:game4) { create :completed_game, :with_users_and_winner, name: 'Game 4', users: [ user1, user3 ], user_won: user3 }
 
     before do
       visit games_history_path
     end
 
-    it 'shows the history' do  
+    it 'shows the history' do
       expect(page).to have_content 'History'
       expect(page.current_path).to eq games_history_path
     end
@@ -545,5 +539,3 @@ RSpec.describe 'Games', type: :system do
     end
   end
 end
-
-  

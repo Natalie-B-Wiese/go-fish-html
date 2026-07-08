@@ -17,7 +17,7 @@ def create_user(name:, email:, password:)
     user.password_digest = password_digest
     user.save!
   else
-    user=User.create!(name: name, email_address: email, password: password, password_confirmation: password) 
+    user=User.create!(name: name, email_address: email, password: password, password_confirmation: password)
   end
 end
 
@@ -30,7 +30,7 @@ ironman=create_user(name: 'iron man', email: 'ironman@example.com', password: 's
 # full started game
 no_clowns_game=Game.find_or_create_by!(name: "No Clowns Allowed Game") do |game|
   game.player_count= 3
-  game.started_at= DateTime.new(2026,6,3,1,1,5)
+  game.started_at= DateTime.new(2026, 6, 3, 1, 1, 5)
 end
 
 Player.find_or_create_by!(user: batman, game: no_clowns_game)
@@ -55,8 +55,8 @@ Player.find_or_create_by!(user: joker, game: everyone_game)
 # full game that is finished where Batman wins
 batman_wins_game=Game.find_or_create_by!(name: "Batman vs Joker Game") do |game|
   game.player_count=2
-  game.started_at= DateTime.new(2001,2,2,1,1,5)
-  game.ended_at= DateTime.new(2001,2,4,2,2,6)
+  game.started_at= DateTime.new(2001, 2, 2, 1, 1, 5)
+  game.ended_at= DateTime.new(2001, 2, 4, 2, 2, 6)
 end
 batman_wins_game.save!
 
@@ -69,8 +69,8 @@ batman_wins_game.save!
 
 spiderman_wins_game=Game.find_or_create_by!(name: "Cool Game") do |game|
   game.player_count=3
-  game.started_at= DateTime.new(2020,8,20)
-  game.ended_at= DateTime.new(2020,8,21)
+  game.started_at= DateTime.new(2020, 8, 20)
+  game.ended_at= DateTime.new(2020, 8, 21)
 end
 spiderman_wins_game.save!
 
@@ -83,8 +83,8 @@ spiderman_wins_game.save!
 
 large_finished_game=Game.find_or_create_by!(name: "Big Game") do |game|
   game.player_count=4
-  game.started_at= DateTime.new(2018,3,2)
-  game.ended_at= DateTime.new(2018,4,6)
+  game.started_at= DateTime.new(2018, 3, 2)
+  game.ended_at= DateTime.new(2018, 4, 6)
 end
 large_finished_game.save!
 

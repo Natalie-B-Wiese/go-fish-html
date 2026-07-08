@@ -34,14 +34,14 @@ class Card
 
   def self.rank_to_s(rank)
     case rank
-    when 'A'
-      'Ace'
-    when 'J'
-      'Jack'
-    when 'Q'
-      'Queen'
-    when 'K'
-      'King'
+    when "A"
+      "Ace"
+    when "J"
+      "Jack"
+    when "Q"
+      "Queen"
+    when "K"
+      "King"
     else
       rank
     end
@@ -57,8 +57,8 @@ class Card
 
   def as_json
     {
-      'rank' => rank,
-      'suit' => suit
+      "rank" => rank,
+      "suit" => suit
     }
   end
 
