@@ -56,6 +56,69 @@ RSpec.describe GoFish::Game, type: :model do
     end
   end
 
+  describe '#valid_move?' do
+    let!(:game) { described_class.new([player1, player2]) }
+    let!(:rank_have) { '5' }
+    let!(:invalid_rank) { 'A' }
+
+    context 'when both rank is nil and opponent is nil' do
+      context 'when player has no cards' do
+        before do
+          player1.cards = []
+        end
+
+        it 'is valid' do
+          expect(game.valid_move?(nil, nil)).to eq true
+        end
+      end
+
+      context 'when player has cards' do
+        before do
+          player1.cards = [Card.new(rank_have, 'Diamonds')]
+        end
+
+        it 'is invalid' do
+          expect(game.valid_move?(nil, nil)).to eq false
+        end
+      end
+    end
+
+    context 'when player does not have the rank' do
+      before do
+        player1.cards = [Card.new(rank_have, 'Diamonds')]
+      end
+    end
+
+    context 'when player has the rank' do
+      before do
+        player1.cards = [Card.new(rank_have, 'Diamonds')]
+      end
+
+      context 'when opponent is self' do
+        it 'is invalid' do
+          expect(game.valid_move?(user1.id, rank_have)).to eq false
+        end
+      end
+
+      context 'when opponent does not exist in this game' do
+        it 'is invalid' do
+          expect(game.valid_move?(user4.id, rank_have)).to eq false
+        end
+      end
+      context 'when opponent exists in game and is not self' do
+        it 'is valid' do
+          expect(game.valid_move?(user2.id, rank_have)).to eq true
+        end
+      end
+
+      context 'when opponent is nil' do
+        it 'is invalid' do
+          expect(game.valid_move?(nil, rank_have)).to eq false
+        end
+      end
+    end
+  end
+
   describe '#play_turn' do
     let!(:game) { described_class.new([player1, player2, player3], current_player_index: 0) }
     context 'when opponent and rank passed in' do

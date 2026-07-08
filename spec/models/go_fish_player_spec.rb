@@ -192,4 +192,39 @@ RSpec.describe GoFish::Player, type: :model do
       end
     end
   end
+
+  describe '#out_of_cards?' do
+    it 'returns true when player has no cards' do
+      expect(player).to be_out_of_cards
+    end
+
+    it 'returns false when player has cards' do
+      player.add_card(Card.new('A', 'Spades'))
+      expect(player).to_not be_out_of_cards
+    end
+  end
+
+  describe '#includes_card_with_rank?' do
+    context 'when player does not have cards' do
+      it 'returns false' do
+        expect(player.includes_card_with_rank?('2')).to eq false
+      end
+    end
+
+    context 'when player has cards' do
+      let(:rank_have) { 'A' }
+      let(:rank_not_have) { '3' }
+      before do
+        player.add_card(Card.new(rank_have, 'Spades'))
+      end
+
+      it 'returns false when player does not include a card with the rank' do
+        expect(player.includes_card_with_rank?(rank_not_have)).to eq false
+      end
+
+      it 'returns true when player does include a card with the rank' do
+        expect(player.includes_card_with_rank?(rank_have)).to eq true
+      end
+    end
+  end
 end

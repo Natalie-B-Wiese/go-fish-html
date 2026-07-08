@@ -9,10 +9,10 @@ module GoFish
     attr_accessor :current_player_index
 
     def initialize(players, deck: Deck.new, current_player_index: 0, feed: [])
-      @players=players
+      @players = players
       @deck = deck
-      @feed=feed
-      @current_player_index=current_player_index
+      @feed = feed
+      @current_player_index = current_player_index
     end
 
     def deal!
@@ -36,22 +36,23 @@ module GoFish
     def ==(other)
       return false if other.nil?
 
-      (players==other.players &&
-      deck==other.deck &&
-      current_player_index==other.current_player_index &&
-      feed==other.feed)
+      players == other.players &&
+        deck == other.deck &&
+        current_player_index == other.current_player_index &&
+        feed == other.feed
     end
 
     def self.from_json(json)
-      json_players=json['players'].map { |player_json| GoFish::Player.from_json(player_json) }
-      json_deck=Deck.from_json(json['deck'])
-      json_feed=json['feed'].map { |turn_result_json| GoFish::TurnResult.from_json(turn_result_json) }
+      json_players = json['players'].map { |player_json| GoFish::Player.from_json(player_json) }
+      json_deck = Deck.from_json(json['deck'])
+      json_feed = json['feed'].map { |turn_result_json| GoFish::TurnResult.from_json(turn_result_json) }
 
-      self.new(json_players, deck: json_deck, current_player_index: json['current_player_index'], feed: json_feed)
+      new(json_players, deck: json_deck, current_player_index: json['current_player_index'], feed: json_feed)
     end
 
     def self.load(json)
       return nil if json.blank?
+
       from_json(json)
     end
 
@@ -60,7 +61,8 @@ module GoFish
     end
 
     def play_turn(opponent_user_id: nil, rank_requested: nil)
-      turn_result = TurnResult.new(current_user_id: current_user_id, opponent_user_id: opponent_user_id, rank_requested: rank_requested)
+      turn_result = TurnResult.new(current_user_id: current_user_id, opponent_user_id: opponent_user_id,
+                                   rank_requested: rank_requested)
       preform_move(turn_result)
       try_make_book(turn_result) if turn_result.rank_received
 
@@ -75,7 +77,11 @@ module GoFish
       player_from_user_id(current_user_id)
     end
 
+    def valid_move?(opponent_user_id, rank)
+      return true if opponent_user_id.nil? && rank.nil? && current_go_fish_player.out_of_cards?
 
+      valid_opponent?(opponent_user_id) && valid_request_rank?(rank)
+    end
 
     # the player currently in the lead
     def winning_player
@@ -91,6 +97,21 @@ module GoFish
     end
 
     private
+
+    def valid_opponent?(opponent_user_id)
+      return true if opponents.find { |opponent| opponent.user_id == opponent_user_id }
+
+      false
+    end
+
+    def valid_request_rank?(rank)
+      current_go_fish_player.includes_card_with_rank?(rank)
+    end
+
+    def opponents
+      players - [current_go_fish_player]
+    end
+
     def request_deck_card(turn_result = TurnResult.new(current_user_id: current_user_id))
       unless deck.empty?
         card_taken = deck.take_top_card
@@ -127,7 +148,7 @@ module GoFish
     end
 
     def player_from_user_id(user_id)
-      players.find { |player| player.user_id==user_id }
+      players.find { |player| player.user_id == user_id }
     end
 
     def try_make_book(turn_result)
@@ -152,7 +173,7 @@ module GoFish
     end
 
     def preform_take_from_opponent_move(turn_result)
-      opponent=player_from_user_id(turn_result.opponent_user_id)
+      opponent = player_from_user_id(turn_result.opponent_user_id)
 
       cards_taken_from_opponent = opponent.take_cards_with_rank(turn_result.rank_requested)
 

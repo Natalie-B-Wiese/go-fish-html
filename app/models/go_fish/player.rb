@@ -68,6 +68,14 @@ module GoFish
       books.max_by(&:value).value
     end
 
+    def includes_card_with_rank?(rank)
+      cards.any? { |card| card.rank == rank }
+    end
+
+    def out_of_cards?
+      cards.empty?
+    end
+
     private
 
     def cards_with_rank(rank)
