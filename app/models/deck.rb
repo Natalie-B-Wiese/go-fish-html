@@ -1,4 +1,4 @@
-require_relative "card"
+require_relative 'card'
 
 # holds a deck of cards
 class Deck
@@ -9,9 +9,9 @@ class Deck
   end
 
   def ==(other)
-      return false if other.nil?
+    return false if other.nil?
 
-      as_json==other.as_json
+    as_json == other.as_json
   end
 
   def as_json
@@ -23,17 +23,15 @@ class Deck
   def self.from_json(json)
     # makes it not care whether json uses string or keys to index
 
-    json_cards=json["cards"].map { |card_json| Card.from_json(card_json) }
-    self.new(json_cards)
+    json_cards = json['cards'].map { |card_json| Card.from_json(card_json) }
+    new(json_cards)
   end
 
   def cards_left
     cards.length
   end
 
-  def empty?
-    cards.empty?
-  end
+  delegate :empty?, to: :cards
 
   def take_top_card
     cards.shift
@@ -47,6 +45,7 @@ class Deck
   end
 
   private
+
   def sorted_deck
     Card::SUITS.flat_map do |suit|
       Card::RANKS.map do |rank|

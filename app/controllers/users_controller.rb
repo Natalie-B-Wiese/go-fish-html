@@ -7,14 +7,14 @@ class UsersController < ApplicationController
       start_new_session_for(@user)
       redirect_to root_path
     else
-      flash.now[:alert]="There was a problem signing up."
-      render :new, layout: "application_form", status: :unprocessable_content
+      flash.now[:alert]='There was a problem signing up.'
+      render :new, layout: 'application_form', status: :unprocessable_content
     end
   end
 
   def new
     @user=User.new
-    render layout: "application_form"
+    render layout: 'application_form'
   end
 
   private

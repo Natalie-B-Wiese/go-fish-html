@@ -17,7 +17,7 @@ RSpec.describe GoFish::Player, type: :model do
       card1 = Card.new('3', 'Diamonds')
       card2 = Card.new('5', 'Hearts')
 
-      player.add_cards([ card1, card2 ])
+      player.add_cards([card1, card2])
       expect(player.cards).to include(card1)
       expect(player.cards).to include(card2)
     end
@@ -25,13 +25,13 @@ RSpec.describe GoFish::Player, type: :model do
 
   describe '#card_ranks' do
     it 'returns an array of ranks' do
-      player.add_cards([ Card.new('3', 'Spades'), Card.new('5', 'Hearts'), Card.new('A', 'Diamonds') ])
-      expect(player.card_ranks).to eq [ '3', '5', 'A' ]
+      player.add_cards([Card.new('3', 'Spades'), Card.new('5', 'Hearts'), Card.new('A', 'Diamonds')])
+      expect(player.card_ranks).to eq %w[3 5 A]
     end
 
     it 'ignores duplicates' do
-      player.add_cards([ Card.new('3', 'Spades'), Card.new('3', 'Hearts'), Card.new('5', 'Diamonds') ])
-      expect(player.card_ranks).to eq [ '3', '5' ]
+      player.add_cards([Card.new('3', 'Spades'), Card.new('3', 'Hearts'), Card.new('5', 'Diamonds')])
+      expect(player.card_ranks).to eq %w[3 5]
     end
   end
 
@@ -43,14 +43,14 @@ RSpec.describe GoFish::Player, type: :model do
     let(:card2_same) { Card.new('2', 'Hearts') }
 
     before do
-      player.add_cards([ card1, card2, card3, card2_same ])
+      player.add_cards([card1, card2, card3, card2_same])
     end
 
     context 'when player has one of the specified card' do
       let(:card_to_take) { card3 }
       it 'returns an array with a single card' do
         result = player.take_cards_with_rank(card_to_take.rank)
-        expect(result).to eq [ card_to_take ]
+        expect(result).to eq [card_to_take]
       end
 
       it 'removes the card from the player' do
@@ -60,7 +60,7 @@ RSpec.describe GoFish::Player, type: :model do
 
       it 'works with non numerical cards' do
         result = player.take_cards_with_rank(card1.rank)
-        expect(result).to eq [ card1 ]
+        expect(result).to eq [card1]
         expect(player.cards).to_not include(card1)
       end
     end
@@ -155,11 +155,11 @@ RSpec.describe GoFish::Player, type: :model do
   describe '#biggest_book_value' do
     context 'when there are no books' do
       before do
-        player.books=[]
+        player.books = []
       end
 
       it 'returns 0' do
-        result=player.biggest_book_value
+        result = player.biggest_book_value
         expect(result).to eq 0
       end
     end
@@ -169,11 +169,11 @@ RSpec.describe GoFish::Player, type: :model do
       let(:biggest_value) { Card.rank_to_value(biggest_rank) }
 
       before do
-        player.books=[ GoFish::Book.new(biggest_rank) ]
+        player.books = [GoFish::Book.new(biggest_rank)]
       end
 
       it 'returns that book value' do
-        result=player.biggest_book_value
+        result = player.biggest_book_value
         expect(result).to eq biggest_value
       end
     end
@@ -183,11 +183,11 @@ RSpec.describe GoFish::Player, type: :model do
       let(:biggest_value) { Card.rank_to_value(biggest_rank) }
 
       before do
-        player.books=[ GoFish::Book.new('2'), GoFish::Book.new(biggest_rank), GoFish::Book.new('8') ]
+        player.books = [GoFish::Book.new('2'), GoFish::Book.new(biggest_rank), GoFish::Book.new('8')]
       end
 
       it 'returns the biggest book value' do
-        result=player.biggest_book_value
+        result = player.biggest_book_value
         expect(result).to eq biggest_value
       end
     end

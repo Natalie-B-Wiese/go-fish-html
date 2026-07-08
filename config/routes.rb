@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   resources :users, only: [ :new, :create ]
-  get "users/profile", to: "users#show"
+  get 'users/profile', to: 'users#show'
 
   resource :session
   resources :passwords, param: :token
@@ -8,19 +8,19 @@ Rails.application.routes.draw do
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  get 'up' => 'rails/health#show', as: :rails_health_check
 
-  get "games/history", to: "games#history"
+  get 'games/history', to: 'games#history'
   resources :games, only: [ :index, :new, :create ]
 
-  post "games/:id/join", to: "games#join", as: "join_game"
-  post "games/:id/play", to: "games#play", as: "play_turn"
+  post 'games/:id/join', to: 'games#join', as: 'join_game'
+  post 'games/:id/play', to: 'games#play', as: 'play_turn'
 
-  get "games/:id", to: "games#show", as: "show_game"
+  get 'games/:id', to: 'games#show', as: 'show_game'
 
-  root "games#index"
+  root 'games#index'
 
-  get "pages/rules", to: "pages#rules"
+  get 'pages/rules', to: 'pages#rules'
   resources :pages, only: [ :index ]
 
   # Stats page ( stats#index ). Player stats (static/placeholder content for now), in a StatsController

@@ -43,11 +43,11 @@ module GoFish
     end
 
     def self.from_json(json)
-      json_players=json["players"].map { |player_json| GoFish::Player.from_json(player_json) }
-      json_deck=Deck.from_json(json["deck"])
-      json_feed=json["feed"].map { |turn_result_json| GoFish::TurnResult.from_json(turn_result_json) }
+      json_players=json['players'].map { |player_json| GoFish::Player.from_json(player_json) }
+      json_deck=Deck.from_json(json['deck'])
+      json_feed=json['feed'].map { |turn_result_json| GoFish::TurnResult.from_json(turn_result_json) }
 
-      self.new(json_players, deck: json_deck, current_player_index: json["current_player_index"], feed: json_feed)
+      self.new(json_players, deck: json_deck, current_player_index: json['current_player_index'], feed: json_feed)
     end
 
     def self.load(json)
@@ -156,12 +156,10 @@ module GoFish
 
       cards_taken_from_opponent = opponent.take_cards_with_rank(turn_result.rank_requested)
 
-      if cards_taken_from_opponent.empty?
-        request_deck_card(turn_result)
-      else
-        turn_result.cards_received_opponent = cards_taken_from_opponent
-        current_go_fish_player.add_cards(cards_taken_from_opponent)
-      end
+      return request_deck_card(turn_result) if cards_taken_from_opponent.empty?
+
+      turn_result.cards_received_opponent = cards_taken_from_opponent
+      current_go_fish_player.add_cards(cards_taken_from_opponent)
     end
   end
 end

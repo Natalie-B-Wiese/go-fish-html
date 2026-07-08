@@ -21,7 +21,7 @@ module GoFish
     end
 
     def self.from_json(json)
-      self.new(json["rank"])
+      self.new(json['rank'])
     end
   end
 end

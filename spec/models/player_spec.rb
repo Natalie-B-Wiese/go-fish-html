@@ -5,11 +5,11 @@ RSpec.describe Player, type: :model do
   let(:user) { create :user }
 
   it 'allows a player to join only once' do
-    valid_player=build(:player, game:, user:)
+    valid_player = build(:player, game:, user:)
     expect(valid_player).to be_valid
     valid_player.save
 
-    invalid_player=build(:player, game:, user:)
+    invalid_player = build(:player, game:, user:)
     expect(invalid_player).to_not be_valid
     expect(invalid_player.errors.full_messages.to_sentence).to include('You already joined the game')
   end

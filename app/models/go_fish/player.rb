@@ -4,15 +4,15 @@ module GoFish
     attr_accessor :cards, :books
 
     def initialize(user_id, cards: [], books: [])
-      @user_id=user_id
+      @user_id = user_id
       @cards = cards
-      @books=books
+      @books = books
     end
 
     def ==(other)
       return false if other.nil?
 
-      as_json==other.as_json
+      as_json == other.as_json
     end
 
     def as_json
@@ -24,10 +24,10 @@ module GoFish
     end
 
     def self.from_json(json)
-      json_cards=json["cards"].map { |card_json| Card.from_json(card_json) }
-      json_books=json["books"].map { |book_json| Book.from_json(book_json) }
+      json_cards = json['cards'].map { |card_json| Card.from_json(card_json) }
+      json_books = json['books'].map { |book_json| Book.from_json(book_json) }
 
-      self.new(json["user_id"], cards: json_cards, books: json_books)
+      new(json['user_id'], cards: json_cards, books: json_books)
     end
 
     def add_card(card)
@@ -67,7 +67,6 @@ module GoFish
 
       books.max_by(&:value).value
     end
-
 
     private
 

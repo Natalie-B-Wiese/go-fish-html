@@ -13,7 +13,7 @@ class GamesController < ApplicationController
       redirect_to games_history_path
     else
       respond_to do |format|
-        format.html { render layout: "application_game" }
+        format.html { render layout: 'application_game' }
         format.json { render json: @game.as_json(current_user) }
       end
     end
@@ -24,7 +24,7 @@ class GamesController < ApplicationController
     if @game.save && Player.create(user: Current.user, game: @game)
       redirect_to root_url
     else
-      flash.now[:alert]="There was a problem creating a game."
+      flash.now[:alert]='There was a problem creating a game.'
       render :new, status: :unprocessable_content
     end
   end
@@ -38,7 +38,7 @@ class GamesController < ApplicationController
     if Player.create(user: Current.user, game: game)
       redirect_to show_game_path(game)
     else
-      flash.now[:alert]="There was a problem joining a game."
+      flash.now[:alert]='There was a problem joining a game.'
       render :index, status: :unprocessable_content
     end
   end

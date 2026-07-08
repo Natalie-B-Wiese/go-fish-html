@@ -8,6 +8,13 @@ class Card
   RANKS = %w[2 3 4 5 6 7 8 9 10 J Q K A].freeze
   SUITS = %w[Spades Hearts Clubs Diamonds].freeze
 
+  RANK_NAMES = {
+    'J' => 'Jack',
+    'Q' => 'Queen',
+    'K' => 'King',
+    'A' => 'Ace'
+  }.freeze
+
   def initialize(rank, suit)
     raise InvalidRank unless RANKS.include? rank
     raise InvalidSuit unless SUITS.include? suit
@@ -33,15 +40,8 @@ class Card
   end
 
   def self.rank_to_s(rank)
-    case rank
-    when "A"
-      "Ace"
-    when "J"
-      "Jack"
-    when "Q"
-      "Queen"
-    when "K"
-      "King"
+    if RANK_NAMES.include?(rank)
+      RANK_NAMES[rank]
     else
       rank
     end
@@ -57,14 +57,14 @@ class Card
 
   def as_json
     {
-      "rank" => rank,
-      "suit" => suit
+      'rank' => rank,
+      'suit' => suit
     }
   end
 
   def self.from_json(json)
     # makes it not care whether json uses string or keys to index
 
-    self.new(json["rank"], json["suit"])
+    self.new(json['rank'], json['suit'])
   end
 end

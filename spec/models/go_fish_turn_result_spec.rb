@@ -15,7 +15,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
 
       it 'returns request message' do
         result = turn_result.request_message
-        expect(result).to match(/#{GoFish::TurnResult::REQUEST}/)
+        expect(result).to match(/#{GoFish::TurnResult::REQUEST}/o)
         expect(result).to match(/#{user.name}.*#{opponent.name}/)
         expect(result).to match(/#{rank_requested}/)
       end
@@ -57,7 +57,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
     context 'when player made a request and receives from opponent' do
       let(:turn_result) do
         described_class.new(current_user_id: user.id, opponent_user_id: opponent.id,
-                       rank_requested: rank_requested, cards_received_opponent: [ Card.new(rank_requested, 'Spades') ])
+                            rank_requested: rank_requested, cards_received_opponent: [Card.new(rank_requested, 'Spades')])
       end
 
       it 'returns receive from opponent message' do
@@ -69,7 +69,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
     context 'when player made a request and receives multiple cards from opponent' do
       let(:turn_result) do
         described_class.new(current_user_id: user.id, opponent_user_id: opponent.id,
-                       rank_requested: rank_requested, cards_received_opponent: [ Card.new(rank_requested, 'Spades'), Card.new(rank_requested, 'Hearts') ])
+                            rank_requested: rank_requested, cards_received_opponent: [Card.new(rank_requested, 'Spades'), Card.new(rank_requested, 'Hearts')])
       end
 
       it 'returns receive from opponent message' do
@@ -81,7 +81,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
     context 'when player made a request and does not receive a card from opponent' do
       let(:turn_result) do
         described_class.new(current_user_id: user.id, opponent_user_id: opponent.id,
-                       rank_requested: rank_requested)
+                            rank_requested: rank_requested)
       end
 
       it 'returns go fish message' do
@@ -99,7 +99,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
 
       it 'does not return deck empty message' do
         result = turn_result.result_message
-        expect(result).to_not match(/#{GoFish::TurnResult::EMPTY_DECK}/)
+        expect(result).to_not match(/#{GoFish::TurnResult::EMPTY_DECK}/o)
       end
 
       it 'returns go again message' do
@@ -109,7 +109,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
 
       it 'returns card draw from deck message' do
         result = turn_result.result_message
-        expect(result).to match(/#{GoFish::TurnResult::TAKE_DECK}/)
+        expect(result).to match(/#{GoFish::TurnResult::TAKE_DECK}/o)
       end
 
       it 'does not show the rank drawn from the deck' do
@@ -126,12 +126,12 @@ RSpec.describe GoFish::TurnResult, type: :model do
 
       it 'does not return card draw from deck message' do
         result = turn_result.result_message
-        expect(result).to_not match(/#{GoFish::TurnResult::TAKE_DECK}/)
+        expect(result).to_not match(/#{GoFish::TurnResult::TAKE_DECK}/o)
       end
 
       it 'returns deck empty message' do
         result = turn_result.result_message
-        expect(result).to match(/#{GoFish::TurnResult::EMPTY_DECK}/)
+        expect(result).to match(/#{GoFish::TurnResult::EMPTY_DECK}/o)
       end
 
       it 'does not return go again message' do
@@ -141,7 +141,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
 
       it 'returns disqualified message' do
         result = turn_result.result_message
-        expect(result).to match(/#{GoFish::TurnResult::DISQUALIFIED}/)
+        expect(result).to match(/#{GoFish::TurnResult::DISQUALIFIED}/o)
       end
     end
 
@@ -149,7 +149,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
       context 'when was_book_made is false' do
         let(:turn_result) do
           described_class.new(current_user_id: user.id, opponent_user_id: opponent.id,
-                         rank_requested: rank_requested, cards_received_opponent: [ Card.new(rank_requested, 'Spades') ])
+                              rank_requested: rank_requested, cards_received_opponent: [Card.new(rank_requested, 'Spades')])
         end
 
         it 'returns go again message' do
@@ -159,19 +159,19 @@ RSpec.describe GoFish::TurnResult, type: :model do
 
         it 'does not return card draw from deck message' do
           result = turn_result.result_message
-          expect(result).to_not match(/#{GoFish::TurnResult::TAKE_DECK}/)
+          expect(result).to_not match(/#{GoFish::TurnResult::TAKE_DECK}/o)
         end
 
         it 'does not return book message' do
           result = turn_result.result_message
-          expect(result).not_to match(/#{GoFish::TurnResult::BOOK}/)
+          expect(result).not_to match(/#{GoFish::TurnResult::BOOK}/o)
         end
       end
 
       context 'when was_book_made is true' do
         let(:turn_result) do
           described_class.new(current_user_id: user.id, opponent_user_id: opponent.id,
-                         rank_requested: rank_requested, cards_received_opponent: [ Card.new(rank_requested, 'Spades') ], was_book_made: true)
+                              rank_requested: rank_requested, cards_received_opponent: [Card.new(rank_requested, 'Spades')], was_book_made: true)
         end
 
         it 'returns go again message' do
@@ -181,12 +181,12 @@ RSpec.describe GoFish::TurnResult, type: :model do
 
         it 'does not return card draw from deck message' do
           result = turn_result.result_message
-          expect(result).to_not match(/#{GoFish::TurnResult::TAKE_DECK}/)
+          expect(result).to_not match(/#{GoFish::TurnResult::TAKE_DECK}/o)
         end
 
         it 'returns book message' do
           result = turn_result.result_message
-          expect(result).to match(/#{GoFish::TurnResult::BOOK}/)
+          expect(result).to match(/#{GoFish::TurnResult::BOOK}/o)
         end
       end
     end
@@ -195,7 +195,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
       context 'when was_book_made is false' do
         let(:turn_result) do
           described_class.new(current_user_id: user.id, opponent_user_id: opponent.id,
-                         rank_requested: rank_requested, card_received_deck: Card.new(rank_requested, 'Spades'))
+                              rank_requested: rank_requested, card_received_deck: Card.new(rank_requested, 'Spades'))
         end
 
         it 'returns go again message' do
@@ -205,7 +205,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
 
         it 'returns a draw from deck message' do
           result = turn_result.result_message
-          expect(result).to match(/#{GoFish::TurnResult::TAKE_DECK}/)
+          expect(result).to match(/#{GoFish::TurnResult::TAKE_DECK}/o)
         end
 
         it 'shows the rank drawn from the deck' do
@@ -215,14 +215,14 @@ RSpec.describe GoFish::TurnResult, type: :model do
 
         it 'does not return book message' do
           result = turn_result.result_message
-          expect(result).not_to match(/#{GoFish::TurnResult::BOOK}/)
+          expect(result).not_to match(/#{GoFish::TurnResult::BOOK}/o)
         end
       end
 
       context 'when was_book_made is true' do
         let(:turn_result) do
           described_class.new(current_user_id: user.id, opponent_user_id: opponent.id,
-                         rank_requested: rank_requested, card_received_deck: Card.new(rank_requested, 'Spades'), was_book_made: true)
+                              rank_requested: rank_requested, card_received_deck: Card.new(rank_requested, 'Spades'), was_book_made: true)
         end
 
         it 'returns go again message' do
@@ -232,7 +232,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
 
         it 'returns a draw from deck message' do
           result = turn_result.result_message
-          expect(result).to match(/#{GoFish::TurnResult::TAKE_DECK}/)
+          expect(result).to match(/#{GoFish::TurnResult::TAKE_DECK}/o)
         end
 
         it 'shows the rank drawn from the deck' do
@@ -242,7 +242,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
 
         it 'returns book message' do
           result = turn_result.result_message
-          expect(result).to match(/#{GoFish::TurnResult::BOOK}/)
+          expect(result).to match(/#{GoFish::TurnResult::BOOK}/o)
         end
       end
     end
@@ -251,12 +251,12 @@ RSpec.describe GoFish::TurnResult, type: :model do
       context 'when was_book_made is false' do
         let(:turn_result) do
           described_class.new(current_user_id: user.id, opponent_user_id: opponent.id,
-                         rank_requested: rank_requested, card_received_deck: Card.new(other_rank, 'Spades'))
+                              rank_requested: rank_requested, card_received_deck: Card.new(other_rank, 'Spades'))
         end
 
         it 'returns card draw from deck message' do
           result = turn_result.result_message
-          expect(result).to match(/#{GoFish::TurnResult::TAKE_DECK}/)
+          expect(result).to match(/#{GoFish::TurnResult::TAKE_DECK}/o)
         end
 
         it 'does not show the rank drawn from the deck' do
@@ -272,14 +272,14 @@ RSpec.describe GoFish::TurnResult, type: :model do
 
         it 'does not return book message' do
           result = turn_result.result_message
-          expect(result).not_to match(/#{GoFish::TurnResult::BOOK}/)
+          expect(result).not_to match(/#{GoFish::TurnResult::BOOK}/o)
         end
       end
 
       context 'when was_book_made is true' do
         let(:turn_result) do
           described_class.new(current_user_id: user.id, opponent_user_id: opponent.id,
-                         rank_requested: rank_requested, card_received_deck: Card.new(other_rank, 'Spades'), was_book_made: true)
+                              rank_requested: rank_requested, card_received_deck: Card.new(other_rank, 'Spades'), was_book_made: true)
         end
 
         it 'does not return go again message' do
@@ -294,7 +294,7 @@ RSpec.describe GoFish::TurnResult, type: :model do
 
         it 'returns book message' do
           result = turn_result.result_message
-          expect(result).to match(/#{GoFish::TurnResult::BOOK}/)
+          expect(result).to match(/#{GoFish::TurnResult::BOOK}/o)
         end
       end
     end

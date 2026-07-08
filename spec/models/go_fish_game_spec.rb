@@ -13,13 +13,13 @@ RSpec.describe GoFish::Game, type: :model do
 
   def add_books_to_player(player, num_books = 1)
     num_books.times do
-      player.books += [ GoFish::Book.new('4') ]
+      player.books += [GoFish::Book.new('4')]
     end
   end
 
   describe '#deal!' do
     context 'with 2 or 3 players' do
-      let(:players) { [ player1, player2 ] }
+      let(:players) { [player1, player2] }
       let(:game) { described_class.new(players) }
 
       it "deals #{GoFish::Game::SMALL_GAME_CARDS} cards to each player" do
@@ -35,7 +35,7 @@ RSpec.describe GoFish::Game, type: :model do
     end
 
     context 'with 4 or more players' do
-      let(:players) { [ player1, player2, player3, player4 ] }
+      let(:players) { [player1, player2, player3, player4] }
       let(:game) { described_class.new(players) }
 
       before do
@@ -57,7 +57,7 @@ RSpec.describe GoFish::Game, type: :model do
   end
 
   describe '#play_turn' do
-    let!(:game) { described_class.new([ player1, player2, player3 ], current_player_index: 0) }
+    let!(:game) { described_class.new([player1, player2, player3], current_player_index: 0) }
     context 'when opponent and rank passed in' do
       it 'adds 1 turn result to the feed' do
         game.play_turn(opponent_user_id: player3.user_id, rank_requested: '5')
@@ -66,8 +66,8 @@ RSpec.describe GoFish::Game, type: :model do
 
       context 'when opponent has that card' do
         before do
-          player1.cards = [ Card.new('5', 'Hearts') ]
-          player3.cards = [ Card.new('5', 'Diamonds') ]
+          player1.cards = [Card.new('5', 'Hearts')]
+          player3.cards = [Card.new('5', 'Diamonds')]
         end
         context 'when opponent has 1 match' do
           let(:rank) { '5' }
@@ -84,7 +84,7 @@ RSpec.describe GoFish::Game, type: :model do
             expect(result.current_user_id).to eq player1.user_id
             expect(result.opponent_user_id).to eq opponent.user_id
             expect(result.rank_requested).to eq rank
-            expect(result.cards_received_opponent).to eq [ taken_card ]
+            expect(result.cards_received_opponent).to eq [taken_card]
             expect(result.card_received_deck).to be_nil
             expect(result.was_book_made).to eq false
             expect(result.go_again?).to eq true
@@ -98,8 +98,8 @@ RSpec.describe GoFish::Game, type: :model do
 
         context 'when opponent has more than one match' do
           before do
-            player1.cards = [ Card.new('A', 'Spades') ]
-            player2.cards = [ Card.new('A', 'Hearts'), Card.new('A', 'Clubs') ]
+            player1.cards = [Card.new('A', 'Spades')]
+            player2.cards = [Card.new('A', 'Hearts'), Card.new('A', 'Clubs')]
           end
 
           let(:rank) { 'A' }
@@ -121,7 +121,7 @@ RSpec.describe GoFish::Game, type: :model do
             expect(result.current_user_id).to eq player1.user_id
             expect(result.opponent_user_id).to eq opponent.user_id
             expect(result.rank_requested).to eq rank
-            expect(result.cards_received_opponent).to eq [ taken_card1, taken_card2 ]
+            expect(result.cards_received_opponent).to eq [taken_card1, taken_card2]
             expect(result.card_received_deck).to be_nil
             expect(result.was_book_made).to eq false
             expect(result.go_again?).to eq true
@@ -137,8 +137,8 @@ RSpec.describe GoFish::Game, type: :model do
           let(:rank) { 'A' }
 
           before do
-            player1.cards = [ Card.new(rank, 'Spades'), Card.new(rank, 'Hearts') ]
-            player2.cards = [ Card.new(rank, 'Diamonds'), Card.new(rank, 'Clubs') ]
+            player1.cards = [Card.new(rank, 'Spades'), Card.new(rank, 'Hearts')]
+            player2.cards = [Card.new(rank, 'Diamonds'), Card.new(rank, 'Clubs')]
           end
 
           let(:opponent) { player2 }
@@ -171,7 +171,7 @@ RSpec.describe GoFish::Game, type: :model do
             expect(result.current_user_id).to eq player1.user_id
             expect(result.opponent_user_id).to eq opponent.user_id
             expect(result.rank_requested).to eq rank
-            expect(result.cards_received_opponent).to eq [ card3, card4 ]
+            expect(result.cards_received_opponent).to eq [card3, card4]
             expect(result.card_received_deck).to be_nil
             expect(result.was_book_made).to eq true
             expect(result.go_again?).to eq true
@@ -189,15 +189,15 @@ RSpec.describe GoFish::Game, type: :model do
         let(:taken_card) { Card.new(rank, 'Spades') }
 
         before do
-          opponent.cards = [ Card.new('8', 'Diamonds') ]
+          opponent.cards = [Card.new('8', 'Diamonds')]
         end
 
         context 'when player cannot make book' do
           let(:rank) { 'A' }
 
           before do
-            game.deck.cards = [ taken_card, Card.new('5', 'Clubs') ]
-            player1.cards = [ Card.new(rank, 'Hearts') ]
+            game.deck.cards = [taken_card, Card.new('5', 'Clubs')]
+            player1.cards = [Card.new(rank, 'Hearts')]
           end
 
           it 'takes from top of deck and gives to player' do
@@ -228,8 +228,8 @@ RSpec.describe GoFish::Game, type: :model do
           let(:rank) { 'A' }
 
           before do
-            player1.cards = [ Card.new(rank, 'Spades'), Card.new(rank, 'Hearts'), Card.new(rank, 'Diamonds') ]
-            game.deck.cards = [ taken_card ]
+            player1.cards = [Card.new(rank, 'Spades'), Card.new(rank, 'Hearts'), Card.new(rank, 'Diamonds')]
+            game.deck.cards = [taken_card]
           end
 
           it 'makes a book' do
@@ -264,13 +264,13 @@ RSpec.describe GoFish::Game, type: :model do
         let(:taken_card) { Card.new(other_rank, 'Spades') }
 
         before do
-          opponent.cards = [ Card.new('8', 'Diamonds') ]
+          opponent.cards = [Card.new('8', 'Diamonds')]
         end
 
         context 'when player cannot make book' do
           before do
-            game.deck.cards = [ taken_card ]
-            player1.cards = [ Card.new(rank, 'Hearts') ]
+            game.deck.cards = [taken_card]
+            player1.cards = [Card.new(rank, 'Hearts')]
           end
 
           it 'takes from top of deck and gives to player' do
@@ -301,9 +301,9 @@ RSpec.describe GoFish::Game, type: :model do
           let(:taken_card) { Card.new(other_rank, 'Clubs') }
 
           before do
-            player1.cards = [ Card.new(rank, 'Hearts'), Card.new(other_rank, 'Spades'),
-                            Card.new(other_rank, 'Hearts'), Card.new(other_rank, 'Diamonds') ]
-            game.deck.cards = [ taken_card ]
+            player1.cards = [Card.new(rank, 'Hearts'), Card.new(other_rank, 'Spades'),
+                             Card.new(other_rank, 'Hearts'), Card.new(other_rank, 'Diamonds')]
+            game.deck.cards = [taken_card]
           end
 
           it 'makes a book' do
@@ -335,8 +335,8 @@ RSpec.describe GoFish::Game, type: :model do
         let(:rank) { 'A' }
 
         before do
-          opponent.cards = [ Card.new('8', 'Diamonds') ]
-          player1.cards = [ Card.new(rank, 'Hearts') ]
+          opponent.cards = [Card.new('8', 'Diamonds')]
+          player1.cards = [Card.new(rank, 'Hearts')]
           game.deck.cards = []
         end
         it 'returns the correct turn result' do
@@ -392,7 +392,7 @@ RSpec.describe GoFish::Game, type: :model do
 
       context 'deck has cards' do
         before do
-          game.deck.cards = [ card_taken, other_card ]
+          game.deck.cards = [card_taken, other_card]
         end
 
         it 'removes the card from the top of the deck' do
@@ -425,7 +425,7 @@ RSpec.describe GoFish::Game, type: :model do
 
       context 'when a different player requests a card' do
         before do
-          game.deck.cards = [ card_taken, other_card ]
+          game.deck.cards = [card_taken, other_card]
           game.current_player_index = 1
         end
 
@@ -459,14 +459,14 @@ RSpec.describe GoFish::Game, type: :model do
   end
 
   describe '#winning_player' do
-    let(:players) { [ player1, player2, player3 ] }
+    let(:players) { [player1, player2, player3] }
     let(:game) { described_class.new(players) }
 
     context 'when one player has most books' do
       before do
         player1.books = []
-        player2.books = [ GoFish::Book.new('5'), GoFish::Book.new('2'), GoFish::Book.new('10') ]
-        player3.books = [ GoFish::Book.new('A') ]
+        player2.books = [GoFish::Book.new('5'), GoFish::Book.new('2'), GoFish::Book.new('10')]
+        player3.books = [GoFish::Book.new('A')]
       end
 
       it 'returns that player' do
@@ -478,9 +478,9 @@ RSpec.describe GoFish::Game, type: :model do
 
     context 'when there is a tie' do
       before do
-        player1.books = [ GoFish::Book.new('8'), GoFish::Book.new('5'), GoFish::Book.new('2') ]
-        player2.books = [ GoFish::Book.new('5'), GoFish::Book.new('3'), GoFish::Book.new('4') ]
-        player3.books = [ GoFish::Book.new('A') ]
+        player1.books = [GoFish::Book.new('8'), GoFish::Book.new('5'), GoFish::Book.new('2')]
+        player2.books = [GoFish::Book.new('5'), GoFish::Book.new('3'), GoFish::Book.new('4')]
+        player3.books = [GoFish::Book.new('A')]
       end
 
       it 'returns user with most book and highest value book' do
@@ -491,7 +491,7 @@ RSpec.describe GoFish::Game, type: :model do
   end
 
   describe '#game_over?' do
-  let!(:game) { described_class.new([ player1, player2 ]) }
+    let!(:game) { described_class.new([player1, player2]) }
     # def game_over?
     #   book_count == BOOKS_TO_WIN
     # end
@@ -510,7 +510,7 @@ RSpec.describe GoFish::Game, type: :model do
       let(:p1_books) { 5 }
       before do
         add_books_to_player(player1, p1_books)
-        add_books_to_player(player2, GoFish::Game::BOOKS_TO_WIN-p1_books)
+        add_books_to_player(player2, GoFish::Game::BOOKS_TO_WIN - p1_books)
       end
 
       it 'returns true' do

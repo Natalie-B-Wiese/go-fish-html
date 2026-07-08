@@ -1,20 +1,20 @@
 module GoFish
   class TurnResult
-    NO_CARDS = "ran out of cards"
-    EMPTY_DECK = "The deck is empty"
-    GO_AGAIN = "can go again"
-    BOOK = "made a book with four"
-    DISQUALIFIED = "out of the game"
-    REQUEST = "requested a"
-    GO_FISH = "Go Fish"
-    TAKE_DECK = "drew a"
+    NO_CARDS = 'ran out of cards'.freeze
+    EMPTY_DECK = 'The deck is empty'.freeze
+    GO_AGAIN = 'can go again'.freeze
+    BOOK = 'made a book with four'.freeze
+    DISQUALIFIED = 'out of the game'.freeze
+    REQUEST = 'requested a'.freeze
+    GO_FISH = 'Go Fish'.freeze
+    TAKE_DECK = 'drew a'.freeze
 
     attr_reader :current_user_id, :opponent_user_id, :rank_requested
 
     attr_accessor :was_book_made, :card_received_deck, :cards_received_opponent
 
     def initialize(current_user_id:, opponent_user_id: nil, rank_requested: nil,
-                  cards_received_opponent: [], card_received_deck: nil, was_book_made: false)
+                   cards_received_opponent: [], card_received_deck: nil, was_book_made: false)
       @current_user_id = current_user_id
       @opponent_user_id = opponent_user_id
       @rank_requested = rank_requested
@@ -36,12 +36,12 @@ module GoFish
     end
 
     def action_message
-      return "" if player_out_of_cards?
+      return '' if player_out_of_cards?
 
-      if cards_received_opponent.nil? || cards_received_opponent.empty?
+      if cards_received_opponent.empty?
         "#{GO_FISH}: #{opponent_user_name} doesn't have any #{rank_requested}s"
       else
-        card_word = cards_received_opponent.length == 1 ? "card" : "cards"
+        card_word = cards_received_opponent.length == 1 ? 'card' : 'cards'
         "#{opponent_user_name} gave #{cards_received_opponent.length} #{card_word} to #{current_user_name}. "
       end
     end
@@ -60,35 +60,41 @@ module GoFish
 
     def as_json
       {
-        "current_user_id" => current_user_id,
-        "opponent_user_id" => opponent_user_id,
-        "rank_requested" => rank_requested,
-        "cards_received_opponent" => cards_received_opponent.map(&:as_json),
-        "card_received_deck" => card_received_deck.as_json,
-        "was_book_made" => was_book_made
+        'current_user_id' => current_user_id,
+        'opponent_user_id' => opponent_user_id,
+        'rank_requested' => rank_requested,
+        'cards_received_opponent' => cards_received_opponent.map(&:as_json),
+        'card_received_deck' => card_received_deck.as_json,
+        'was_book_made' => was_book_made
       }
 
       #  'display' => request_message + action_message + result_message
     end
 
     def self.from_json(json)
-      json_cards= json["cards_received_opponent"].nil? ? [] : json["cards_received_opponent"].map { |card_json| Card.from_json(card_json) }
-      json_deck_card=json["card_received_deck"].nil? ? nil : Card.from_json(json["card_received_deck"])
+      json_cards = if json['cards_received_opponent'].nil?
+                     []
+                   else
+                     json['cards_received_opponent'].map do |card_json|
+                       Card.from_json(card_json)
+                     end
+                   end
+      json_deck_card = json['card_received_deck'].nil? ? nil : Card.from_json(json['card_received_deck'])
 
-      self.new(current_user_id: json["current_user_id"], opponent_user_id: json["opponent_user_id"],
-              rank_requested: json["rank_requested"], cards_received_opponent: json_cards,
-              card_received_deck: json_deck_card,
-              was_book_made: json["was_book_made"])
+      new(current_user_id: json['current_user_id'], opponent_user_id: json['opponent_user_id'],
+          rank_requested: json['rank_requested'], cards_received_opponent: json_cards,
+          card_received_deck: json_deck_card,
+          was_book_made: json['was_book_made'])
     end
 
     def ==(other)
       return false if other.nil?
 
-      (current_user_id==other.current_user_id &&
-      opponent_user_id==other.opponent_user_id &&
-      rank_requested==other.rank_requested &&
-      cards_received_opponent==other.cards_received_opponent &&
-      was_book_made==other.was_book_made)
+      current_user_id == other.current_user_id &&
+        opponent_user_id == other.opponent_user_id &&
+        rank_requested == other.rank_requested &&
+        cards_received_opponent == other.cards_received_opponent &&
+        was_book_made == other.was_book_made
     end
 
     def rank_received
@@ -102,6 +108,7 @@ module GoFish
     end
 
     private
+
     def current_user_name
       User.find(current_user_id).name
     end
@@ -131,9 +138,9 @@ module GoFish
     end
 
     def deck_messages
-      return "" unless card_received_deck
+      return '' unless card_received_deck
 
-      card_str = rank_received == rank_requested ? rank_requested : "card"
+      card_str = rank_received == rank_requested ? rank_requested : 'card'
       "#{current_user_name} #{TAKE_DECK} #{card_str} from the deck. "
     end
   end
