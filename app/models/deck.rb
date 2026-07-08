@@ -14,7 +14,7 @@ class Deck
       return as_json==other.as_json   
   end
 
-  def as_json(*)
+  def as_json
     {
       cards: cards.map(&:as_json)
     }

@@ -15,7 +15,7 @@ module GoFish
       as_json==other.as_json
     end
 
-    def as_json(*)
+    def as_json
       {
         user_id: user_id,
         cards: cards.map(&:as_json),

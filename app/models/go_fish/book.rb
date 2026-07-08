@@ -14,7 +14,7 @@ module GoFish
       "#{Card.rank_to_s(rank).downcase}_of_hearts.png"
     end
 
-    def as_json(*)
+    def as_json
       {
         rank: rank
       }
