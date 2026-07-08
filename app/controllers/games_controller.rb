@@ -1,10 +1,6 @@
 class GamesController < ApplicationController
-  def new
-    @game=Game.new
-  end
-
   def show
-    @game=Game.find(params[:id])
+    @game = Game.find(params[:id])
 
     @game.start! if @game.full? && !@game.started?
 
@@ -19,18 +15,22 @@ class GamesController < ApplicationController
     end
   end
 
+  def new
+    @game = Game.new
+  end
+
   def create
-    @game=Game.new(game_params)
+    @game = Game.new(game_params)
     if @game.save && Player.create(user: Current.user, game: @game)
       redirect_to root_url
     else
-      flash.now[:alert]='There was a problem creating a game.'
+      flash.now[:alert] = 'There was a problem creating a game.'
       render :new, status: :unprocessable_content
     end
   end
 
   def join
-    game=Game.find(params[:id])
+    game = Game.find(params[:id])
 
     # TODO: don't let them join a game that is full
 
@@ -38,33 +38,35 @@ class GamesController < ApplicationController
     if Player.create(user: Current.user, game: game)
       redirect_to show_game_path(game)
     else
-      flash.now[:alert]='There was a problem joining a game.'
+      flash.now[:alert] = 'There was a problem joining a game.'
       render :index, status: :unprocessable_content
     end
   end
 
   def play
-    game_id=turn_result_params[:game_id]
-    game=Game.find(game_id)
-
-    # opponent user id and rank requested is nil when player is out of cards and drawing from deck
-    opponent_user_id = turn_result_params[:player].nil? ? nil : Integer(turn_result_params[:player])
-
-    game.go_fish.play_turn(opponent_user_id: opponent_user_id, rank_requested: turn_result_params[:rank])
+    game = Game.find(params[:id])
+    play_turn(game)
     game.save!
 
     # TODO: only redirect if successful and user can view the game?
-    redirect_to show_game_path(game_id)
+    redirect_to show_game_path(game)
   end
-
 
   private
 
-  def game_params
-    params.require(:game).permit(:name, :game_type, :player_count)
+  def play_turn(game)
+    turn_params = turn_result_params
+    game.go_fish.play_turn(opponent_user_id: Integer(turn_params[:player]), rank_requested: turn_params[:rank])
+  rescue ActionController::ParameterMissing
+    game.go_fish.play_turn(opponent_user_id: nil, rank_requested: nil)
   end
 
+  # throws a ActionController::ParameterMissing if user is requesting a card from the deck (aka hand empty)
   def turn_result_params
-    params.expect(turn_result: [ :player, :rank, :game_id ])
+    params.expect(turn_result: %i[player rank])
+  end
+
+  def game_params
+    params.require(:game).permit(:name, :game_type, :player_count)
   end
 end

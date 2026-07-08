@@ -4,7 +4,7 @@
 / is_my_turn (a boolean)
 / game: a Game object (not specific to Go Fish)
 
-= simple_form_for :turn_result, url: play_turn_path, html: { class: "game-actions op-stack items-stretch.gap-sm" } do |f|
+= simple_form_for :turn_result, url: play_turn_path(game.id), html: { class: "game-actions op-stack items-stretch.gap-sm" } do |f|
 	- unless my_ranks.empty?
 		.game-actions__options.op-split.items-stretch.gap-sm
 			= f.input :player,
@@ -18,8 +18,6 @@
 			collection: my_ranks,
 			selected: my_ranks.first,
 			wrapper_html: { class: 'flex-grow-1'}
-
-	= f.hidden_field :game_id, value: game.id
 
 	- if is_my_turn
 		= f.button :submit, 'Play'

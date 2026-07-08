@@ -15,7 +15,7 @@ RSpec.describe 'Games', type: :system do
 
   def add_books_to_player(player, num_books = 1)
     num_books.times do
-      player.books += [ GoFish::Book.new('4') ]
+      player.books += [GoFish::Book.new('4')]
     end
   end
 
@@ -91,8 +91,7 @@ RSpec.describe 'Games', type: :system do
 
   context 'join game flow' do
     let(:game1_name) { 'Cool game' }
-    let!(:game) { create :game, :with_users, name: game1_name, player_count: 3, users: [ user1 ] }
-
+    let!(:game) { create :game, :with_users, name: game1_name, player_count: 3, users: [user1] }
 
     context 'when game does not have all players' do
       before do
@@ -152,7 +151,7 @@ RSpec.describe 'Games', type: :system do
     end
 
     context 'when game is full' do
-      let!(:game) { create :game, :with_users, name: game1_name, player_count: 3, users: [ user1, user2, user3 ] }
+      let!(:game) { create :game, :with_users, name: game1_name, player_count: 3, users: [user1, user2, user3] }
 
       before do
         sign_out
@@ -197,8 +196,8 @@ RSpec.describe 'Games', type: :system do
     let(:full_game) { Game.find_by(name: full_game_name) }
 
     before do
-      create :game, :with_users, name: unfull_game_name, player_count: 3, users: [ user1, user2 ]
-      create :game, :with_users, name: full_game_name, player_count: 3, users: [ user1, user2, user3 ]
+      create :game, :with_users, name: unfull_game_name, player_count: 3, users: [user1, user2]
+      create :game, :with_users, name: full_game_name, player_count: 3, users: [user1, user2, user3]
     end
 
     it 'shows the game name' do
@@ -240,7 +239,7 @@ RSpec.describe 'Games', type: :system do
 
       it 'starts the game and only starts it once' do
         expect(full_game.reload).to be_started
-        started_at=Game.find(full_game.id).started_at
+        started_at = Game.find(full_game.id).started_at
 
         sleep(1)
         visit show_game_path(full_game)
@@ -264,28 +263,30 @@ RSpec.describe 'Games', type: :system do
         end
 
         it 'has accordions of other players only' do
-          player1_accordions = elements_within_parent(parent_selector: '.players', element_index: 0, element_selector: '.accordion')
+          player1_accordions = elements_within_parent(parent_selector: '.players', element_index: 0,
+                                                      element_selector: '.accordion')
           expect(player1_accordions[0]).to have_content(user2.name)
           expect(player1_accordions[1]).to have_content(user3.name)
 
           sign_out
           sign_in_as(user2)
           visit show_game_path(full_game)
-          player2_accordions = elements_within_parent(parent_selector: '.players', element_index: 0, element_selector: '.accordion')
+          player2_accordions = elements_within_parent(parent_selector: '.players', element_index: 0,
+                                                      element_selector: '.accordion')
           expect(player2_accordions[0]).to have_content(user1.name)
           expect(player2_accordions[1]).to have_content(user3.name)
         end
 
         it 'deals the cards to the players' do
           within '.game-view__hand' do
-            player1_card_count=find_all('.playing-card').count
+            player1_card_count = find_all('.playing-card').count
             expect(player1_card_count).to eq GoFish::Game::SMALL_GAME_CARDS
           end
 
           player2_card_count = elements_within_parent(parent_selector: '.accordion',
-                                    element_index: 0, element_selector: '.playing-card').count
+                                                      element_index: 0, element_selector: '.playing-card').count
           player3_card_count = elements_within_parent(parent_selector: '.accordion',
-                                    element_index: 1, element_selector: '.playing-card').count
+                                                      element_index: 1, element_selector: '.playing-card').count
 
           expect(player2_card_count).to eq GoFish::Game::SMALL_GAME_CARDS
           expect(player3_card_count).to eq GoFish::Game::SMALL_GAME_CARDS
@@ -317,25 +318,25 @@ RSpec.describe 'Games', type: :system do
         context 'when player has cards' do
           it 'has correct player dropdown options' do
             dropdown_options1 = page.find_field('Player').all('option').map(&:text)
-            expect(dropdown_options1).to eq [ user2.name, user3.name ]
+            expect(dropdown_options1).to eq [user2.name, user3.name]
 
             sign_out
             sign_in_as(user2)
             visit show_game_path(full_game)
 
             dropdown_options2 = page.find_field('Player').all('option').map(&:text)
-            expect(dropdown_options2).to eq [ user1.name, user3.name ]
+            expect(dropdown_options2).to eq [user1.name, user3.name]
           end
 
           it 'has correct rank dropdown options' do
-            p1_card_ranks=full_game.go_fish.players[0].card_ranks
+            p1_card_ranks = full_game.go_fish.players[0].card_ranks
             dropdown_options1 = page.find_field('Rank').all('option').map(&:text)
             expect(dropdown_options1).to match_array(p1_card_ranks)
 
             sign_out
             sign_in_as(user2)
             visit show_game_path(full_game)
-            p2_card_ranks=full_game.go_fish.players[1].card_ranks
+            p2_card_ranks = full_game.go_fish.players[1].card_ranks
             dropdown_options2 = page.find_field('Rank').all('option').map(&:text)
             expect(dropdown_options2).to match_array(p2_card_ranks)
           end
@@ -364,11 +365,9 @@ RSpec.describe 'Games', type: :system do
           end
         end
 
-
-
         context 'when current player is out of cards' do
           before do
-            full_game.go_fish.players.first.cards=[]
+            full_game.go_fish.players.first.cards = []
             full_game.save!
             full_game.reload
             visit show_game_path(full_game)
@@ -386,7 +385,6 @@ RSpec.describe 'Games', type: :system do
             before do
               page.click_on 'Play'
               full_game.reload
-              visit show_game_path(full_game)
             end
 
             it 'stays on current game show page' do
@@ -412,14 +410,13 @@ RSpec.describe 'Games', type: :system do
 
           context 'when current player clicks on play button and deck has no cards' do
             before do
-              full_game.go_fish.deck.cards=[]
+              full_game.go_fish.deck.cards = []
               full_game.save!
               full_game.reload
               visit show_game_path(full_game)
 
               page.click_on 'Play'
               full_game.reload
-              visit show_game_path(full_game)
             end
 
             it 'stays on current game show page' do
@@ -471,7 +468,7 @@ RSpec.describe 'Games', type: :system do
         end
 
         it 'records an ended at date only once' do
-          ended_at=full_game.ended_at
+          ended_at = full_game.ended_at
           expect(ended_at).to_not be_nil
 
           sleep(3)
@@ -489,9 +486,10 @@ RSpec.describe 'Games', type: :system do
     end
   end
 
-
   context 'games page' do
-    let!(:game1) { create :completed_game, :with_users_and_winner, name: 'Finished Game', users: [ user1, user2 ], user_won: user2 }
+    let!(:game1) do
+      create :completed_game, :with_users_and_winner, name: 'Finished Game', users: [user1, user2], user_won: user2
+    end
 
     it 'does not show games already finished' do
       visit games_path
@@ -500,10 +498,16 @@ RSpec.describe 'Games', type: :system do
   end
 
   context '/games/history' do
-    let!(:game1) { create :completed_game, :with_users_and_winner, name: 'Game 1', users: [ user1, user2 ], user_won: user2 }
-    let!(:game2) { create :completed_game, :with_users_and_winner, name: 'Game no user1', users: [ user2, user3 ], user_won: user3 }
-    let!(:game3) { create :game, :with_users, name: 'Unfinished Game', users: [ user1, user2, user3 ] }
-    let!(:game4) { create :completed_game, :with_users_and_winner, name: 'Game 4', users: [ user1, user3 ], user_won: user3 }
+    let!(:game1) do
+      create :completed_game, :with_users_and_winner, name: 'Game 1', users: [user1, user2], user_won: user2
+    end
+    let!(:game2) do
+      create :completed_game, :with_users_and_winner, name: 'Game no user1', users: [user2, user3], user_won: user3
+    end
+    let!(:game3) { create :game, :with_users, name: 'Unfinished Game', users: [user1, user2, user3] }
+    let!(:game4) do
+      create :completed_game, :with_users_and_winner, name: 'Game 4', users: [user1, user3], user_won: user3
+    end
 
     before do
       visit games_history_path
@@ -524,13 +528,13 @@ RSpec.describe 'Games', type: :system do
     end
 
     it 'shows who played' do
-      expect(page).to have_content user1.email_address+", "+user2.email_address
-      expect(page).to have_content user1.email_address+", "+user3.email_address
+      expect(page).to have_content user1.email_address + ', ' + user2.email_address
+      expect(page).to have_content user1.email_address + ', ' + user3.email_address
     end
 
     it 'shows when it was finished' do
-      expect(page).to have_content game1.ended_at.strftime("%b %d, %Y")
-      expect(page).to have_content game4.ended_at.strftime("%b %d, %Y")
+      expect(page).to have_content game1.ended_at.strftime('%b %d, %Y')
+      expect(page).to have_content game4.ended_at.strftime('%b %d, %Y')
     end
 
     it 'show the winner' do
