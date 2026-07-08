@@ -10,7 +10,7 @@ div.card.card--padded.card--condensed
 			div.flex.items-center
 				| #{game.num_joined_players}/#{game.player_count} Players
 			- if is_in_game 
-				= button_to show_game_path(game.id), method: :get, class: "btn" do
+				= button_to show_game_path(game), method: :get, class: "btn" do
 					- if game.full?
 						| Play Now
 						i.ph.ph-arrow-fat-line-right.icon.icon--large
@@ -19,6 +19,6 @@ div.card.card--padded.card--condensed
 						i.ph.ph-arrow-fat-line-right.icon.icon--large
 
 			- else 
-				= button_to join_game_path(game.id), method: :post, class: "btn" do
+				= button_to join_game_path(game), method: :post, class: "btn" do
 					| Join
 					i.ph.ph-user-plus.icon.icon--large

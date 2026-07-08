@@ -36,7 +36,7 @@ class GamesController < ApplicationController
 
     # prevents user from joining a game they are already in
     if Player.create(user: Current.user, game: game)
-      redirect_to show_game_path(game.id)
+      redirect_to show_game_path(game)
     else
       flash.now[:alert]="There was a problem joining a game."
       render :index, status: :unprocessable_content
