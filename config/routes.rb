@@ -12,8 +12,8 @@ Rails.application.routes.draw do
 
   get "games/history", to: "games#history"
   resources :games, only: [:index, :new, :create]
-  # TODO: change to post for join
-  get "games/join/:id", to: 'games#join', as: "join_game"
+  
+  post "games/:id/join", to: 'games#join', as: "join_game"
   
   get "games/:id", to: 'games#show', as: "show_game"
   
