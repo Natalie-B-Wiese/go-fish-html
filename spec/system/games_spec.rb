@@ -110,7 +110,7 @@ RSpec.describe 'Games', type: :system do
 
         it 'clicking on button allows player to view the game' do
           click_on('View')
-          expect(page.current_path).to eq show_game_path(game.id)
+          expect(page.current_path).to eq show_game_path(game)
         end
       end
       
@@ -137,7 +137,7 @@ RSpec.describe 'Games', type: :system do
         it 'allows player to join the game and goes to show path' do
           expect do
             click_on('Join')
-            expect(page.current_path).to eq show_game_path(game.id)
+            expect(page.current_path).to eq show_game_path(game)
             
             visit root_path
             within('.all-games') do
@@ -173,7 +173,7 @@ RSpec.describe 'Games', type: :system do
 
         it 'when clicked on play now, it allows player to view the game' do
           click_on 'Play Now'
-          expect(page.current_path).to eq show_game_path(game.id)
+          expect(page.current_path).to eq show_game_path(game)
         end
       end
       
@@ -204,15 +204,15 @@ RSpec.describe 'Games', type: :system do
     end
 
     it 'shows the game name' do
-      visit show_game_path(unfull_game.id)
+      visit show_game_path(unfull_game)
       expect(page).to have_content unfull_game_name
 
-      visit show_game_path(full_game.id)
+      visit show_game_path(full_game)
       expect(page).to have_content full_game_name
     end
     
     it 'shows only the players in that game' do
-      visit show_game_path(unfull_game.id)
+      visit show_game_path(unfull_game)
 
       expect(page).to have_content user1.name
       expect(page).to have_content user2.name
@@ -221,7 +221,7 @@ RSpec.describe 'Games', type: :system do
 
     context 'before game is full' do
       before do
-        visit show_game_path(unfull_game.id)
+        visit show_game_path(unfull_game)
       end
 
       it 'game is not started' do
@@ -237,7 +237,7 @@ RSpec.describe 'Games', type: :system do
 
     context 'when game is full' do
       before do
-        visit show_game_path(full_game.id)
+        visit show_game_path(full_game)
       end
 
       it 'starts the game and only starts it once' do
@@ -245,7 +245,7 @@ RSpec.describe 'Games', type: :system do
         started_at=Game.find(full_game.id).started_at
 
         sleep(1)
-        visit show_game_path(full_game.id)
+        visit show_game_path(full_game)
         expect(full_game.reload.started_at).to eq started_at
       end
 
@@ -262,7 +262,7 @@ RSpec.describe 'Games', type: :system do
       context 'when game is started' do
         before do
           full_game.reload
-          visit show_game_path(full_game.id)
+          visit show_game_path(full_game)
         end
 
         it 'has accordions of other players only' do
@@ -272,7 +272,7 @@ RSpec.describe 'Games', type: :system do
           
           sign_out
           sign_in_as(user2)
-          visit show_game_path(full_game.id)
+          visit show_game_path(full_game)
           player2_accordions = elements_within_parent(parent_selector: '.players', element_index: 0, element_selector: '.accordion')
           expect(player2_accordions[0]).to have_content(user1.name)
           expect(player2_accordions[1]).to have_content(user3.name)
@@ -298,7 +298,7 @@ RSpec.describe 'Games', type: :system do
 
           sign_out
           sign_in_as(user2)
-          visit show_game_path(full_game.id)
+          visit show_game_path(full_game)
           expect(page).to have_content("#{user1.name}'s Turn")
         end
 
@@ -307,12 +307,12 @@ RSpec.describe 'Games', type: :system do
 
           sign_out
           sign_in_as(user2)
-          visit show_game_path(full_game.id)
+          visit show_game_path(full_game)
           expect(page).to have_button('Play', disabled: true)
 
           sign_out
           sign_in_as(user3)
-          visit show_game_path(full_game.id)
+          visit show_game_path(full_game)
           expect(page).to have_button('Play', disabled: true)
         end
 
@@ -323,7 +323,7 @@ RSpec.describe 'Games', type: :system do
 
             sign_out
             sign_in_as(user2)
-            visit show_game_path(full_game.id)
+            visit show_game_path(full_game)
 
             dropdown_options2 = page.find_field('Player').all('option').map(&:text)
             expect(dropdown_options2).to eq [user1.name, user3.name]
@@ -336,7 +336,7 @@ RSpec.describe 'Games', type: :system do
 
             sign_out
             sign_in_as(user2)
-            visit show_game_path(full_game.id)
+            visit show_game_path(full_game)
             p2_card_ranks=full_game.go_fish.players[1].card_ranks
             dropdown_options2 = page.find_field('Rank').all('option').map(&:text)
             expect(dropdown_options2).to match_array(p2_card_ranks)
@@ -349,7 +349,7 @@ RSpec.describe 'Games', type: :system do
             end
 
             it 'stays on current game show page' do
-              expect(page).to have_current_path show_game_path(full_game.id)
+              expect(page).to have_current_path show_game_path(full_game)
             end
 
             it 'preforms the move' do
@@ -374,7 +374,7 @@ RSpec.describe 'Games', type: :system do
             full_game.go_fish.players.first.cards=[]
             full_game.save!
             full_game.reload
-            visit show_game_path(full_game.id)
+            visit show_game_path(full_game)
           end
 
           it 'does not have dropdown for player' do
@@ -389,11 +389,11 @@ RSpec.describe 'Games', type: :system do
             before do
               page.click_on 'Play'
               full_game.reload
-              visit show_game_path(full_game.id)
+              visit show_game_path(full_game)
             end
 
             it 'stays on current game show page' do
-              expect(page).to have_current_path show_game_path(full_game.id)
+              expect(page).to have_current_path show_game_path(full_game)
             end
 
             it 'draws from the deck' do
@@ -418,15 +418,15 @@ RSpec.describe 'Games', type: :system do
               full_game.go_fish.deck.cards=[]
               full_game.save!
               full_game.reload
-              visit show_game_path(full_game.id)
+              visit show_game_path(full_game)
 
               page.click_on 'Play'
               full_game.reload
-              visit show_game_path(full_game.id)
+              visit show_game_path(full_game)
             end
 
             it 'stays on current game show page' do
-              expect(page).to have_current_path show_game_path(full_game.id)
+              expect(page).to have_current_path show_game_path(full_game)
             end
 
             it 'does not get a card' do
@@ -445,7 +445,7 @@ RSpec.describe 'Games', type: :system do
               expect(page).to have_button('Play', disabled: true)
               sign_out
               sign_in_as(user2)
-              visit show_game_path(full_game.id)
+              visit show_game_path(full_game)
               expect(page).to have_button('Play', disabled: false)
             end
           end
@@ -457,14 +457,14 @@ RSpec.describe 'Games', type: :system do
         before do
           # ensures game is started
           full_game.reload
-          visit show_game_path(full_game.id)
+          visit show_game_path(full_game)
 
           # add the books
           add_books_to_player(full_game.go_fish.players.first, GoFish::Game::BOOKS_TO_WIN)
           full_game.save!
 
           full_game.reload
-          visit show_game_path(full_game.id)
+          visit show_game_path(full_game)
           full_game.reload
         end
 
@@ -480,7 +480,7 @@ RSpec.describe 'Games', type: :system do
           sleep(3)
 
           full_game.reload
-          visit show_game_path(full_game.id)
+          visit show_game_path(full_game)
           full_game.reload
           expect(full_game.ended_at).to eq ended_at
         end
