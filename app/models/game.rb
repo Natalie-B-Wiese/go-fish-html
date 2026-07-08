@@ -55,6 +55,8 @@ class Game < ApplicationRecord
   end
 
   def game_over?
+    return false if go_fish.nil?
+    
     go_fish.game_over?
   end  
   
