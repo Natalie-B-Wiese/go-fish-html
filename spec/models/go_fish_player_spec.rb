@@ -92,46 +92,6 @@ RSpec.describe GoFish::Player, type: :model do
     end
   end
 
-  xdescribe '#card_count' do
-    context 'when the player has no cards' do
-      it 'returns 0' do
-        result = player.card_count
-        expect(result).to eq 0
-      end
-    end
-
-    context 'when there is 1 card' do
-      it 'returns 1' do
-        player.add_card(Card.new('A', 'Spades'))
-
-        result = player.card_count
-        expect(result).to eq 1
-      end
-    end
-
-    context 'when there are many cards' do
-      it 'returns correct number' do
-        player.add_card(Card.new('A', 'Spades'))
-        player.add_card(Card.new('J', 'Diamonds'))
-        player.add_card(Card.new('3', 'Hearts'))
-
-        result = player.card_count
-        expect(result).to eq 3
-      end
-    end
-  end
-
-  xdescribe '#out_of_cards?' do
-    it 'returns true when player has no cards' do
-      expect(player).to be_out_of_cards
-    end
-
-    it 'returns false when player has cards' do
-      player.add_card(Card.new('A', 'Spades'))
-      expect(player).to_not be_out_of_cards
-    end
-  end
-
   describe '#try_make_book' do
     let(:possible_rank) { 'A' }
     let(:impossible_rank) { '5' }
@@ -232,34 +192,5 @@ RSpec.describe GoFish::Player, type: :model do
       end
     end
 
-  end
-
-  xdescribe '#cards_to_s' do
-    context 'when hand is empty' do
-      it 'shows empty cards message' do
-        expect(player.cards_to_s).to match(/no cards/i)
-      end
-    end
-
-    context 'when hand has 1 card' do
-      before do
-        player.add_card(Card.new('5', 'Diamonds'))
-      end
-      it 'shows card' do
-        result = player.cards_to_s
-        expect(result).to eq '5 of Diamonds'
-      end
-    end
-
-    context 'when hand has multiple cards' do
-      before do
-        player.add_card(Card.new('5', 'Diamonds'))
-        player.add_card(Card.new('3', 'Hearts'))
-      end
-      it 'shows sorted cards seperated by commas' do
-        result = player.cards_to_s
-        expect(result).to eq '3 of Hearts, 5 of Diamonds'
-      end
-    end
   end
 end
