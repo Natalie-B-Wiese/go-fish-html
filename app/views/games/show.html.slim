@@ -44,13 +44,6 @@ div.panel.panel--padded.game-view__game-board
 		- unless my_player.nil?
 			= render 'request_card_form', game: game, is_my_turn: is_my_turn, my_ranks: my_player.card_ranks , opponents: opponents
 
-		/- if my_player.out_of_cards?
-		/	= render 'take_deck_form', is_my_turn: is_my_turn
-		/- else
-			/ == slim :'_request_card_form', locals: { is_my_turn: is_my_turn, my_player: my_player, opponents: opponents}
-
-
-
 
 div.game-view__hand.panel.panel--secondary
 	header.panel__header
