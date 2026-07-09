@@ -46,6 +46,9 @@ class GamesController < ApplicationController
 
   def play
     game = Game.find(params[:id])
+
+    return redirect_to show_game_path(game) if game.go_fish.current_user_id != Current.user.id
+
     play_turn(game)
     game.save!
 

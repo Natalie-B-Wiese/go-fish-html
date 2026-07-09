@@ -96,6 +96,10 @@ module GoFish
       total_book_count == BOOKS_TO_WIN
     end
 
+    def current_user_id
+      players[current_player_index].user_id
+    end
+
     private
 
     def valid_opponent?(opponent_user_id)
@@ -141,10 +145,6 @@ module GoFish
     def switch_turn
       self.current_player_index += 1
       self.current_player_index = 0 if current_player_index >= players.length
-    end
-
-    def current_user_id
-      players[current_player_index].user_id
     end
 
     def player_from_user_id(user_id)

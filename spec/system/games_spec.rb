@@ -301,6 +301,24 @@ RSpec.describe 'Games', type: :system do
           expect(page).to have_button('Play', disabled: true)
         end
 
+        context 'when non current player hacks in and clicks on play button', js: true do
+          before do
+            sign_out
+            sign_in_as(user2)
+            visit show_game_path(full_game)
+
+            page.execute_script("document.querySelector(\"input[type='submit'][value='Play']\").disabled = false;")
+            page.click_on 'Play'
+            full_game.reload
+          end
+
+          it 'does not preform the move' do
+            page.within '.feed-content' do
+              expect(page.find_all('.feed-bubble').count).to eq 0
+            end
+          end
+        end
+
         context 'when player has cards' do
           it 'has correct player dropdown options' do
             dropdown_options1 = page.find_field('Player').all('option').map(&:text)
