@@ -83,13 +83,21 @@ RSpec.describe GoFish::Player, type: :model do
 
   describe '#card_ranks' do
     it 'returns an array of ranks' do
-      player.add_cards([Card.new('3', 'Spades'), Card.new('5', 'Hearts'), Card.new('A', 'Diamonds')])
-      expect(player.card_ranks).to eq %w[3 5 A]
+      ranks = %w[3 5 A]
+      ranks.each do |rank|
+        player.add_card(Card.new(rank, 'Hearts'))
+      end
+
+      expect(player.card_ranks).to eq ranks
     end
 
     it 'ignores duplicates' do
-      player.add_cards([Card.new('3', 'Spades'), Card.new('3', 'Hearts'), Card.new('5', 'Diamonds')])
-      expect(player.card_ranks).to eq %w[3 5]
+      ranks = %w[3 3 5]
+      ranks.each do |rank|
+        player.add_card(Card.new(rank, 'Hearts'))
+      end
+
+      expect(player.card_ranks).to eq ranks.uniq
     end
   end
 
