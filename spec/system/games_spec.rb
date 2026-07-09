@@ -5,6 +5,14 @@ RSpec.describe 'Games', type: :system do
   let!(:user3) { create(:user3) }
   let!(:user4) { create(:user4) }
 
+  def create_game(name: 'Game', player_count: 2, game_type: 'Go Fish')
+    visit new_game_path
+    fill_in 'Name', with: name
+    # fill_in 'Game type', with: game_type
+    fill_in 'Player count', with: player_count
+    click_button 'Create Game'
+  end
+
   before do
     sign_in_as(user1)
   end

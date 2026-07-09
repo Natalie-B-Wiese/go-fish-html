@@ -4,6 +4,7 @@ FactoryBot.define do
     player_count { 2 }
     started_at { nil }
     ended_at { nil }
+    type { 'GoFishGame' }
     association :winner, factory: :player, strategy: :null
 
     trait :started do
@@ -22,10 +23,10 @@ FactoryBot.define do
       end
 
       after(:create) do |game, evaluator|
-        game.player_count=evaluator.users.count
+        game.player_count = evaluator.users.count
         evaluator.users.each do |user|
-          player=create(:player, game: game, user: user)
-          game.update!(winner: player) if user==evaluator.user_won
+          player = create(:player, game: game, user: user)
+          game.update!(winner: player) if user == evaluator.user_won
         end
         game.reload
       end
@@ -45,8 +46,8 @@ FactoryBot.define do
       end
     end
 
-    factory :started_game, traits: [ :started ]
-    factory :completed_game, traits: [ :started, :completed ]
+    factory :started_game, traits: [:started]
+    factory :completed_game, traits: %i[started completed]
 
     # games in different states with players attached:
     # waiting game
