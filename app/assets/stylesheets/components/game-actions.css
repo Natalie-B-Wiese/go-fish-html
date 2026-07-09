@@ -8,4 +8,16 @@
   display: flex;
   flex-flow: column;
   gap: var(--op-space-x-small);
+
+  .game-actions__options
+  {
+    display: flex;
+    flex-flow: row;
+    gap: var(--op-space-small);
+    
+    *
+    {
+      flex-grow: 1;
+    }
+  }
 }

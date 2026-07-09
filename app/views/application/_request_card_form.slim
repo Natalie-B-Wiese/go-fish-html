@@ -5,18 +5,16 @@
 
 = simple_form_for @turn, url: play_turn_path(@turn.game), html: { class: "game-actions" } do |f|
 	- unless my_ranks.empty?
-		.game-actions__options.op-split.items-stretch.gap-sm
+		.game-actions__options
 			= f.input :player,
 			as: :select, 
 			collection: opponents,
-			selected: opponents.first,
-			wrapper_html: { class: 'flex-grow-1'}
+			selected: opponents.first
 
 			= f.input :rank,
 			as: :select, 
 			collection: my_ranks,
-			selected: my_ranks.first,
-			wrapper_html: { class: 'flex-grow-1'}
+			selected: my_ranks.first
 
 	- if is_my_turn
 		= f.button :submit, 'Play'
