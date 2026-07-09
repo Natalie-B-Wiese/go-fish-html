@@ -1,6 +1,7 @@
 class GamesController < ApplicationController
   def show
     @game = Game.find(params[:id])
+    @turn = Turn.new(game: @game, requestor_user: Current.user)
 
     @game.start! if @game.full? && !@game.started?
 
@@ -63,7 +64,7 @@ class GamesController < ApplicationController
 
   # throws a ActionController::ParameterMissing if user is requesting a card from the deck (aka hand empty)
   def turn_result_params
-    params.expect(turn_result: %i[player rank])
+    params.require(:turn).permit(:player, :rank)
   end
 
   def game_params
