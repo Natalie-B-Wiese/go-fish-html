@@ -333,14 +333,14 @@ RSpec.describe 'Games', type: :system do
           end
 
           it 'has correct rank dropdown options' do
-            p1_card_ranks = full_game.go_fish.players[0].card_ranks
+            p1_card_ranks = full_game.game_state.players[0].card_ranks
             dropdown_options1 = page.find_field('Rank').all('option').map(&:text)
             expect(dropdown_options1).to match_array(p1_card_ranks)
 
             sign_out
             sign_in_as(user2)
             visit show_game_path(full_game)
-            p2_card_ranks = full_game.go_fish.players[1].card_ranks
+            p2_card_ranks = full_game.game_state.players[1].card_ranks
             dropdown_options2 = page.find_field('Rank').all('option').map(&:text)
             expect(dropdown_options2).to match_array(p2_card_ranks)
           end
@@ -371,7 +371,7 @@ RSpec.describe 'Games', type: :system do
 
         context 'when current player is out of cards' do
           before do
-            full_game.go_fish.players.first.cards = []
+            full_game.game_state.players.first.cards = []
             full_game.save!
             full_game.reload
             visit show_game_path(full_game)
@@ -414,7 +414,7 @@ RSpec.describe 'Games', type: :system do
 
           context 'when current player clicks on play button and deck has no cards' do
             before do
-              full_game.go_fish.deck.cards = []
+              full_game.game_state.deck.cards = []
               full_game.save!
               full_game.reload
               visit show_game_path(full_game)
@@ -451,14 +451,14 @@ RSpec.describe 'Games', type: :system do
       end
 
       context 'when game is over' do
-        let(:winning_player) { full_game.go_fish.players.first }
+        let(:winning_player) { full_game.game_state.players.first }
         before do
           # ensures game is started
           full_game.reload
           visit show_game_path(full_game)
 
           # add the books
-          add_books_to_player(full_game.go_fish.players.first, GoFish::Game::BOOKS_TO_WIN)
+          add_books_to_player(full_game.game_state.players.first, GoFish::Game::BOOKS_TO_WIN)
           full_game.save!
 
           full_game.reload

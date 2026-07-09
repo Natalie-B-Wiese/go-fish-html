@@ -64,7 +64,7 @@ module GoFish
       turn_result = TurnResult.new(current_user_id: current_user_id, opponent_user_id: opponent_user_id,
                                    rank_requested: rank_requested)
       preform_move(turn_result)
-      turn_result.was_book_made = current_go_fish_player.book_made? if turn_result.rank_received
+      turn_result.was_book_made = current_player.book_made? if turn_result.rank_received
 
       switch_turn unless turn_result.go_again?
 
@@ -73,12 +73,13 @@ module GoFish
       turn_result
     end
 
-    def current_go_fish_player
+    # the Go Fish player whose turn it is
+    def current_player
       player_from_user_id(current_user_id)
     end
 
     def valid_move?(opponent_user_id, rank)
-      return true if opponent_user_id.nil? && rank.nil? && current_go_fish_player.out_of_cards?
+      return true if opponent_user_id.nil? && rank.nil? && current_player.out_of_cards?
 
       valid_opponent?(opponent_user_id) && valid_request_rank?(rank)
     end
@@ -109,18 +110,18 @@ module GoFish
     end
 
     def valid_request_rank?(rank)
-      current_go_fish_player.includes_card_with_rank?(rank)
+      current_player.includes_card_with_rank?(rank)
     end
 
     def opponents
-      players - [current_go_fish_player]
+      players - [current_player]
     end
 
     def request_deck_card(turn_result = TurnResult.new(current_user_id: current_user_id))
       unless deck.empty?
         card_taken = deck.take_top_card
         turn_result.card_received_deck = card_taken
-        current_go_fish_player.add_card(card_taken)
+        current_player.add_card(card_taken)
       end
 
       turn_result
@@ -175,7 +176,7 @@ module GoFish
       return request_deck_card(turn_result) if cards_taken_from_opponent.empty?
 
       turn_result.cards_received_opponent = cards_taken_from_opponent
-      current_go_fish_player.add_cards(cards_taken_from_opponent)
+      current_player.add_cards(cards_taken_from_opponent)
     end
   end
 end

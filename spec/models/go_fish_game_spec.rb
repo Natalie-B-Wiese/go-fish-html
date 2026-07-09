@@ -236,7 +236,7 @@ RSpec.describe GoFish::Game, type: :model do
 
           it 'does not switch turns' do
             game.play_turn(rank_requested: rank, opponent_user_id: opponent.user_id)
-            expect(game.current_go_fish_player).to eq player1
+            expect(game.current_player).to eq player1
           end
         end
       end
@@ -277,7 +277,7 @@ RSpec.describe GoFish::Game, type: :model do
 
           it 'does not switch turns' do
             game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
-            expect(game.current_go_fish_player).to eq player1
+            expect(game.current_player).to eq player1
           end
         end
 
@@ -308,7 +308,7 @@ RSpec.describe GoFish::Game, type: :model do
 
           it 'does not switch turns' do
             game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
-            expect(game.current_go_fish_player).to eq player1
+            expect(game.current_player).to eq player1
           end
         end
       end
@@ -349,7 +349,7 @@ RSpec.describe GoFish::Game, type: :model do
 
           it 'switches turns' do
             game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
-            expect(game.current_go_fish_player).to eq player2
+            expect(game.current_player).to eq player2
           end
         end
 
@@ -382,7 +382,7 @@ RSpec.describe GoFish::Game, type: :model do
 
           it 'switches turns' do
             game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
-            expect(game.current_go_fish_player).to_not eq player1
+            expect(game.current_player).to_not eq player1
           end
         end
       end
@@ -409,7 +409,7 @@ RSpec.describe GoFish::Game, type: :model do
 
         it 'switches turns' do
           game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
-          expect(game.current_go_fish_player).to eq player2
+          expect(game.current_player).to eq player2
         end
       end
     end

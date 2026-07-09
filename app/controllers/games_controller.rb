@@ -22,7 +22,7 @@ class GamesController < ApplicationController
 
   def create
     @game = Game.new(game_params)
-    if @game.save && Player.create(user: Current.user, game: @game)
+    if Player.create(user: Current.user, game: @game) && @game.save
       redirect_to root_url
     else
       flash.now[:alert] = 'There was a problem creating a game.'
@@ -47,7 +47,7 @@ class GamesController < ApplicationController
   def play
     game = Game.find(params[:id])
 
-    return redirect_to show_game_path(game) if game.go_fish.current_user_id != Current.user.id
+    return redirect_to show_game_path(game) if game.game_state.current_user_id != Current.user.id
 
     play_turn(game)
     game.save!
@@ -60,9 +60,9 @@ class GamesController < ApplicationController
 
   def play_turn(game)
     turn_params = turn_result_params
-    game.go_fish.play_turn(opponent_user_id: Integer(turn_params[:player]), rank_requested: turn_params[:rank])
+    game.game_state.play_turn(opponent_user_id: Integer(turn_params[:player]), rank_requested: turn_params[:rank])
   rescue ActionController::ParameterMissing
-    game.go_fish.play_turn(opponent_user_id: nil, rank_requested: nil)
+    game.game_state.play_turn(opponent_user_id: nil, rank_requested: nil)
   end
 
   # throws a ActionController::ParameterMissing if user is requesting a card from the deck (aka hand empty)

@@ -1,9 +1,9 @@
 - game = Game.find(params[:id])
 - users_in_game=game.users
 - my_user=Current.user
-- my_player=game.find_go_fish_player_by_user_id(my_user.id)
-- current_go_fish_user = game.current_go_fish_user
-- is_my_turn=current_go_fish_user==my_user
+- my_player=game.find_game_state_player_by_user_id(my_user.id)
+- current_game_state_user = game.current_game_state_user
+- is_my_turn=current_game_state_user==my_user
 - opponents=users_in_game-[my_user]
 
 div.panel.panel--padded.game-view__game-board
@@ -18,7 +18,7 @@ div.panel.panel--padded.game-view__game-board
 			// make one of these for each player (excluding own player)
 			- opponents.each do |opponent|
 				div.players__hand.op-stack.gap-xs
-					= render 'player_accordion', user: opponent, player: game.find_go_fish_player_by_user_id(opponent.id)
+					= render 'player_accordion', user: opponent, player: game.find_game_state_player_by_user_id(opponent.id)
 		- else 
 			p 
 				| Waiting for more players to join...
@@ -34,12 +34,12 @@ div.panel.panel--padded.game-view__game-board
 		- if is_my_turn
 			.badge.badge--primary Your Turn
 		- else
-			.badge.badge--primary #{current_go_fish_user.name}'s Turn
+			.badge.badge--primary #{current_game_state_user.name}'s Turn
 
 	.panel__content.op-stack.flex-grow-1.gap-none
 		.feed-content.op-stack.gap-xs.flex-grow-1
-			- unless game.go_fish.nil?
-				- game.go_fish.feed.each do |turn_action|
+			- unless game.game_state.nil?
+				- game.game_state.feed.each do |turn_action|
 					= render 'feed_bubble', turn_action: turn_action
 		- unless my_player.nil?
 			= render 'request_card_form', is_my_turn: is_my_turn, my_ranks: my_player.card_ranks , opponents: opponents
