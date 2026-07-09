@@ -64,7 +64,7 @@ class IconBuilder
   end
 
   def tag_classes
-    ['icon', size == DEFAULT_SIZE ? '' : "icon--#{size}", additional_classes]
+    [ 'icon', size == DEFAULT_SIZE ? '' : "icon--#{size}", additional_classes ]
   end
 
   def color_attribute

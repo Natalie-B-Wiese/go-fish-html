@@ -1,0 +1,29 @@
+/ Locals to pass:
+/ user (a User object)
+/ player (a GoFish Player object)
+
+- cards = player.nil? ? [] : player.cards
+
+details.accordion
+	summary
+		div.accordion__marker
+			i.ph.ph-caret-right.icon.icon--small
+		span.accordion__header #{user.name}
+		div.text-pair.text-pair--inline
+			div
+				| Cards:#{' '}
+				span
+					strong #{cards.length}
+			div
+				| Books:#{' '}
+				span
+					strong #{player.book_count}
+
+	div.accordion__content
+		div.flex.flex-row.flex-no-wrap.justify-between
+			div.flex.cards-stacked
+				- cards.each do |card|
+					= image_tag "cards/playing-card-back.jpg", class: "playing-card playing-card--sm"
+			div.flex.cards-stacked
+				- player.books.each do |book|
+					= image_tag "cards/#{book.to_image_name}", class: "playing-card playing-card--sm"

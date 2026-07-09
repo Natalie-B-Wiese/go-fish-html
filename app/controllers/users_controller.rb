@@ -7,7 +7,7 @@ class UsersController < ApplicationController
       start_new_session_for(@user)
       redirect_to root_path
     else
-      flash.now[:alert]="There was a problem signing up."
+      flash.now[:alert]='There was a problem signing up.'
       render :new, layout: 'application_form', status: :unprocessable_content
     end
   end
@@ -20,6 +20,6 @@ class UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:email_address, :password, :password_confirmation)
+    params.require(:user).permit(:email_address, :name, :password, :password_confirmation)
   end
 end
