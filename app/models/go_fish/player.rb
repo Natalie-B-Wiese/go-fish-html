@@ -1,18 +1,23 @@
 module GoFish
   class Player
     attr_reader :user_id
-    attr_accessor :cards, :books
+    attr_accessor :cards, :books, :was_book_made
 
     def initialize(user_id, cards: [], books: [])
       @user_id = user_id
       @cards = cards
       @books = books
+      @was_book_made = false
     end
 
     def ==(other)
       return false if other.nil?
 
       as_json == other.as_json
+    end
+
+    def book_made?
+      !!was_book_made
     end
 
     def as_json
@@ -32,6 +37,7 @@ module GoFish
 
     def add_card(card)
       cards.push(card)
+      try_make_book(card.rank)
     end
 
     def add_cards(card_array)
@@ -52,16 +58,6 @@ module GoFish
       books.length
     end
 
-    def try_make_book(rank)
-      cards_in_book = cards_with_rank(rank)
-      return nil unless cards_in_book.length == Book::SIZE
-
-      self.cards -= cards_in_book
-      book = Book.new(rank)
-      books.push(book)
-      book
-    end
-
     def biggest_book_value
       return 0 if books.empty?
 
@@ -80,6 +76,22 @@ module GoFish
 
     def cards_with_rank(rank)
       cards.select { |card| card.rank == rank }
+    end
+
+    def try_make_book(rank)
+      self.was_book_made = false
+      cards_in_book = cards_with_rank(rank)
+      return nil unless cards_in_book.length == Book::SIZE
+
+      make_book(cards_in_book)
+    end
+
+    def make_book(cards)
+      self.was_book_made = true
+      self.cards -= cards
+      book = Book.new(cards.first.rank)
+      books.push(book)
+      book
     end
   end
 end

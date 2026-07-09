@@ -10,6 +10,32 @@ RSpec.describe GoFish::Player, type: :model do
       player.add_card(card1)
       expect(player.cards).to include(card1)
     end
+
+    it 'will create a book if possible' do
+      rank = 'A'
+      %w[Hearts Spades Diamonds Clubs].each do |suit|
+        player.add_card(Card.new(rank, suit))
+      end
+
+      expect(player.books).to_not be_empty
+      expect(player.book_made?).to eq true
+    end
+
+    context 'when previously made a book' do
+      let(:other_rank) { '5' }
+
+      before do
+        rank = 'A'
+        %w[Hearts Spades Diamonds Clubs].each do |suit|
+          player.add_card(Card.new(rank, suit))
+        end
+      end
+
+      it 'resets book variable when book impossible' do
+        player.add_card(Card.new(other_rank, 'Hearts'))
+        expect(player.book_made?).to eq false
+      end
+    end
   end
 
   describe '#add_cards' do
@@ -20,6 +46,38 @@ RSpec.describe GoFish::Player, type: :model do
       player.add_cards([card1, card2])
       expect(player.cards).to include(card1)
       expect(player.cards).to include(card2)
+    end
+
+    it 'will create a book if possible' do
+      rank = 'A'
+      cards_to_add = []
+      %w[Hearts Spades Diamonds Clubs].each do |suit|
+        cards_to_add.push(Card.new(rank, suit))
+      end
+
+      player.add_cards(cards_to_add)
+
+      expect(player.books).to_not be_empty
+      expect(player.book_made?).to eq true
+    end
+
+    context 'when previously made a book' do
+      let(:other_rank) { '5' }
+
+      before do
+        rank = 'A'
+        cards_to_add = []
+        %w[Hearts Spades Diamonds Clubs].each do |suit|
+          cards_to_add.push(Card.new(rank, suit))
+        end
+
+        player.add_cards(cards_to_add)
+      end
+
+      it 'resets book variable when book not possible' do
+        player.add_cards([Card.new(other_rank, 'Hearts')])
+        expect(player.book_made?).to eq false
+      end
     end
   end
 
@@ -88,66 +146,6 @@ RSpec.describe GoFish::Player, type: :model do
         num_cards_before = player.cards.length
         player.take_cards_with_rank(nonexistant_rank)
         expect(player.cards.length).to eq num_cards_before
-      end
-    end
-  end
-
-  describe '#try_make_book' do
-    let(:possible_rank) { 'A' }
-    let(:impossible_rank) { '5' }
-
-    before do
-      player.add_card(Card.new(possible_rank, 'Hearts'))
-      player.add_card(Card.new(possible_rank, 'Spades'))
-      player.add_card(Card.new(possible_rank, 'Clubs'))
-      player.add_card(Card.new(possible_rank, 'Diamonds'))
-
-      player.add_card(Card.new(impossible_rank, 'Hearts'))
-      player.add_card(Card.new(impossible_rank, 'Spades'))
-      player.add_card(Card.new(impossible_rank, 'Clubs'))
-    end
-
-    context 'when book possible' do
-      it 'removes only those cards from player' do
-        card_count_before = player.cards.length
-
-        player.try_make_book(possible_rank)
-        expect(player.cards.length).to eq card_count_before - GoFish::Book::SIZE
-        expect(player.cards.map(&:rank)).to_not include possible_rank
-        expect(player.cards.map(&:rank)).to include impossible_rank
-      end
-
-      it 'adds the book to books array' do
-        value = Card.rank_to_value(possible_rank)
-        player.try_make_book(possible_rank)
-        expect(player.book_count).to eq 1
-        expect(player.books[0].value).to eq value
-      end
-
-      it 'returns the book' do
-        result = player.try_make_book(possible_rank)
-        expect(result).not_to be_nil
-      end
-    end
-
-    context 'when book impossible' do
-      it 'returns nil' do
-        result = player.try_make_book(impossible_rank)
-        expect(result).to be_nil
-      end
-
-      it 'does not remove cards' do
-        card_count_before = player.cards.length
-
-        player.try_make_book(impossible_rank)
-        expect(player.cards.length).to eq card_count_before
-        expect(player.cards.map(&:rank)).to include possible_rank
-        expect(player.cards.map(&:rank)).to include impossible_rank
-      end
-
-      it 'does not add a book to array' do
-        player.try_make_book(impossible_rank)
-        expect(player.book_count).to eq 0
       end
     end
   end
