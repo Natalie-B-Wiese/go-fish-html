@@ -11,12 +11,6 @@ RSpec.describe GoFish::Game, type: :model do
   let!(:player3) { GoFish::Player.new(user3.id) }
   let!(:player4) { GoFish::Player.new(user4.id) }
 
-  def add_books_to_player(player, num_books = 1)
-    num_books.times do
-      player.books += [GoFish::Book.new('4')]
-    end
-  end
-
   describe '#deal!' do
     context 'with 2 or 3 players' do
       let(:players) { [player1, player2] }
@@ -579,6 +573,12 @@ RSpec.describe GoFish::Game, type: :model do
       it 'returns true' do
         expect(game).to be_game_over
       end
+    end
+  end
+
+  def add_books_to_player(player, num_books = 1)
+    num_books.times do
+      player.books += [GoFish::Book.new('4')]
     end
   end
 end

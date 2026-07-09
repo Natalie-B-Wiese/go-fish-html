@@ -5,20 +5,6 @@ RSpec.describe 'Games', type: :system do
   let!(:user3) { create(:user3) }
   let!(:user4) { create(:user4) }
 
-  def elements_within_parent(parent_selector:, element_index:, element_selector:)
-    parent = page.find_all(parent_selector)[element_index]
-    parent.find_all(element_selector)
-    page.within parent do
-      return page.find_all(element_selector, visible: :all)
-    end
-  end
-
-  def add_books_to_player(player, num_books = 1)
-    num_books.times do
-      player.books += [GoFish::Book.new('4')]
-    end
-  end
-
   before do
     sign_in_as(user1)
   end
@@ -540,6 +526,20 @@ RSpec.describe 'Games', type: :system do
     it 'show the winner' do
       expect(page).to have_content(user2.email_address).twice
       expect(page).to have_content(user3.email_address).twice
+    end
+  end
+
+  def elements_within_parent(parent_selector:, element_index:, element_selector:)
+    parent = page.find_all(parent_selector)[element_index]
+    parent.find_all(element_selector)
+    page.within parent do
+      return page.find_all(element_selector, visible: :all)
+    end
+  end
+
+  def add_books_to_player(player, num_books = 1)
+    num_books.times do
+      player.books += [GoFish::Book.new('4')]
     end
   end
 end
