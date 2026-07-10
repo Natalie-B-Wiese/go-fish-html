@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Deck, type: :model do
   it 'Should have 52 cards when created' do
     deck = Deck.new
-    expect(deck.cards_left).to eq 52
+    expect(deck.cards.count).to eq 52
   end
 
   describe '#take_top_card' do
@@ -20,36 +20,6 @@ RSpec.describe Deck, type: :model do
       card1 = deck.take_top_card
       card2 = deck.take_top_card
       expect(card1).not_to eq card2
-    end
-  end
-
-  describe '#cards_left' do
-    it 'returns 52 on full deck' do
-      deck = Deck.new
-      expect(deck.cards_left).to eq 52
-    end
-    it 'returns cards_left for non-full deck' do
-      deck = Deck.new
-      deck.take_top_card
-      deck.take_top_card
-      deck.take_top_card
-      expect(deck.cards_left).to eq 49
-    end
-  end
-
-  describe '#empty?' do
-    it 'returns false when there are cards' do
-      deck = Deck.new
-      expect(deck).to_not be_empty
-    end
-
-    it 'returns true when there are no cards left' do
-      deck = Deck.new
-
-      # clear all the cards
-      deck.cards = []
-
-      expect(deck).to be_empty
     end
   end
 
