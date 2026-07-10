@@ -9,35 +9,12 @@ RSpec.describe 'Games', type: :system do
     sign_in_as(user1)
   end
 
-  context 'games flow' do
-    before do
-      visit games_path
-    end
-
-    it 'shows the games index' do
-      expect(page).to have_content 'Your Games'
-      expect(page).to have_content 'All Games'
-    end
-
-    context 'when clicking the new game button' do
-      before do
-        click_on('New Game')
-      end
-
-      it 'shows the new game page' do
-        expect(page).to have_content 'New Game'
-        expect(page).to have_button 'Create Game'
-        expect(page.current_path).to eq new_game_path
-      end
-    end
-  end
-
   context 'show and start game flow' do
     let(:game_name) { "Penelope's Game" }
     let(:game) { Game.find_by(name: game_name) }
 
     before do
-      create :game, :with_users, name: game_name, player_count: 3, users: [user1, user2, user3]
+      create :game, :go_fish, :with_users, name: game_name, player_count: 3, users: [user1, user2, user3]
       visit show_game_path(game)
 
       game.reload
@@ -292,52 +269,6 @@ RSpec.describe 'Games', type: :system do
 
     it 'reroutes to history page' do
       expect(page.current_path).to eq games_history_path
-    end
-  end
-
-  context '/games/history' do
-    let!(:game1) do
-      create :completed_game, :with_users_and_winner, name: 'Game 1', users: [user1, user2], user_won: user2
-    end
-    let!(:game2) do
-      create :completed_game, :with_users_and_winner, name: 'Game no user1', users: [user2, user3], user_won: user3
-    end
-    let!(:game3) { create :game, :with_users, name: 'Unfinished Game', users: [user1, user2, user3] }
-    let!(:game4) do
-      create :completed_game, :with_users_and_winner, name: 'Game 4', users: [user1, user3], user_won: user3
-    end
-
-    before do
-      visit games_history_path
-    end
-
-    it 'shows the history' do
-      expect(page).to have_content 'History'
-      expect(page.current_path).to eq games_history_path
-    end
-
-    it 'shows only finished games belonging to user' do
-      # the user right now is user 1
-      expect(page).to have_content 'Game 1'
-      expect(page).to have_content 'Game 4'
-
-      expect(page).to_not have_content 'Game no user1'
-      expect(page).to_not have_content 'Unfinished Game'
-    end
-
-    it 'shows who played' do
-      expect(page).to have_content user1.email_address + ', ' + user2.email_address
-      expect(page).to have_content user1.email_address + ', ' + user3.email_address
-    end
-
-    it 'shows when it was finished' do
-      expect(page).to have_content game1.ended_at.strftime('%b %d, %Y')
-      expect(page).to have_content game4.ended_at.strftime('%b %d, %Y')
-    end
-
-    it 'show the winner' do
-      expect(page).to have_content(user2.email_address).twice
-      expect(page).to have_content(user3.email_address).twice
     end
   end
 

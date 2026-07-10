@@ -7,6 +7,14 @@ FactoryBot.define do
     type { 'GoFishGame' }
     association :winner, factory: :player, strategy: :null
 
+    trait :go_fish do
+      type { 'GoFishGame' }
+    end
+
+    trait :crazy_eights do
+      type { 'CrazyEightsGame' }
+    end
+
     trait :started do
       started_at { Time.zone.now }
     end

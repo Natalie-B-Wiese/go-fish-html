@@ -9,7 +9,15 @@ RSpec.describe 'Games', type: :system do
     sign_in_as(user1)
   end
 
+  context 'games page' do
+  end
+
   context 'games index' do
+    let(:finished_game_name) { 'Finished Game' }
+    let!(:finished_game) do
+      create :completed_game, :with_users_and_winner, name: finished_game_name, users: [user1, user2], user_won: user2
+    end
+
     before do
       visit games_path
     end
@@ -18,6 +26,10 @@ RSpec.describe 'Games', type: :system do
       expect(page.current_path).to eq games_path
       expect(page).to have_content 'Your Games'
       expect(page).to have_content 'All Games'
+    end
+
+    it 'does not show games already finished' do
+      expect(page).to_not have_content finished_game_name
     end
 
     context 'when clicking the new game button' do
@@ -36,73 +48,46 @@ RSpec.describe 'Games', type: :system do
   context 'games creation' do
     let(:game_name) { 'My First Game' }
     let(:capacity) { 2 }
+
     before do
       visit new_game_path
       fill_in 'Name', with: game_name
-      # select 'Go Fish', from: 'Game type'
+      select 'Go Fish', from: 'Type'
       fill_in 'Player count', with: capacity
     end
 
-    it 'creates a game' do
+    it 'creates a game and a player' do
       expect do
         click_button 'Create Game'
-      end.to change(Game, :count).by 1
+      end.to change(Game, :count).by(1)
+                                 .and change(Player, :count).by(1)
     end
 
-    it 'creates a player' do
-      expect do
+    context 'after game is created and user goes to index page' do
+      before do
         click_button 'Create Game'
-      end.to change(Player, :count).by 1
-    end
-
-    it 'shows the games in the my-games section of the index page' do
-      click_button 'Create Game'
-      visit root_path
-
-      within('.my-games') { expect(page).to have_content game_name }
-      within('.all-games') { expect(page).to_not have_content game_name }
-    end
-  end
-
-  context 'games creation flow' do
-    context 'when input is valid' do
-      it 'allows user to fill out and submit form' do
-        create_game(name: 'Game 1', player_count: 2)
+        visit root_path
       end
 
-      it 'creates a game and reroutes to that game\'s show path' do
-        expect do
-          create_game(name: 'Game 1', player_count: 2)
-          expect(page).to have_current_path root_path
-        end.to change(Game, :count).by 1
+      it 'shows the games in the correct section' do
+        within('.my-games') { expect(page).to have_content game_name }
+        within('.all-games') { expect(page).to_not have_content game_name }
+
+        sign_out
+        sign_in_as(user2)
+        visit root_path
+        within('.my-games') { expect(page).to_not have_content game_name }
+        within('.all-games') { expect(page).to have_content game_name }
       end
 
-      it 'creates a player and reroutes to root path' do
-        expect do
-          create_game(name: 'Game 1', player_count: 2)
-        end.to change(Player, :count).by 1
-      end
+      it 'shows correct button on game' do
+        within('.my-games') { expect(page).to have_button('View') }
 
-      it 'shows the new games in the my games list only' do
-        create_game(name: 'Cool game', player_count: 2)
-        create_game(name: 'Cooler game', player_count: 6)
+        sign_out
+        sign_in_as(user2)
         visit root_path
 
-        within('.my-games') do
-          expect(page).to have_content 'Cool game'
-          expect(page).to have_content '1/2 Players'
-
-          expect(page).to have_content 'Cooler game'
-          expect(page).to have_content '1/6 Players'
-        end
-
-        within('.all-games') do
-          expect(page).to_not have_content 'Cool game'
-          expect(page).to_not have_content '1/2 Players'
-
-          expect(page).to_not have_content 'Cooler game'
-          expect(page).to_not have_content '1/6 Players'
-        end
+        within('.all-games') { expect(page).to have_button('Join') }
       end
     end
   end
@@ -300,17 +285,6 @@ RSpec.describe 'Games', type: :system do
     end
   end
 
-  context 'games page' do
-    let!(:game1) do
-      create :completed_game, :with_users_and_winner, name: 'Finished Game', users: [user1, user2], user_won: user2
-    end
-
-    it 'does not show games already finished' do
-      visit games_path
-      expect(page).to_not have_content 'Finished Game'
-    end
-  end
-
   context '/games/history' do
     let!(:game1) do
       create :completed_game, :with_users_and_winner, name: 'Game 1', users: [user1, user2], user_won: user2
@@ -362,12 +336,6 @@ RSpec.describe 'Games', type: :system do
     parent.find_all(element_selector)
     page.within parent do
       return page.find_all(element_selector, visible: :all)
-    end
-  end
-
-  def add_books_to_player(player, num_books = 1)
-    num_books.times do
-      player.books += [GoFish::Book.new('4')]
     end
   end
 end
