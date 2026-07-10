@@ -1,5 +1,5 @@
 module GoFish
-  class Game
+  class Implementation
     SMALL_GAME_CARDS = 7
     BIG_GAME_CARDS = 5
     BOOKS_TO_WIN = (Card::SUITS.length * Card::RANKS.length) / Book::SIZE
@@ -7,6 +7,11 @@ module GoFish
     attr_reader :players, :deck, :feed
 
     attr_accessor :current_player_index
+
+    # keys are the user id and values are the Go Fish Players
+    def players_hash
+      players.index_by(&:user_id)
+    end
 
     def initialize(players, deck: Deck.new, current_player_index: 0, feed: [])
       @players = players
@@ -75,7 +80,7 @@ module GoFish
 
     # the Go Fish player whose turn it is
     def current_player
-      player_from_user_id(current_user_id)
+      players[current_player_index]
     end
 
     def valid_move?(opponent_user_id, rank)
@@ -148,10 +153,6 @@ module GoFish
       self.current_player_index = 0 if current_player_index >= players.length
     end
 
-    def player_from_user_id(user_id)
-      players.find { |player| player.user_id == user_id }
-    end
-
     def deal_cards_to_players(num_cards_to_deal)
       num_cards_to_deal.times do
         players.each do |player|
@@ -169,7 +170,7 @@ module GoFish
     end
 
     def preform_take_from_opponent_move(turn_result)
-      opponent = player_from_user_id(turn_result.opponent_user_id)
+      opponent = players_hash[turn_result.opponent_user_id]
 
       cards_taken_from_opponent = opponent.take_cards_with_rank(turn_result.rank_requested)
 

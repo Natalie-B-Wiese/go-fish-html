@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe GoFish::Game, type: :model do
+RSpec.describe GoFish::Implementation, type: :model do
   let!(:user1) { create :user1 }
   let!(:user2) { create :user2 }
   let!(:user3) { create :user3 }
@@ -16,10 +16,10 @@ RSpec.describe GoFish::Game, type: :model do
       let(:players) { [player1, player2] }
       let(:game) { described_class.new(players) }
 
-      it "deals #{GoFish::Game::SMALL_GAME_CARDS} cards to each player" do
+      it "deals #{GoFish::Implementation::SMALL_GAME_CARDS} cards to each player" do
         game.deal!
-        expect(player1.cards.length).to eq GoFish::Game::SMALL_GAME_CARDS
-        expect(player2.cards.length).to eq GoFish::Game::SMALL_GAME_CARDS
+        expect(player1.cards.length).to eq GoFish::Implementation::SMALL_GAME_CARDS
+        expect(player2.cards.length).to eq GoFish::Implementation::SMALL_GAME_CARDS
       end
 
       it 'cards are shuffled' do
@@ -36,11 +36,11 @@ RSpec.describe GoFish::Game, type: :model do
         game.deal!
       end
 
-      it "deals #{GoFish::Game::BIG_GAME_CARDS} cards to each player" do
-        expect(player1.cards.length).to eq GoFish::Game::BIG_GAME_CARDS
-        expect(player2.cards.length).to eq GoFish::Game::BIG_GAME_CARDS
-        expect(player3.cards.length).to eq GoFish::Game::BIG_GAME_CARDS
-        expect(player4.cards.length).to eq GoFish::Game::BIG_GAME_CARDS
+      it "deals #{GoFish::Implementation::BIG_GAME_CARDS} cards to each player" do
+        expect(player1.cards.length).to eq GoFish::Implementation::BIG_GAME_CARDS
+        expect(player2.cards.length).to eq GoFish::Implementation::BIG_GAME_CARDS
+        expect(player3.cards.length).to eq GoFish::Implementation::BIG_GAME_CARDS
+        expect(player4.cards.length).to eq GoFish::Implementation::BIG_GAME_CARDS
       end
 
       it 'cards are shuffled' do
@@ -567,7 +567,7 @@ RSpec.describe GoFish::Game, type: :model do
       let(:p1_books) { 5 }
       before do
         add_books_to_player(player1, p1_books)
-        add_books_to_player(player2, GoFish::Game::BOOKS_TO_WIN - p1_books)
+        add_books_to_player(player2, GoFish::Implementation::BOOKS_TO_WIN - p1_books)
       end
 
       it 'returns true' do

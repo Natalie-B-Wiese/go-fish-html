@@ -1,18 +1,17 @@
 class GamesController < ApplicationController
   def show
-    @game = Game.find(params[:id])
-    @turn = Turn.new(game: @game, requestor_user: Current.user)
+    game = Game.find(params[:id])
 
-    @game.start! if @game.full? && !@game.started?
+    @presenter = game.presenter_class.new(game, Current.user)
+    @turn = Turn.new(game: game, requestor_user: Current.user)
 
-    if @game.game_over?
-      @game.end! unless @game.ended?
+    game.start! if game.full? && !game.started?
+
+    if game.game_over?
+      game.end! unless game.ended?
       redirect_to games_history_path
     else
-      respond_to do |format|
-        format.html { render layout: 'application_game' }
-        format.json { render json: @game.as_json(current_user) }
-      end
+      render layout: 'application_game'
     end
   end
 

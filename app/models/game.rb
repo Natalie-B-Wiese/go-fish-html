@@ -13,21 +13,12 @@ class Game < ApplicationRecord
     { 'Go Fish' => 'GoFishGame' }
   end
 
+  def presenter_class
+    GamePresenter
+  end
+
   def create_and_start_game
     raise NoMethodError, "Abstract method '#{__method__}' must be overridden to create, start, and return a game"
-  end
-
-  # finds a specific player (eg a GoFish player) from a user id
-  def find_game_state_player_by_user_id(user_id)
-    return nil if game_state.nil?
-
-    game_state.players.find { |player| player.user_id == user_id }
-  end
-
-  # the user whose turn it is
-  def current_game_state_user
-    index = game_state.nil? ? 0 : game_state.current_player_index
-    users[index]
   end
 
   def started?

@@ -1,64 +1,49 @@
-- game = Game.find(params[:id])
-- users_in_game=game.users
-- my_user=Current.user
-- my_player=game.find_game_state_player_by_user_id(my_user.id)
-- current_game_state_user = game.current_game_state_user
-- is_my_turn=current_game_state_user==my_user
-- opponents=users_in_game-[my_user]
+/ @presenter
+/ @turn
+/ Note: @presenter.implementation is nil if game is not started yet
 
-div.panel.panel--padded.game-view__game-board
-	header.panel__header.gap-xs
-		button.btn.btn--no-border.btn--icon.btn--small
-			i.ph.ph-caret-left.icon.icon--large
-		h2 #{game.name}
-	div.panel__content.op-stack.gap-xs.players
-		h3 Players
+- unless @presenter.implementation?
+	= render 'go_fish_games/lobby'
+- else
+	div.panel.panel--padded.game-view__game-board
+		header.panel__header.gap-xs
+			button.btn.btn--no-border.btn--icon.btn--small
+				i.ph.ph-caret-left.icon.icon--large
+			h2 #{@presenter.game.name}
+		div.panel__content.op-stack.gap-xs.players
+			h3 Players
 
-		- if game.full?
-			// make one of these for each player (excluding own player)
-			- opponents.each do |opponent|
-				div.players__hand.op-stack.gap-xs
-					= render 'player_accordion', user: opponent, player: game.find_game_state_player_by_user_id(opponent.id)
-		- else 
-			p 
-				| Waiting for more players to join...
-
-			- users_in_game.each do |user|
-				p 
-					| #{user.name}
+			- @presenter.opponent_users.each do |opponent|
+					div.players__hand.op-stack.gap-xs
+						= render 'player_accordion', user: opponent, player: @presenter.implementation_players_hash[opponent.id]
 
 
-.game-view__game-feed.panel.panel--padded.panel--primary
-	header.panel__header.op-split
-		h2 Game Feed
-		- if is_my_turn
-			.badge.badge--primary Your Turn
-		- else
-			.badge.badge--primary #{current_game_state_user.name}'s Turn
+	.game-view__game-feed.panel.panel--padded.panel--primary
+		header.panel__header.op-split
+			h2 Game Feed
+			- if @presenter.my_turn?
+				.badge.badge--primary Your Turn
+			- else
+				.badge.badge--primary #{@presenter.implementation_current_user.name}'s Turn
 
-	.panel__content.op-stack.flex-grow-1.gap-none
-		.feed-content.op-stack.gap-xs.flex-grow-1
-			- unless game.game_state.nil?
-				- game.game_state.feed.each do |turn_action|
+		.panel__content.op-stack.flex-grow-1.gap-none
+			.feed-content.op-stack.gap-xs.flex-grow-1
+				- @presenter.implementation.feed.each do |turn_action|
 					= render 'feed_bubble', turn_action: turn_action
-		- unless my_player.nil?
-			= render 'request_card_form', is_my_turn: is_my_turn, my_ranks: my_player.card_ranks , opponents: opponents
+			= render 'request_card_form', is_my_turn: @presenter.my_turn?, my_ranks: @presenter.my_implementation_player.card_ranks , opponents: @presenter.opponent_users
 
-
-div.game-view__hand.panel.panel--secondary
-	header.panel__header
-		h2 Hand
-	div.panel__content
-		div.cards-stacked.flex.margin-top-md
-			- unless my_player.nil?
-				- my_player.cards.each do |card|
+	div.game-view__hand.panel.panel--secondary
+		header.panel__header
+			h2 Hand
+		div.panel__content
+			div.cards-stacked.flex.margin-top-md
+				- @presenter.my_implementation_player.cards.each do |card|
 					= image_tag "cards/#{card.to_image_name}", alt: "#{card.to_s}", class: "playing-card playing-card--lg playing-card--hover"
 
-div.game-view__books.panel.panel--secondary
-		header.panel__header
-			h2 Books
-		div.panel__content
-			div.cards-stacked.flex
-				- unless my_player.nil?
-					- my_player.books.each do |book|
+	div.game-view__books.panel.panel--secondary
+			header.panel__header
+				h2 Books
+			div.panel__content
+				div.cards-stacked.flex
+					- @presenter.my_implementation_player.books.each do |book|
 						= image_tag "cards/#{book.to_image_name}", class: "playing-card playing-card--sm"

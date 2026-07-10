@@ -66,7 +66,7 @@ RSpec.describe 'Games', type: :system do
     it 'deals the cards to the players' do
       within '.game-view__hand' do
         player1_card_count = find_all('.playing-card').count
-        expect(player1_card_count).to eq GoFish::Game::SMALL_GAME_CARDS
+        expect(player1_card_count).to eq GoFish::Implementation::SMALL_GAME_CARDS
       end
 
       player2_card_count = elements_within_parent(parent_selector: '.accordion',
@@ -74,8 +74,8 @@ RSpec.describe 'Games', type: :system do
       player3_card_count = elements_within_parent(parent_selector: '.accordion',
                                                   element_index: 1, element_selector: '.playing-card').count
 
-      expect(player2_card_count).to eq GoFish::Game::SMALL_GAME_CARDS
-      expect(player3_card_count).to eq GoFish::Game::SMALL_GAME_CARDS
+      expect(player2_card_count).to eq GoFish::Implementation::SMALL_GAME_CARDS
+      expect(player3_card_count).to eq GoFish::Implementation::SMALL_GAME_CARDS
     end
 
     it 'shows whose turn it is' do
@@ -157,7 +157,7 @@ RSpec.describe 'Games', type: :system do
 
         it 'preforms the move' do
           page.within '.game-view__hand' do
-            expect(page.find_all('.playing-card').count).to_not eq GoFish::Game::SMALL_GAME_CARDS
+            expect(page.find_all('.playing-card').count).to_not eq GoFish::Implementation::SMALL_GAME_CARDS
           end
         end
 
@@ -197,7 +197,7 @@ RSpec.describe 'Games', type: :system do
 
         it 'draws from the deck' do
           page.within '.game-view__hand' do
-            expect(page.find_all('.playing-card').count).to_not eq GoFish::Game::SMALL_GAME_CARDS
+            expect(page.find_all('.playing-card').count).to_not eq GoFish::Implementation::SMALL_GAME_CARDS
           end
         end
 
@@ -265,7 +265,7 @@ RSpec.describe 'Games', type: :system do
       visit show_game_path(game)
 
       # add the books
-      add_books_to_player(game.game_state.players.first, GoFish::Game::BOOKS_TO_WIN)
+      add_books_to_player(game.game_state.players.first, GoFish::Implementation::BOOKS_TO_WIN)
       game.save!
 
       game.reload
