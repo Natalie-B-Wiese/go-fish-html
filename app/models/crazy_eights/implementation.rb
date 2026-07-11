@@ -34,19 +34,20 @@ module CrazyEights
       # return nil unless current_player.out_of_cards?
       # To draw from the deck, player must not have any playable cards
       # Add a safe check here
+      # return nil unless current_player.playable_cards(discard_pile.top_card)
 
-      draw_from_deck
-      true
-
-      # turn_result = TurnResult.new(current_user_id: current_user_id)
-      # finish_turn(turn_result)
+      turn_result = TurnResult.new(current_user_id: current_user_id)
+      draw_from_deck(turn_result)
+      feed.push(turn_result)
+      turn_result
     end
 
-    # TODO: implement turn result and feed
     def play_turn(rank:, suit:)
-      play_card(rank, suit)
+      card_played = play_card(rank, suit)
+      turn_result = TurnResult.new(current_user_id: current_user_id, card_played: card_played)
       switch_turn
-      true
+      feed.push(turn_result)
+      turn_result
     end
 
     # the Crazy Eights player whose turn it is
@@ -94,7 +95,7 @@ module CrazyEights
       deck = Deck.from_json(json['deck'])
 
       # feed = json['feed'].map { |turn_result_json| CrazyEights::TurnResult.from_json(turn_result_json) }
-      feed = []
+      feed = json['feed'].map { |turn_result_json| GoFish::TurnResult.from_json(turn_result_json) }
       player_index = json['current_player_index']
       discard_pile = DiscardPile.from_json(json['discard_pile'])
 
@@ -125,14 +126,18 @@ module CrazyEights
       discard_pile.insert_card_to_top(card)
     end
 
-    def draw_from_deck
+    def draw_from_deck(turn_result)
       recreate_deck_from_discard if deck.empty?
 
-      current_player.add_card(deck.take_top_card)
+      card = deck.take_top_card
+      turn_result.card_received_deck = card
+      current_player.add_card(card)
     end
 
     def play_card(rank, suit)
-      add_discard(current_player.take_card(rank, suit))
+      card = current_player.take_card(rank, suit)
+      add_discard(card)
+      card
     end
 
     # takes from top of deck and adds it to discard pile

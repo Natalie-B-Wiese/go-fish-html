@@ -92,6 +92,11 @@ RSpec.describe CrazyEights::Implementation, type: :model do
       expect(game.current_player_index).to eq 0
     end
 
+    it 'adds 1 turn result to the feed' do
+      game.draw_deck_turn
+      expect(game.feed.length).to eq 1
+    end
+
     context 'deck has cards' do
       let(:top_deck_card) { Card.new('5', 'Hearts') }
       let(:other_card) { Card.new('2', 'Diamonds') }
@@ -109,17 +114,19 @@ RSpec.describe CrazyEights::Implementation, type: :model do
         expect(player1.cards).to_not include other_card
       end
 
-      xit 'returns the correct turn result' do
+      it 'returns the correct turn result' do
         result = game.draw_deck_turn
         expect(result.current_user_id).to eq player1.user_id
-        expect(result.opponent_user_id).to be_nil
-        expect(result.card_received_deck).to eq card_taken
+        expect(result.card_played).to be_nil
+        expect(result.card_received_deck).to eq top_deck_card
       end
     end
 
     context 'deck is empty' do
       before do
         game.deck.cards = []
+        game.discard_pile.insert_card_to_top(Card.new('4', 'Spades'))
+        game.discard_pile.insert_card_to_top(Card.new('A', 'Hearts'))
         game.draw_deck_turn
       end
 
@@ -136,11 +143,11 @@ RSpec.describe CrazyEights::Implementation, type: :model do
         expect(player1.cards.count).to eq(player1_cards.count + 1)
       end
 
-      xit 'returns the correct turn result' do
+      it 'returns the correct turn result' do
         result = game.draw_deck_turn
         expect(result.current_user_id).to eq player1.user_id
-        expect(result.opponent_user_id).to be_nil
-        expect(result.card_received_deck).to eq card_taken
+        expect(result.card_played).to be_nil
+        expect(result.card_received_deck).to_not be_nil
       end
     end
   end
@@ -158,6 +165,11 @@ RSpec.describe CrazyEights::Implementation, type: :model do
       game.discard_pile.cards = discard_cards
     end
 
+    it 'adds 1 turn result to the feed' do
+      game.draw_deck_turn
+      expect(game.feed.length).to eq 1
+    end
+
     it 'removes the card from the player hand and adds it to top of discard pile' do
       game.play_turn(rank: card1.rank, suit: card1.suit)
       expect(player1.cards).to_not include card1
@@ -166,21 +178,16 @@ RSpec.describe CrazyEights::Implementation, type: :model do
       expect(game.discard_pile.cards).to include discard_cards.first
     end
 
-    xit 'returns the correct turn result' do
+    it 'returns the correct turn result' do
       result = game.play_turn(rank: card1.rank, suit: card1.suit)
       expect(result.current_user_id).to eq player1.user_id
-      expect(result.opponent_user_id).to be_nil
-      expect(result.card_received_deck).to eq card_taken
+      expect(result.card_played).to eq card1
+      expect(result.card_received_deck).to be_nil
     end
 
     it 'switches turns' do
       game.play_turn(rank: card1.rank, suit: card1.suit)
       expect(game.current_player_index).to eq 1
-    end
-
-    xit 'adds 1 turn result to the feed' do
-      game.play_turn(rank: card1.rank, suit: card1.suit)
-      expect(game.feed.length).to eq 1
     end
   end
 end

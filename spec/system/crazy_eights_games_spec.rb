@@ -120,6 +120,12 @@ RSpec.describe 'Crazy Eights Games', type: :system do
       end
 
       context 'when current user clicks on play button' do
+        let!(:card_count_before) do
+          page.within('.game-view__hand') do
+            page.all('.playing-card').count
+          end
+        end
+
         before do
           page.click_on 'Play'
           game.reload
@@ -129,13 +135,15 @@ RSpec.describe 'Crazy Eights Games', type: :system do
           expect(page).to have_current_path show_game_path(game)
         end
 
-        xit 'preforms the move' do
+        it 'preforms the move' do
           page.within '.game-view__hand' do
-            expect(page.find_all('.playing-card').count).to_not eq GoFish::Implementation::SMALL_GAME_CARDS
+            expect(page.find_all('.playing-card').count).to_not eq card_count_before
           end
         end
 
-        xit 'posts messages in the feed' do
+        it 'posts messages in the feed' do
+          visit show_game_path(game)
+
           page.within '.feed-content' do
             expect(page.find_all('.feed-bubble').count).to_not eq 0
           end
@@ -159,25 +167,24 @@ RSpec.describe 'Crazy Eights Games', type: :system do
       end
 
       context 'when current player clicks on play button' do
-        it 'stays on current game show page and draws a card from the deck' do
+        let!(:card_count_before) { game.game_state.players.first.cards.length }
+
+        before do
           page.click_on 'Play'
           game.reload
+        end
 
+        it 'stays on current game show page and draws a card from the deck' do
           expect(page).to have_current_path show_game_path(game)
         end
 
         it 'draws from the deck' do
-          card_count_before = game.game_state.players.first.cards.length
-
-          page.click_on 'Play'
-          game.reload
-
           page.within '.game-view__hand' do
             expect(page.find_all('.playing-card').count).to eq(card_count_before + 1)
           end
         end
 
-        xit 'posts messages in the feed' do
+        it 'posts messages in the feed' do
           page.within '.feed-content' do
             expect(page.find_all('.feed-bubble').count).to_not eq 0
           end
