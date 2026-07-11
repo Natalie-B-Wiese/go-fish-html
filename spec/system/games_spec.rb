@@ -9,9 +9,6 @@ RSpec.describe 'Games', type: :system do
     sign_in_as(user1)
   end
 
-  context 'games page' do
-  end
-
   context 'games index' do
     let(:finished_game_name) { 'Finished Game' }
     let!(:finished_game) do

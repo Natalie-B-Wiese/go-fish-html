@@ -10,7 +10,8 @@ class Game < ApplicationRecord
   validates :player_count, comparison: { greater_than: 1, less_than_or_equal_to: 6 }
 
   def types
-    { 'Go Fish' => 'GoFishGame' }
+    { 'Go Fish' => 'GoFishGame',
+      'Crazy Eights' => 'CrazyEightsGame' }
   end
 
   def presenter_class
@@ -19,6 +20,11 @@ class Game < ApplicationRecord
 
   def create_and_start_game
     raise NoMethodError, "Abstract method '#{__method__}' must be overridden to create, start, and return a game"
+  end
+
+  # is true if the player who is preforming a move is their turn
+  def valid_turn?
+    game_state.current_user_id == Current.user.id
   end
 
   def started?

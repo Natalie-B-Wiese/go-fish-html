@@ -65,28 +65,29 @@ module GoFish
       obj.as_json
     end
 
-    def play_turn(opponent_user_id: nil, rank_requested: nil)
+    # returns nil if move could not be preformed, otherwise returns a turn result
+    def draw_deck_turn
+      return nil unless current_player.out_of_cards?
+
+      turn_result = TurnResult.new(current_user_id: current_user_id)
+      request_deck_card(turn_result)
+      finish_turn(turn_result)
+    end
+
+    # returns nil if move could not be preformed, otherwise returns a turn result
+    def request_opponent_turn(opponent_user_id:, rank_requested:)
+      return nil unless valid_opponent?(opponent_user_id) && valid_request_rank?(rank_requested)
+
       turn_result = TurnResult.new(current_user_id: current_user_id, opponent_user_id: opponent_user_id,
                                    rank_requested: rank_requested)
-      preform_move(turn_result)
-      turn_result.was_book_made = current_player.book_made? if turn_result.rank_received
 
-      switch_turn unless turn_result.go_again?
-
-      feed.push(turn_result)
-
-      turn_result
+      preform_take_from_opponent_move(turn_result)
+      finish_turn(turn_result)
     end
 
     # the Go Fish player whose turn it is
     def current_player
       players[current_player_index]
-    end
-
-    def valid_move?(opponent_user_id, rank)
-      return true if opponent_user_id.nil? && rank.nil? && current_player.out_of_cards?
-
-      valid_opponent?(opponent_user_id) && valid_request_rank?(rank)
     end
 
     # the player currently in the lead
@@ -108,10 +109,15 @@ module GoFish
 
     private
 
-    def valid_opponent?(opponent_user_id)
-      return true if opponents.find { |opponent| opponent.user_id == opponent_user_id }
+    def finish_turn(turn_result)
+      turn_result.was_book_made = current_player.book_made? if turn_result.rank_received
+      switch_turn unless turn_result.go_again?
+      feed.push(turn_result)
+      turn_result
+    end
 
-      false
+    def valid_opponent?(opponent_user_id)
+      opponents.any? { |opponent| opponent.user_id == opponent_user_id }
     end
 
     def valid_request_rank?(rank)
@@ -158,14 +164,6 @@ module GoFish
         players.each do |player|
           player.add_card(deck.take_top_card)
         end
-      end
-    end
-
-    def preform_move(turn_result)
-      if turn_result.opponent_user_id.nil? && turn_result.rank_requested.nil?
-        request_deck_card(turn_result)
-      else
-        preform_take_from_opponent_move(turn_result)
       end
     end
 

@@ -15,6 +15,23 @@ class Card
     'A' => 'Ace'
   }.freeze
 
+  SUIT_SYMBOLS = {
+    'S' => 'Spades',
+    'H' => 'Hearts',
+    'C' => 'Clubs',
+    'D' => 'Diamonds'
+  }.freeze
+
+  def key
+    "#{rank}#{SUIT_SYMBOLS.invert[suit]}"
+  end
+
+  def self.from_key(key)
+    rank = key[0]
+    suit = SUIT_SYMBOLS[key[1]]
+    Card.new(rank, suit)
+  end
+
   def initialize(rank, suit)
     raise InvalidRank unless RANKS.include? rank
     raise InvalidSuit unless SUITS.include? suit
@@ -63,8 +80,6 @@ class Card
   end
 
   def self.from_json(json)
-    # makes it not care whether json uses string or keys to index
-
-    self.new(json['rank'], json['suit'])
+    new(json['rank'], json['suit'])
   end
 end

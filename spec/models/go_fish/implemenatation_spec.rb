@@ -50,74 +50,176 @@ RSpec.describe GoFish::Implementation, type: :model do
     end
   end
 
-  describe '#valid_move?' do
-    let!(:game) { described_class.new([player1, player2]) }
-    let!(:rank_have) { '5' }
-    let!(:invalid_rank) { 'A' }
+  describe '#draw_deck_turn' do
+    let!(:game) { described_class.new([player1, player2, player3], current_player_index: 0) }
 
-    context 'when both rank is nil and opponent is nil' do
-      context 'when player has no cards' do
+    let(:card_taken) { Card.new('A', 'Spades') }
+    let(:other_card) { Card.new('5', 'Spades') }
+
+    let(:player1_index) { 0 }
+    let(:player2_index) { 1 }
+
+    context 'when player has no cards' do
+      before do
+        player1.cards = []
+      end
+
+      it 'adds 1 turn result to the feed' do
+        game.draw_deck_turn
+        expect(game.feed.length).to eq 1
+      end
+
+      context 'deck is empty' do
         before do
-          player1.cards = []
+          game.deck.cards = []
         end
 
-        it 'is valid' do
-          expect(game.valid_move?(nil, nil)).to eq true
+        it 'returns the correct turn result' do
+          result = game.draw_deck_turn
+          expect(result.current_user_id).to eq player1.user_id
+          expect(result.opponent_user_id).to be_nil
+          expect(result.rank_requested).to be_nil
+          expect(result.cards_received_opponent).to be_empty
+          expect(result.card_received_deck).to be_nil
+          expect(result.was_book_made).to eq false
+        end
+
+        it 'switches turns' do
+          game.draw_deck_turn
+          expect(game.current_player_index).to eq player2_index
+        end
+
+        it 'adds 1 turn result to the feed' do
+          game.draw_deck_turn
+          expect(game.feed.length).to eq 1
         end
       end
 
-      context 'when player has cards' do
+      context 'deck has cards' do
         before do
-          player1.cards = [Card.new(rank_have, 'Diamonds')]
+          game.deck.cards = [card_taken, other_card]
         end
 
-        it 'is invalid' do
-          expect(game.valid_move?(nil, nil)).to eq false
+        it 'removes the card from the top of the deck' do
+          game.draw_deck_turn
+          expect(game.deck.cards).to_not include card_taken
+          expect(game.deck.cards).to include other_card
         end
+
+        it 'gives the card to the player' do
+          game.draw_deck_turn
+          expect(player1.cards).to include card_taken
+          expect(player1.cards).to_not include other_card
+        end
+
+        it 'returns the correct turn result' do
+          result = game.draw_deck_turn
+          expect(result.current_user_id).to eq player1.user_id
+          expect(result.opponent_user_id).to be_nil
+          expect(result.rank_requested).to be_nil
+          expect(result.cards_received_opponent).to be_empty
+          expect(result.card_received_deck).to eq card_taken
+          expect(result.was_book_made).to eq false
+        end
+
+        it 'does not switch turns' do
+          game.draw_deck_turn
+          expect(game.current_player_index).to eq player1_index
+        end
+      end
+
+      it 'works with other players' do
+        game.deck.cards = [card_taken, other_card]
+        game.current_player_index = 1
+
+        result = game.draw_deck_turn
+        expect(result.current_user_id).to eq player2.user_id
+
+        expect(game.deck.cards).to_not include card_taken
+        expect(player2.cards).to include card_taken
+        expect(game.current_player_index).to eq player2_index
       end
     end
 
-    context 'when player does not have the rank' do
+    context 'when player has cards' do
       before do
-        player1.cards = [Card.new(rank_have, 'Diamonds')]
-      end
-    end
-
-    context 'when player has the rank' do
-      before do
-        player1.cards = [Card.new(rank_have, 'Diamonds')]
+        player1.cards = [Card.new('2', 'Diamonds')]
       end
 
-      context 'when opponent is self' do
-        it 'is invalid' do
-          expect(game.valid_move?(user1.id, rank_have)).to eq false
-        end
+      it 'does not add a turn result to the feed' do
+        game.draw_deck_turn
+        expect(game.feed).to be_empty
       end
 
-      context 'when opponent does not exist in this game' do
-        it 'is invalid' do
-          expect(game.valid_move?(user4.id, rank_have)).to eq false
-        end
-      end
-      context 'when opponent exists in game and is not self' do
-        it 'is valid' do
-          expect(game.valid_move?(user2.id, rank_have)).to eq true
-        end
+      it 'does not preform the move' do
+        card_count_before = player1.cards.length
+        game.draw_deck_turn
+        expect(player1.cards.length).to eq card_count_before
       end
 
-      context 'when opponent is nil' do
-        it 'is invalid' do
-          expect(game.valid_move?(nil, rank_have)).to eq false
-        end
+      it 'does not switch turns' do
+        game.draw_deck_turn
+        expect(game.current_player_index).to eq player1_index
+      end
+
+      it 'returns nil' do
+        expect(game.draw_deck_turn).to be_nil
       end
     end
   end
 
-  describe '#play_turn' do
+  describe '#request_opponent_turn' do
     let!(:game) { described_class.new([player1, player2, player3], current_player_index: 0) }
-    context 'when opponent and rank passed in' do
+
+    let!(:rank_have) { '5' }
+    let!(:invalid_rank) { 'A' }
+    let(:player1_index) { 0 }
+
+    before do
+      player1.cards = [Card.new(rank_have, 'Diamonds')]
+    end
+
+    context 'when player does not have the rank' do
+      it 'returns nil and does nothing' do
+        card_count_before = player1.cards.length
+        result = game.request_opponent_turn(opponent_user_id: player2.user_id, rank_requested: invalid_rank)
+
+        expect(result).to be_nil
+        expect(game.feed).to be_empty
+        expect(player1.cards.length).to eq card_count_before
+        expect(game.current_player_index).to eq player1_index
+      end
+    end
+
+    context 'when player has the rank and opponent is self' do
+      it 'returns nil and does nothing' do
+        self_user_id = player1.user_id
+        card_count_before = player1.cards.length
+        result = game.request_opponent_turn(opponent_user_id: self_user_id, rank_requested: rank_have)
+
+        expect(result).to be_nil
+        expect(game.feed).to be_empty
+        expect(player1.cards.length).to eq card_count_before
+        expect(game.current_player_index).to eq player1_index
+      end
+    end
+
+    context 'when player has the rank and opponent does not exist in game' do
+      it 'returns nil and does nothing' do
+        nonexistant_opponent_id = player4.user_id
+        card_count_before = player1.cards.length
+        result = game.request_opponent_turn(opponent_user_id: nonexistant_opponent_id, rank_requested: rank_have)
+
+        expect(result).to be_nil
+        expect(game.feed).to be_empty
+        expect(player1.cards.length).to eq card_count_before
+        expect(game.current_player_index).to eq player1_index
+      end
+    end
+
+    context 'when player has the rank and opponent is valid' do
       it 'adds 1 turn result to the feed' do
-        game.play_turn(opponent_user_id: player3.user_id, rank_requested: '5')
+        game.request_opponent_turn(opponent_user_id: player3.user_id, rank_requested: '5')
         expect(game.feed.length).to eq 1
       end
 
@@ -131,13 +233,13 @@ RSpec.describe GoFish::Implementation, type: :model do
           let(:opponent) { player3 }
           let(:taken_card) { Card.new(rank, 'Diamonds') }
           it 'takes from opponent and gives to player' do
-            game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(player1.cards).to include taken_card
             expect(opponent.cards).to_not include taken_card
           end
 
           it 'returns the correct turn result' do
-            result = game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            result = game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(result.current_user_id).to eq player1.user_id
             expect(result.opponent_user_id).to eq opponent.user_id
             expect(result.rank_requested).to eq rank
@@ -148,7 +250,7 @@ RSpec.describe GoFish::Implementation, type: :model do
           end
 
           it 'does not switch turns' do
-            result = game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(game.current_player_index).to eq 0
           end
         end
@@ -165,7 +267,7 @@ RSpec.describe GoFish::Implementation, type: :model do
           let!(:taken_card2) { opponent.cards[1] }
 
           it 'takes from opponent and gives to player' do
-            game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(player1.cards).to include taken_card1
             expect(player1.cards).to include taken_card2
 
@@ -174,7 +276,7 @@ RSpec.describe GoFish::Implementation, type: :model do
           end
 
           it 'returns the correct turn result' do
-            result = game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            result = game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(result.current_user_id).to eq player1.user_id
             expect(result.opponent_user_id).to eq opponent.user_id
             expect(result.rank_requested).to eq rank
@@ -185,7 +287,7 @@ RSpec.describe GoFish::Implementation, type: :model do
           end
 
           it 'does not switch turns' do
-            game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(game.current_player_index).to eq 0
           end
         end
@@ -205,7 +307,7 @@ RSpec.describe GoFish::Implementation, type: :model do
           let!(:card4) { player2.cards[1] }
 
           it 'takes from both opponent and player' do
-            game.play_turn(rank_requested: rank, opponent_user_id: opponent.user_id)
+            game.request_opponent_turn(rank_requested: rank, opponent_user_id: opponent.user_id)
             expect(player1.cards).to_not include card1
             expect(player1.cards).to_not include card2
             expect(player1.cards).to_not include card3
@@ -218,13 +320,13 @@ RSpec.describe GoFish::Implementation, type: :model do
           end
 
           it 'makes a book' do
-            game.play_turn(rank_requested: rank, opponent_user_id: opponent.user_id)
+            game.request_opponent_turn(rank_requested: rank, opponent_user_id: opponent.user_id)
             expect(player1.book_count).to eq 1
             expect(opponent.book_count).to eq 0
           end
 
           it 'returns the correct turn result' do
-            result = game.play_turn(rank_requested: rank, opponent_user_id: opponent.user_id)
+            result = game.request_opponent_turn(rank_requested: rank, opponent_user_id: opponent.user_id)
             expect(result.current_user_id).to eq player1.user_id
             expect(result.opponent_user_id).to eq opponent.user_id
             expect(result.rank_requested).to eq rank
@@ -235,7 +337,7 @@ RSpec.describe GoFish::Implementation, type: :model do
           end
 
           it 'does not switch turns' do
-            game.play_turn(rank_requested: rank, opponent_user_id: opponent.user_id)
+            game.request_opponent_turn(rank_requested: rank, opponent_user_id: opponent.user_id)
             expect(game.current_player).to eq player1
           end
         end
@@ -258,13 +360,13 @@ RSpec.describe GoFish::Implementation, type: :model do
           end
 
           it 'takes from top of deck and gives to player' do
-            game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(player1.cards).to include taken_card
             expect(game.deck.cards).to_not include taken_card
           end
 
           it 'returns the correct turn result' do
-            result = game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            result = game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
 
             expect(result.current_user_id).to eq player1.user_id
             expect(result.opponent_user_id).to eq opponent.user_id
@@ -276,7 +378,7 @@ RSpec.describe GoFish::Implementation, type: :model do
           end
 
           it 'does not switch turns' do
-            game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(game.current_player).to eq player1
           end
         end
@@ -290,13 +392,13 @@ RSpec.describe GoFish::Implementation, type: :model do
           end
 
           it 'makes a book' do
-            game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(player1.book_count).to eq 1
             expect(opponent.book_count).to eq 0
           end
 
           it 'returns the correct turn result' do
-            result = game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            result = game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(result.current_user_id).to eq player1.user_id
             expect(result.opponent_user_id).to eq opponent.user_id
             expect(result.rank_requested).to eq rank
@@ -307,7 +409,7 @@ RSpec.describe GoFish::Implementation, type: :model do
           end
 
           it 'does not switch turns' do
-            game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(game.current_player).to eq player1
           end
         end
@@ -331,13 +433,13 @@ RSpec.describe GoFish::Implementation, type: :model do
           end
 
           it 'takes from top of deck and gives to player' do
-            game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(player1.cards).to include taken_card
             expect(game.deck.cards).to_not include taken_card
           end
 
           it 'returns the correct turn result' do
-            result = game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            result = game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(result.current_user_id).to eq player1.user_id
             expect(result.opponent_user_id).to eq opponent.user_id
             expect(result.rank_requested).to eq rank
@@ -348,7 +450,7 @@ RSpec.describe GoFish::Implementation, type: :model do
           end
 
           it 'switches turns' do
-            game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(game.current_player).to eq player2
           end
         end
@@ -364,13 +466,13 @@ RSpec.describe GoFish::Implementation, type: :model do
           end
 
           it 'makes a book' do
-            game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(player1.book_count).to eq 1
             expect(opponent.book_count).to eq 0
           end
 
           it 'returns the correct turn result' do
-            result = game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            result = game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(result.current_user_id).to eq player1.user_id
             expect(result.opponent_user_id).to eq opponent.user_id
             expect(result.rank_requested).to eq rank
@@ -381,7 +483,7 @@ RSpec.describe GoFish::Implementation, type: :model do
           end
 
           it 'switches turns' do
-            game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+            game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
             expect(game.current_player).to_not eq player1
           end
         end
@@ -397,7 +499,7 @@ RSpec.describe GoFish::Implementation, type: :model do
           game.deck.cards = []
         end
         it 'returns the correct turn result' do
-          result = game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+          result = game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
           expect(result.current_user_id).to eq player1.user_id
           expect(result.opponent_user_id).to eq opponent.user_id
           expect(result.rank_requested).to eq rank
@@ -408,108 +510,8 @@ RSpec.describe GoFish::Implementation, type: :model do
         end
 
         it 'switches turns' do
-          game.play_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
+          game.request_opponent_turn(opponent_user_id: opponent.user_id, rank_requested: rank)
           expect(game.current_player).to eq player2
-        end
-      end
-    end
-
-    context 'when no parameters passed in (aka requesting player is out of cards)' do
-      let(:card_taken) { Card.new('A', 'Spades') }
-      let(:other_card) { Card.new('5', 'Spades') }
-
-      let(:player1_index) { 0 }
-      let(:player2_index) { 1 }
-
-      context 'deck is empty' do
-        before do
-          game.deck.cards = []
-        end
-
-        it 'returns the correct turn result' do
-          result = game.play_turn
-          expect(result.current_user_id).to eq player1.user_id
-          expect(result.opponent_user_id).to be_nil
-          expect(result.rank_requested).to be_nil
-          expect(result.cards_received_opponent).to be_empty
-          expect(result.card_received_deck).to be_nil
-          expect(result.was_book_made).to eq false
-        end
-
-        it 'switches turns' do
-          game.play_turn
-          expect(game.current_player_index).to eq player2_index
-        end
-
-        it 'adds 1 turn result to the feed' do
-          game.play_turn
-          expect(game.feed.length).to eq 1
-        end
-      end
-
-      context 'deck has cards' do
-        before do
-          game.deck.cards = [card_taken, other_card]
-        end
-
-        it 'removes the card from the top of the deck' do
-          game.play_turn
-          expect(game.deck.cards).to_not include card_taken
-          expect(game.deck.cards).to include other_card
-        end
-
-        it 'gives the card to the player' do
-          game.play_turn
-          expect(player1.cards).to include card_taken
-          expect(player1.cards).to_not include other_card
-        end
-
-        it 'returns the correct turn result' do
-          result = game.play_turn
-          expect(result.current_user_id).to eq player1.user_id
-          expect(result.opponent_user_id).to be_nil
-          expect(result.rank_requested).to be_nil
-          expect(result.cards_received_opponent).to be_empty
-          expect(result.card_received_deck).to eq card_taken
-          expect(result.was_book_made).to eq false
-        end
-
-        it 'does not switch turns' do
-          game.play_turn
-          expect(game.current_player_index).to eq player1_index
-        end
-      end
-
-      context 'when a different player requests a card' do
-        before do
-          game.deck.cards = [card_taken, other_card]
-          game.current_player_index = 1
-        end
-
-        it 'removes the card from the top of the deck' do
-          game.play_turn
-          expect(game.deck.cards).to_not include card_taken
-          expect(game.deck.cards).to include other_card
-        end
-
-        it 'gives the card to the player' do
-          game.play_turn
-          expect(player2.cards).to include card_taken
-          expect(player2.cards).to_not include other_card
-        end
-
-        it 'returns the correct turn result' do
-          result = game.play_turn
-          expect(result.current_user_id).to eq player2.user_id
-          expect(result.opponent_user_id).to be_nil
-          expect(result.rank_requested).to be_nil
-          expect(result.cards_received_opponent).to be_empty
-          expect(result.card_received_deck).to eq card_taken
-        end
-
-        it 'does not switch turns' do
-          game.play_turn
-          expect(game.current_player_index).to eq player2_index
         end
       end
     end

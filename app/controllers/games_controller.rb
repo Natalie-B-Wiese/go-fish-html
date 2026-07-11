@@ -3,7 +3,6 @@ class GamesController < ApplicationController
     game = Game.find(params[:id])
 
     @presenter = game.presenter_class.new(game, Current.user)
-    @turn = Turn.new(game: game, requestor_user: Current.user)
 
     game.start! if game.full? && !game.started?
 
@@ -46,27 +45,18 @@ class GamesController < ApplicationController
   def play
     game = Game.find(params[:id])
 
-    return redirect_to show_game_path(game) if game.game_state.current_user_id != Current.user.id
+    game.save! if game.valid_turn? && game.play_turn?(**turn_params_hash)
 
-    play_turn(game)
-    game.save!
-
-    # TODO: only redirect if successful and user can view the game?
     redirect_to show_game_path(game)
   end
 
   private
 
-  def play_turn(game)
-    turn_params = turn_result_params
-    game.game_state.play_turn(opponent_user_id: Integer(turn_params[:player]), rank_requested: turn_params[:rank])
+  # returns nil if user is user cannot play a card even though it's their turn
+  def turn_params_hash
+    params.require(:turn).permit(:player, :rank, :card).to_h.symbolize_keys
   rescue ActionController::ParameterMissing
-    game.game_state.play_turn(opponent_user_id: nil, rank_requested: nil)
-  end
-
-  # throws a ActionController::ParameterMissing if user is requesting a card from the deck (aka hand empty)
-  def turn_result_params
-    params.require(:turn).permit(:player, :rank)
+    {}
   end
 
   def game_params

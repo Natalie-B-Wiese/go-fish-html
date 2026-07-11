@@ -74,6 +74,77 @@ RSpec.describe CrazyEights::Implementation, type: :model do
     end
   end
 
+  describe '#draw_deck_turn' do
+    let!(:game) { described_class.new([player1, player2], current_player_index: 0) }
+    let(:card1) { Card.new('5', 'Spades') }
+    let(:player1_cards) { [card1, Card.new(rank8, 'Diamonds'), Card.new(rank8, 'Hearts')] }
+    let(:rank8) { '8' }
+    let(:discard_cards) { [Card.new('3', 'Spades'), Card.new('2', 'Diamonds')] }
+
+    before do
+      game.start!
+      player1.cards = player1_cards.dup
+      game.discard_pile.cards = discard_cards
+    end
+
+    it 'does not switch turns' do
+      game.draw_deck_turn
+      expect(game.current_player_index).to eq 0
+    end
+
+    context 'deck has cards' do
+      let(:top_deck_card) { Card.new('5', 'Hearts') }
+      let(:other_card) { Card.new('2', 'Diamonds') }
+
+      before do
+        game.deck.cards = [top_deck_card, other_card]
+      end
+
+      it 'removes the card from the top of the deck and gives to player' do
+        game.draw_deck_turn
+        expect(game.deck.cards).to_not include top_deck_card
+        expect(game.deck.cards).to include other_card
+
+        expect(player1.cards).to include top_deck_card
+        expect(player1.cards).to_not include other_card
+      end
+
+      xit 'returns the correct turn result' do
+        result = game.draw_deck_turn
+        expect(result.current_user_id).to eq player1.user_id
+        expect(result.opponent_user_id).to be_nil
+        expect(result.card_received_deck).to eq card_taken
+      end
+    end
+
+    context 'deck is empty' do
+      before do
+        game.deck.cards = []
+        game.draw_deck_turn
+      end
+
+      it 'creates a new deck from all but top card of discard pile and draws from deck' do
+        expect(game.discard_pile.card_count).to eq 1
+        expect(game.discard_pile.top_card).to eq discard_cards.first
+
+        expect(game.deck.cards).to_not include discard_cards.first
+
+        # deck length does not include first card
+        # Player has also drawn from deck
+        # ie '-2'
+        expect(game.deck.cards.count).to eq(discard_cards.length - 2)
+        expect(player1.cards.count).to eq(player1_cards.count + 1)
+      end
+
+      xit 'returns the correct turn result' do
+        result = game.draw_deck_turn
+        expect(result.current_user_id).to eq player1.user_id
+        expect(result.opponent_user_id).to be_nil
+        expect(result.card_received_deck).to eq card_taken
+      end
+    end
+  end
+
   describe '#play_turn' do
     let!(:game) { described_class.new([player1, player2], current_player_index: 0) }
     let(:card1) { Card.new('5', 'Spades') }
@@ -87,77 +158,29 @@ RSpec.describe CrazyEights::Implementation, type: :model do
       game.discard_pile.cards = discard_cards
     end
 
-    context 'when rank and suit passed in' do
-      before do
-        game.play_turn(rank: card1.rank, suit: card1.suit)
-      end
-
-      it 'removes the card from the player hand and adds it to top of discard pile' do
-        expect(player1.cards).to_not include card1
-        expect(player1.cards.length).to eq 2
-        expect(game.discard_pile.top_card).to eq card1
-        expect(game.discard_pile.cards).to include discard_cards.first
-      end
-
-      it 'switches turns' do
-        expect(game.current_player_index).to eq 1
-      end
-
-      xit 'adds 1 turn result to the feed' do
-        expect(game.feed.length).to eq 1
-      end
+    it 'removes the card from the player hand and adds it to top of discard pile' do
+      game.play_turn(rank: card1.rank, suit: card1.suit)
+      expect(player1.cards).to_not include card1
+      expect(player1.cards.length).to eq 2
+      expect(game.discard_pile.top_card).to eq card1
+      expect(game.discard_pile.cards).to include discard_cards.first
     end
 
-    context 'when no parameters passed in (aka player cannot play a card)' do
-      context 'deck has cards' do
-        let(:top_deck_card) { Card.new('5', 'Hearts') }
-        let(:other_card) { Card.new('2', 'Diamonds') }
+    xit 'returns the correct turn result' do
+      result = game.play_turn(rank: card1.rank, suit: card1.suit)
+      expect(result.current_user_id).to eq player1.user_id
+      expect(result.opponent_user_id).to be_nil
+      expect(result.card_received_deck).to eq card_taken
+    end
 
-        before do
-          game.deck.cards = [top_deck_card, other_card]
-        end
+    it 'switches turns' do
+      game.play_turn(rank: card1.rank, suit: card1.suit)
+      expect(game.current_player_index).to eq 1
+    end
 
-        it 'removes the card from the top of the deck and gives to player' do
-          game.play_turn
-          expect(game.deck.cards).to_not include top_deck_card
-          expect(game.deck.cards).to include other_card
-
-          expect(player1.cards).to include top_deck_card
-          expect(player1.cards).to_not include other_card
-        end
-
-        it 'does not switch turns' do
-          game.play_turn
-          expect(game.current_player_index).to eq 0
-        end
-
-        xit 'returns the correct turn result' do
-          result = game.play_turn
-          expect(result.current_user_id).to eq player1.user_id
-          expect(result.opponent_user_id).to be_nil
-          expect(result.card_received_deck).to eq card_taken
-        end
-      end
-
-      context 'deck is empty' do
-        before do
-          game.deck.cards = []
-          game.play_turn
-        end
-
-        it 'creates a new deck from all but top card of discard pile and draws from deck' do
-          expect(game.discard_pile.card_count).to eq 1
-          expect(game.discard_pile.top_card).to eq discard_cards.first
-
-          expect(game.deck.cards).to_not include discard_cards.first
-
-          # deck length does not include first card
-          # Player has also drawn from deck
-          # ie '-2'
-          expect(game.deck.cards.count).to eq(discard_cards.length - 2)
-          expect(player1.cards.count).to eq(player1_cards.count + 1)
-        end
-      end
+    xit 'adds 1 turn result to the feed' do
+      game.play_turn(rank: card1.rank, suit: card1.suit)
+      expect(game.feed.length).to eq 1
     end
   end
 end

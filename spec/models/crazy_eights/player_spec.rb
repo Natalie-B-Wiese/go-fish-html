@@ -24,6 +24,84 @@ RSpec.describe CrazyEights::Player, type: :model do
     end
   end
 
+  describe '#playable_cards' do
+    let(:discard_card) { Card.new('5', 'Hearts') }
+
+    let(:card1) { Card.new(discard_card.rank, 'Spades') }
+    let(:card2) { Card.new('2', discard_card.suit) }
+    let(:card3) { Card.new('3', discard_card.suit) }
+    let(:bad_card) { Card.new('6', 'Diamonds') }
+
+    let(:cards) { [card1, bad_card, card2, card3] }
+    let(:good_cards) { cards - [bad_card] }
+
+    before do
+      cards.each do |card|
+        player.add_card(card)
+      end
+    end
+
+    it 'it returns an array of cards with either same rank or same suit' do
+      result = player.playable_cards(discard_card)
+      expect(result).to eq good_cards
+    end
+
+    context 'if player has an eight' do
+      before do
+        player.add_card(Card.new('8', 'Spades'))
+      end
+
+      it 'it includes the 8 in all suits' do
+        result = player.playable_cards(discard_card)
+
+        expect(result).to include Card.new('8', 'Spades')
+        expect(result).to include Card.new('8', 'Clubs')
+        expect(result).to include Card.new('8', 'Diamonds')
+        expect(result).to include Card.new('8', 'Hearts')
+
+        good_cards.each { |card| expect(result).to include card }
+      end
+    end
+  end
+
+  describe 'cards_to_h' do
+    let(:card1) { Card.new('A', 'Spades') }
+    let(:card2) { Card.new('2', 'Clubs') }
+    let(:card3) { Card.new('3', 'Diamonds') }
+    let(:card4) { Card.new('4', 'Hearts') }
+    let(:cards) { [card1, card2, card3, card4] }
+
+    context 'with cards passed in' do
+      it 'it returns a hash of cards passed in' do
+        expected_result =
+          { 'A of Spades' => 'AS',
+            '2 of Clubs' => '2C',
+            '3 of Diamonds' => '3D',
+            '4 of Hearts' => '4H' }
+
+        result = player.cards_to_h(cards)
+        expect(result).to eq expected_result
+      end
+    end
+
+    context 'with no cards passed in' do
+      before do
+        cards.each { |card| player.add_card(card) }
+      end
+
+      it 'it returns a hash of cards in user hand' do
+        expected_result =
+          { 'A of Spades' => 'AS',
+            '2 of Clubs' => '2C',
+            '3 of Diamonds' => '3D',
+            '4 of Hearts' => '4H' }
+
+        result = player.cards_to_h
+        expect(result).to eq expected_result
+      end
+    end
+  end
+
   describe '#take_card' do
     context 'with non-8 card' do
       let(:card) { Card.new('5', 'Diamonds') }
