@@ -43,4 +43,4 @@
 			header.panel__header
 				h2 Deck
 			div.panel__content
-				/ TODO: show the card at the top of the deck
+				= image_tag "cards/#{@presenter.discard_card.to_image_name}", alt: "#{@presenter.discard_card.to_s}", class: "playing-card playing-card--lg"
