@@ -24,8 +24,8 @@ div.op-page__main
 						td
 							= game.name
 						td
-							= game.users.map{|user| user.email_address}.join(', ')
+							= game.users.map{|user| user.name}.join(', ')
 						td
-							= game.winner.user.email_address
+							= game.winner.user.name
 						td
 							= game.ended_at.strftime("%b %d, %Y")

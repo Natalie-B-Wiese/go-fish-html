@@ -313,8 +313,8 @@ RSpec.describe 'Games', type: :system do
     end
 
     it 'shows who played' do
-      expect(page).to have_content user1.email_address + ', ' + user2.email_address
-      expect(page).to have_content user1.email_address + ', ' + user3.email_address
+      expect(page).to have_content user1.name + ', ' + user2.name
+      expect(page).to have_content user1.name + ', ' + user3.name
     end
 
     it 'shows when it was finished' do
@@ -323,8 +323,8 @@ RSpec.describe 'Games', type: :system do
     end
 
     it 'show the winner' do
-      expect(page).to have_content(user2.email_address).twice
-      expect(page).to have_content(user3.email_address).twice
+      expect(page).to have_content(user2.name).twice
+      expect(page).to have_content(user3.name).twice
     end
   end
 
