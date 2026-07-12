@@ -35,6 +35,22 @@ class CardCollection
     cards.delete_at(rand(cards.length))
   end
 
+  def cards_by_rank(rank = nil)
+    if rank.nil?
+      cards.group_by(&:rank)
+    else
+      cards.group_by(&:rank)[rank] || []
+    end
+  end
+
+  def cards_by_suit(suit = nil)
+    if suit.nil?
+      cards.group_by(&:suit)
+    else
+      cards.group_by(&:suit)[suit] || []
+    end
+  end
+
   def card_count
     cards.length
   end

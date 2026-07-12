@@ -161,6 +161,98 @@ RSpec.describe CardCollection, type: :model do
     end
   end
 
+  describe '#cards_by_rank' do
+    let(:rank1) { 'A' }
+    let(:rank2) { '5' }
+    let(:other_rank) { '6' }
+
+    let(:card1) { Card.new(rank1, 'Spades') }
+    let(:card2) { Card.new(rank2, 'Clubs') }
+    let(:card3) { Card.new(rank1, 'Diamonds') }
+
+    before do
+      collection_with_3_cards.cards = [card1, card2, card3]
+    end
+
+    context 'with no parameters' do
+      it 'returns a hash with card groupings' do
+        result = collection_with_3_cards.cards_by_rank
+
+        expect(result).to have_key(rank1)
+        expect(result).to have_key(rank2)
+        expect(result).to_not have_key(other_rank)
+
+        expect(result[rank1]).to eq [card1, card3]
+        expect(result[rank2]).to eq [card2]
+      end
+    end
+
+    context 'with rank parameter' do
+      context 'when there are cards with that rank' do
+        it 'returns an array of cards in that group' do
+          result1 = collection_with_3_cards.cards_by_rank(rank1)
+          expect(result1).to eq [card1, card3]
+
+          result2 = collection_with_3_cards.cards_by_rank(rank2)
+          expect(result2).to eq [card2]
+        end
+      end
+
+      context 'when there are no cards with that rank' do
+        it 'returns an empty array' do
+          result = collection_with_3_cards.cards_by_rank(other_rank)
+          expect(result).to be_empty
+        end
+      end
+    end
+  end
+
+  describe '#cards_by_suit' do
+    let(:suit1) { 'Diamonds' }
+    let(:suit2) { 'Hearts' }
+    let(:other_suit) { 'Clubs' }
+
+    let(:card1) { Card.new('A', suit1) }
+    let(:card2) { Card.new('7', suit2) }
+    let(:card3) { Card.new('5', suit1) }
+
+    before do
+      collection_with_3_cards.cards = [card1, card2, card3]
+    end
+
+    context 'with no parameters' do
+      it 'returns a hash with card groupings' do
+        result = collection_with_3_cards.cards_by_suit
+
+        expect(result).to have_key(suit1)
+        expect(result).to have_key(suit2)
+        expect(result).to_not have_key(other_suit)
+
+        expect(result[suit1]).to eq [card1, card3]
+        expect(result[suit2]).to eq [card2]
+      end
+    end
+
+    context 'with suit parameter' do
+      context 'when there are cards with that suit' do
+        it 'returns an array of cards in that group' do
+          result1 = collection_with_3_cards.cards_by_suit(suit1)
+          expect(result1).to eq [card1, card3]
+
+          result2 = collection_with_3_cards.cards_by_suit(suit2)
+          expect(result2).to eq [card2]
+        end
+      end
+
+      context 'when there are no cards with that suit' do
+        it 'returns an empty array' do
+          result = collection_with_3_cards.cards_by_suit(other_suit)
+          expect(result).to be_empty
+        end
+      end
+    end
+  end
+
   describe '#card_count' do
     it 'when empty it returns 0' do
       expect(collection_no_cards.card_count).to eq 0
