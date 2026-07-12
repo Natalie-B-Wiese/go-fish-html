@@ -157,7 +157,7 @@ RSpec.describe CardCollection, type: :model do
       collection_no_cards.cards = original_array.dup
 
       card_taken = collection_no_cards.take_card_at_random
-      expect(collection_no_cards.cards + [card_taken]).to eq original_array
+      expect(collection_no_cards.cards).to eq(original_array - [card_taken])
     end
   end
 

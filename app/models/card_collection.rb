@@ -32,7 +32,7 @@ class CardCollection
   end
 
   def take_card_at_random
-    cards.delete_at(rand(0..cards.length))
+    cards.delete_at(rand(cards.length))
   end
 
   def card_count
