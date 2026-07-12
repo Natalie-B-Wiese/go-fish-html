@@ -190,4 +190,65 @@ RSpec.describe CrazyEights::Implementation, type: :model do
       expect(game.current_player_index).to eq 1
     end
   end
+
+  describe '#game_over?' do
+    let!(:game) { described_class.new([player1, player2], current_player_index: 0) }
+
+    before do
+      game.start!
+    end
+
+    context 'when all players have cards' do
+      before do
+        player1.cards = [Card.new('5', 'Spades')]
+        player2.cards = [Card.new('3', 'Spades')]
+      end
+
+      it 'is not over' do
+        expect(game.game_over?).to eq false
+      end
+    end
+
+    context 'when one player is out of cards' do
+      before do
+        player1.cards = [Card.new('5', 'Spades')]
+        player2.cards = []
+      end
+
+      it 'is game over' do
+        expect(game.game_over?).to eq true
+      end
+    end
+  end
+
+  describe '#winning_player' do
+    let!(:game) { described_class.new([player1, player2], current_player_index: 0) }
+
+    before do
+      game.start!
+    end
+
+    context 'when all players have cards' do
+      before do
+        player1.cards = [Card.new('5', 'Spades')]
+        player2.cards = [Card.new('3', 'Spades')]
+      end
+
+      it 'returns nil' do
+        expect(game.winning_player).to be_nil
+      end
+    end
+
+    context 'when player is out of cards' do
+      it 'returns the player who is out of cards' do
+        player1.cards = []
+        player2.cards = [Card.new('5', 'Spades')]
+        expect(game.winning_player).to eq player1
+
+        player1.cards = [Card.new('5', 'Spades')]
+        player2.cards = []
+        expect(game.winning_player).to eq player2
+      end
+    end
+  end
 end

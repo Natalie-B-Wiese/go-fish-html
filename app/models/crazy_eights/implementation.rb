@@ -103,7 +103,11 @@ module CrazyEights
     end
 
     def game_over?
-      false
+      players.any? { |player| player.cards.empty? }
+    end
+
+    def winning_player
+      players.find { |player| player.cards.empty? }
     end
 
     private

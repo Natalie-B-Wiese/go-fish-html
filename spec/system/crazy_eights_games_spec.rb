@@ -197,7 +197,7 @@ RSpec.describe 'Crazy Eights Games', type: :system do
     end
   end
 
-  xcontext 'when game is over' do
+  context 'when game is over' do
     let(:winning_player) { game.game_state.players.first }
 
     let(:game_name) { "Penelope's Game" }
