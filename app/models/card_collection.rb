@@ -6,6 +6,35 @@ class CardCollection
     @cards = cards
   end
 
+  def push_cards(*cards_to_add)
+    cards_to_add = cards_to_add.flatten
+    self.cards = cards.concat(cards_to_add)
+    self
+  end
+
+  def pop_card
+    cards.pop
+  end
+
+  def unshift_cards(*cards_to_add)
+    cards_to_add = cards_to_add.flatten
+    cards.unshift(*cards_to_add)
+    self
+  end
+
+  def shift_card
+    cards.shift
+  end
+
+  def insert_card_at_random(card)
+    cards.insert(rand(0..cards.length), card)
+    self
+  end
+
+  def take_card_at_random
+    cards.delete_at(rand(0..cards.length))
+  end
+
   def card_count
     cards.length
   end
