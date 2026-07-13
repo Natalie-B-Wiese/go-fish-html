@@ -7,10 +7,10 @@ module CrazyEights
       hand.cards.sort_by(&:value)
     end
 
-    def initialize(user_id, cards: [], hand: nil)
+    def initialize(user_id, cards: [], hand: CardCollection.new(cards))
       @user_id = user_id
 
-      @hand = hand || CardCollection.new(cards)
+      @hand = hand
     end
 
     def add_card(card)
@@ -45,7 +45,6 @@ module CrazyEights
         hand == other.hand
     end
 
-    # TODO: make it implement the hand as json
     def as_json
       {
         user_id: user_id,
@@ -53,7 +52,6 @@ module CrazyEights
       }
     end
 
-    # TODO: make it implement the hand from json
     def self.from_json(json)
       json_hand = CardCollection.from_json(json['hand'])
 
