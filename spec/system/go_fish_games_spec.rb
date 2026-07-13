@@ -148,7 +148,7 @@ RSpec.describe 'Games', type: :system do
 
     context 'when current player is out of cards' do
       before do
-        game.game_state.players.first.cards = []
+        game.game_state.players.first.hand.cards = []
         game.save!
         game.reload
         visit show_game_path(game)

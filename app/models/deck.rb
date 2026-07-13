@@ -10,25 +10,11 @@ class Deck < CardCollection
     cards.first
   end
 
-  def take_top_card
-    cards.shift
-  end
-
   def shuffle
     shuffled = cards.shuffle
     shuffled = cards.shuffle while shuffled == cards
 
     self.cards = shuffled
-  end
-
-  # untested
-  def insert_card_to_top(card)
-    cards.unshift(card)
-  end
-
-  # untested
-  def insert_card_at_random_position(card)
-    cards.insert(rand(0..cards.size), card)
   end
 
   private

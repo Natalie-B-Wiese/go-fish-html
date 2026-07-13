@@ -1,19 +1,20 @@
 module CrazyEights
   class Player
     attr_reader :user_id
-    attr_accessor :cards
+    attr_accessor :hand
 
-    def initialize(user_id, cards: [])
+    def cards
+      hand.cards
+    end
+
+    def initialize(user_id, cards: [], hand: nil)
       @user_id = user_id
-      @cards = cards
+
+      @hand = hand || CardCollection.new(cards)
     end
 
     def add_card(card)
-      cards.push(card)
-    end
-
-    def cards_to_h(cards_to_convert = cards)
-      cards_to_convert.to_h { |card| [card.to_s, card.key] }.stringify_keys
+      hand.push_cards(card)
     end
 
     def playable_cards(discard_card)
@@ -33,7 +34,7 @@ module CrazyEights
                      cards.find { |card| card.rank == rank && card.suit == suit }
                    end
 
-      self.cards -= [card_taken]
+      hand.cards -= [card_taken]
       Card.new(rank, suit)
     end
 
@@ -41,20 +42,22 @@ module CrazyEights
       return false if other.nil?
 
       user_id == other.user_id &&
-        cards == other.cards
+        hand == other.hand
     end
 
+    # TODO: make it implement the hand as json
     def as_json
       {
         user_id: user_id,
-        cards: cards.map(&:as_json)
+        hand: hand.as_json
       }
     end
 
+    # TODO: make it implement the hand from json
     def self.from_json(json)
-      json_cards = json['cards'].map { |card_json| Card.from_json(card_json) }
+      json_hand = CardCollection.from_json(json['hand'])
 
-      new(json['user_id'], cards: json_cards)
+      new(json['user_id'], hand: json_hand)
     end
 
     private

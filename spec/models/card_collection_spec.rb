@@ -316,4 +316,46 @@ RSpec.describe CardCollection, type: :model do
       expect(converted).to eq original
     end
   end
+
+  describe '.cards_to_h' do
+    let(:card1) { Card.new('A', 'Spades') }
+    let(:card2) { Card.new('2', 'Clubs') }
+    let(:card3) { Card.new('3', 'Diamonds') }
+    let(:card4) { Card.new('4', 'Hearts') }
+    let(:cards) { [card1, card2, card3, card4] }
+
+    it 'it returns a hash of cards passed in' do
+      expected_result =
+        { 'A of Spades' => 'AS',
+          '2 of Clubs' => '2C',
+          '3 of Diamonds' => '3D',
+          '4 of Hearts' => '4H' }
+
+      result = CardCollection.cards_to_h(cards)
+      expect(result).to eq expected_result
+    end
+  end
+
+  describe '#cards_to_h' do
+    let(:card1) { Card.new('A', 'Spades') }
+    let(:card2) { Card.new('2', 'Clubs') }
+    let(:card3) { Card.new('3', 'Diamonds') }
+    let(:card4) { Card.new('4', 'Hearts') }
+    let(:cards) { [card1, card2, card3, card4] }
+
+    before do
+      collection_no_cards.cards = cards.dup
+    end
+
+    it 'it returns a hash of cards in user hand' do
+      expected_result =
+        { 'A of Spades' => 'AS',
+          '2 of Clubs' => '2C',
+          '3 of Diamonds' => '3D',
+          '4 of Hearts' => '4H' }
+
+      result = collection_no_cards.cards_to_h
+      expect(result).to eq expected_result
+    end
+  end
 end

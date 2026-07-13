@@ -98,9 +98,9 @@ RSpec.describe 'Crazy Eights Games', type: :system do
 
     context 'when current player has card to play' do
       let(:player) { game.game_state.players.first }
-      let(:discard_card) { player.cards.first }
+      let(:discard_card) { player.hand.cards.first }
       before do
-        game.game_state.discard_pile.insert_card_to_top(discard_card)
+        game.game_state.discard_pile.unshift_cards(discard_card)
         game.save!
         game.reload
 
@@ -115,8 +115,8 @@ RSpec.describe 'Crazy Eights Games', type: :system do
         dropdown_labels = dropdown_options.map(&:text)
         dropdown_values = dropdown_options.map { |opt| opt[:value] }
 
-        expect(dropdown_labels).to match_array(player.cards_to_h(card_options).keys)
-        expect(dropdown_values).to match_array(player.cards_to_h(card_options).values)
+        expect(dropdown_labels).to match_array(CardCollection.cards_to_h(card_options).keys)
+        expect(dropdown_values).to match_array(CardCollection.cards_to_h(card_options).values)
       end
 
       context 'when current user clicks on play button' do
@@ -153,8 +153,8 @@ RSpec.describe 'Crazy Eights Games', type: :system do
 
     context 'when current player has no playable cards' do
       before do
-        game.game_state.players.first.cards = [Card.new('5', 'Hearts')]
-        game.game_state.discard_pile.insert_card_to_top(Card.new('3', 'Diamonds'))
+        game.game_state.players.first.hand.cards = [Card.new('5', 'Hearts')]
+        game.game_state.discard_pile.unshift_cards(Card.new('3', 'Diamonds'))
 
         game.save!
         game.reload
@@ -212,7 +212,7 @@ RSpec.describe 'Crazy Eights Games', type: :system do
       visit show_game_path(game)
 
       # force the win condition
-      game.game_state.players.first.cards = []
+      game.game_state.players.first.hand.cards = []
       game.save!
 
       game.reload

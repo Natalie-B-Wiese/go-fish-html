@@ -130,7 +130,7 @@ module GoFish
 
     def request_deck_card(turn_result = TurnResult.new(current_user_id: current_user_id))
       unless deck.empty?
-        card_taken = deck.take_top_card
+        card_taken = deck.shift_card
         turn_result.card_received_deck = card_taken
         current_player.add_card(card_taken)
       end
@@ -162,7 +162,7 @@ module GoFish
     def deal_cards_to_players(num_cards_to_deal)
       num_cards_to_deal.times do
         players.each do |player|
-          player.add_card(deck.take_top_card)
+          player.add_card(deck.shift_card)
         end
       end
     end

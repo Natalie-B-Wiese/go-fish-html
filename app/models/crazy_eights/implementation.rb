@@ -27,7 +27,7 @@ module CrazyEights
       deal
 
       # deal a non-8 to the discard pile
-      deck.insert_card_at_random_position(discard_pile.take_top_card) while top_deck_card_to_discard.rank == '8'
+      deck.insert_card_at_random(discard_pile.shift_card) while top_deck_card_to_discard.rank == '8'
     end
 
     def draw_deck_turn
@@ -94,8 +94,7 @@ module CrazyEights
       players = json['players'].map { |player_json| CrazyEights::Player.from_json(player_json) }
       deck = Deck.from_json(json['deck'])
 
-      # feed = json['feed'].map { |turn_result_json| CrazyEights::TurnResult.from_json(turn_result_json) }
-      feed = json['feed'].map { |turn_result_json| GoFish::TurnResult.from_json(turn_result_json) }
+      feed = json['feed'].map { |turn_result_json| CrazyEights::TurnResult.from_json(turn_result_json) }
       player_index = json['current_player_index']
       discard_pile = DiscardPile.from_json(json['discard_pile'])
 
@@ -122,18 +121,18 @@ module CrazyEights
       discard_pile.cards = [discard_pile.top_card]
 
       cards.each do |card|
-        deck.insert_card_at_random_position(card)
+        deck.insert_card_at_random(card)
       end
     end
 
     def add_discard(card)
-      discard_pile.insert_card_to_top(card)
+      discard_pile.unshift_cards(card)
     end
 
     def draw_from_deck(turn_result)
       recreate_deck_from_discard if deck.empty?
 
-      card = deck.take_top_card
+      card = deck.shift_card
       turn_result.card_received_deck = card
       current_player.add_card(card)
     end
@@ -147,7 +146,7 @@ module CrazyEights
     # takes from top of deck and adds it to discard pile
     # Returns the card that was added to the discard pile
     def top_deck_card_to_discard
-      top_card = deck.take_top_card
+      top_card = deck.shift_card
       add_discard(top_card)
       top_card
     end
@@ -164,7 +163,7 @@ module CrazyEights
     def deal_cards_to_players(num_cards_to_deal)
       num_cards_to_deal.times do
         players.each do |player|
-          player.add_card(deck.take_top_card)
+          player.add_card(deck.shift_card)
         end
       end
     end

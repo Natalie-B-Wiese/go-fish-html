@@ -78,4 +78,12 @@ class CardCollection
     json_cards = json['cards'].map { |card_json| Card.from_json(card_json) }
     new(json_cards)
   end
+
+  def cards_to_h
+    CardCollection.cards_to_h(cards)
+  end
+
+  def self.cards_to_h(cards)
+    cards.to_h { |card| [card.to_s, card.key] }.stringify_keys
+  end
 end

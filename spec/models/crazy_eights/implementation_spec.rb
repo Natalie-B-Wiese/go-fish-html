@@ -28,8 +28,8 @@ RSpec.describe CrazyEights::Implementation, type: :model do
 
       it "deals #{CrazyEights::Implementation::SMALL_GAME_CARDS} cards to each player and 1 to discard pile" do
         game.start!
-        expect(player1.cards.length).to eq CrazyEights::Implementation::SMALL_GAME_CARDS
-        expect(player2.cards.length).to eq CrazyEights::Implementation::SMALL_GAME_CARDS
+        expect(player1.hand.cards.length).to eq CrazyEights::Implementation::SMALL_GAME_CARDS
+        expect(player2.hand.cards.length).to eq CrazyEights::Implementation::SMALL_GAME_CARDS
         total_cards_dealt_to_players = game.players.count * CrazyEights::Implementation::SMALL_GAME_CARDS
         expect(game.deck.cards.length).to eq full_deck_size - (1 + total_cards_dealt_to_players)
         expect(game.discard_pile.card_count).to eq 1
@@ -47,9 +47,9 @@ RSpec.describe CrazyEights::Implementation, type: :model do
 
       it "deals #{CrazyEights::Implementation::BIG_GAME_CARDS} cards to each player and 1 to discard pile" do
         game.start!
-        expect(player1.cards.length).to eq CrazyEights::Implementation::BIG_GAME_CARDS
-        expect(player2.cards.length).to eq CrazyEights::Implementation::BIG_GAME_CARDS
-        expect(player3.cards.length).to eq CrazyEights::Implementation::BIG_GAME_CARDS
+        expect(player1.hand.cards.length).to eq CrazyEights::Implementation::BIG_GAME_CARDS
+        expect(player2.hand.cards.length).to eq CrazyEights::Implementation::BIG_GAME_CARDS
+        expect(player3.hand.cards.length).to eq CrazyEights::Implementation::BIG_GAME_CARDS
         total_cards_dealt_to_players = game.players.count * CrazyEights::Implementation::BIG_GAME_CARDS
         expect(game.deck.cards.length).to eq full_deck_size - (1 + total_cards_dealt_to_players)
         expect(game.discard_pile.card_count).to eq 1
@@ -83,7 +83,7 @@ RSpec.describe CrazyEights::Implementation, type: :model do
 
     before do
       game.start!
-      player1.cards = player1_cards.dup
+      player1.hand.cards = player1_cards.dup
       game.discard_pile.cards = discard_cards
     end
 
@@ -110,8 +110,8 @@ RSpec.describe CrazyEights::Implementation, type: :model do
         expect(game.deck.cards).to_not include top_deck_card
         expect(game.deck.cards).to include other_card
 
-        expect(player1.cards).to include top_deck_card
-        expect(player1.cards).to_not include other_card
+        expect(player1.hand.cards).to include top_deck_card
+        expect(player1.hand.cards).to_not include other_card
       end
 
       it 'returns the correct turn result' do
@@ -125,8 +125,7 @@ RSpec.describe CrazyEights::Implementation, type: :model do
     context 'deck is empty' do
       before do
         game.deck.cards = []
-        game.discard_pile.insert_card_to_top(Card.new('4', 'Spades'))
-        game.discard_pile.insert_card_to_top(Card.new('A', 'Hearts'))
+        game.discard_pile.unshift_cards(Card.new('4', 'Spades'), Card.new('A', 'Hearts'))
         game.draw_deck_turn
       end
 
@@ -140,7 +139,7 @@ RSpec.describe CrazyEights::Implementation, type: :model do
         # Player has also drawn from deck
         # ie '-2'
         expect(game.deck.cards.count).to eq(discard_cards.length - 2)
-        expect(player1.cards.count).to eq(player1_cards.count + 1)
+        expect(player1.hand.cards.count).to eq(player1_cards.count + 1)
       end
 
       it 'returns the correct turn result' do
@@ -161,7 +160,7 @@ RSpec.describe CrazyEights::Implementation, type: :model do
 
     before do
       game.start!
-      player1.cards = player1_cards.dup
+      player1.hand.cards = player1_cards.dup
       game.discard_pile.cards = discard_cards
     end
 
@@ -172,8 +171,8 @@ RSpec.describe CrazyEights::Implementation, type: :model do
 
     it 'removes the card from the player hand and adds it to top of discard pile' do
       game.play_turn(rank: card1.rank, suit: card1.suit)
-      expect(player1.cards).to_not include card1
-      expect(player1.cards.length).to eq 2
+      expect(player1.hand.cards).to_not include card1
+      expect(player1.hand.cards.length).to eq 2
       expect(game.discard_pile.top_card).to eq card1
       expect(game.discard_pile.cards).to include discard_cards.first
     end
@@ -200,8 +199,8 @@ RSpec.describe CrazyEights::Implementation, type: :model do
 
     context 'when all players have cards' do
       before do
-        player1.cards = [Card.new('5', 'Spades')]
-        player2.cards = [Card.new('3', 'Spades')]
+        player1.hand.cards = [Card.new('5', 'Spades')]
+        player2.hand.cards = [Card.new('3', 'Spades')]
       end
 
       it 'is not over' do
@@ -211,8 +210,8 @@ RSpec.describe CrazyEights::Implementation, type: :model do
 
     context 'when one player is out of cards' do
       before do
-        player1.cards = [Card.new('5', 'Spades')]
-        player2.cards = []
+        player1.hand.cards = [Card.new('5', 'Spades')]
+        player2.hand.cards = []
       end
 
       it 'is game over' do
@@ -230,8 +229,8 @@ RSpec.describe CrazyEights::Implementation, type: :model do
 
     context 'when all players have cards' do
       before do
-        player1.cards = [Card.new('5', 'Spades')]
-        player2.cards = [Card.new('3', 'Spades')]
+        player1.hand.cards = [Card.new('5', 'Spades')]
+        player2.hand.cards = [Card.new('3', 'Spades')]
       end
 
       it 'returns nil' do
@@ -241,12 +240,12 @@ RSpec.describe CrazyEights::Implementation, type: :model do
 
     context 'when player is out of cards' do
       it 'returns the player who is out of cards' do
-        player1.cards = []
-        player2.cards = [Card.new('5', 'Spades')]
+        player1.hand.cards = []
+        player2.hand.cards = [Card.new('5', 'Spades')]
         expect(game.winning_player).to eq player1
 
-        player1.cards = [Card.new('5', 'Spades')]
-        player2.cards = []
+        player1.hand.cards = [Card.new('5', 'Spades')]
+        player2.hand.cards = []
         expect(game.winning_player).to eq player2
       end
     end

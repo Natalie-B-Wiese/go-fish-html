@@ -61,7 +61,7 @@ RSpec.describe GoFish::Implementation, type: :model do
 
     context 'when player has no cards' do
       before do
-        player1.cards = []
+        player1.hand.cards = []
       end
 
       it 'adds 1 turn result to the feed' do
@@ -143,7 +143,7 @@ RSpec.describe GoFish::Implementation, type: :model do
 
     context 'when player has cards' do
       before do
-        player1.cards = [Card.new('2', 'Diamonds')]
+        player1.hand.cards = [Card.new('2', 'Diamonds')]
       end
 
       it 'does not add a turn result to the feed' do
@@ -176,7 +176,7 @@ RSpec.describe GoFish::Implementation, type: :model do
     let(:player1_index) { 0 }
 
     before do
-      player1.cards = [Card.new(rank_have, 'Diamonds')]
+      player1.hand.cards = [Card.new(rank_have, 'Diamonds')]
     end
 
     context 'when player does not have the rank' do
@@ -225,8 +225,8 @@ RSpec.describe GoFish::Implementation, type: :model do
 
       context 'when opponent has that card' do
         before do
-          player1.cards = [Card.new('5', 'Hearts')]
-          player3.cards = [Card.new('5', 'Diamonds')]
+          player1.hand.cards = [Card.new('5', 'Hearts')]
+          player3.hand.cards = [Card.new('5', 'Diamonds')]
         end
         context 'when opponent has 1 match' do
           let(:rank) { '5' }
@@ -257,8 +257,8 @@ RSpec.describe GoFish::Implementation, type: :model do
 
         context 'when opponent has more than one match' do
           before do
-            player1.cards = [Card.new('A', 'Spades')]
-            player2.cards = [Card.new('A', 'Hearts'), Card.new('A', 'Clubs')]
+            player1.hand.cards = [Card.new('A', 'Spades')]
+            player2.hand.cards = [Card.new('A', 'Hearts'), Card.new('A', 'Clubs')]
           end
 
           let(:rank) { 'A' }
@@ -296,8 +296,8 @@ RSpec.describe GoFish::Implementation, type: :model do
           let(:rank) { 'A' }
 
           before do
-            player1.cards = [Card.new(rank, 'Spades'), Card.new(rank, 'Hearts')]
-            player2.cards = [Card.new(rank, 'Diamonds'), Card.new(rank, 'Clubs')]
+            player1.hand.cards = [Card.new(rank, 'Spades'), Card.new(rank, 'Hearts')]
+            player2.hand.cards = [Card.new(rank, 'Diamonds'), Card.new(rank, 'Clubs')]
           end
 
           let(:opponent) { player2 }
@@ -348,7 +348,7 @@ RSpec.describe GoFish::Implementation, type: :model do
         let(:taken_card) { Card.new(rank, 'Spades') }
 
         before do
-          opponent.cards = [Card.new('8', 'Diamonds')]
+          opponent.hand.cards = [Card.new('8', 'Diamonds')]
         end
 
         context 'when player cannot make book' do
@@ -356,7 +356,7 @@ RSpec.describe GoFish::Implementation, type: :model do
 
           before do
             game.deck.cards = [taken_card, Card.new('5', 'Clubs')]
-            player1.cards = [Card.new(rank, 'Hearts')]
+            player1.hand.cards = [Card.new(rank, 'Hearts')]
           end
 
           it 'takes from top of deck and gives to player' do
@@ -387,7 +387,7 @@ RSpec.describe GoFish::Implementation, type: :model do
           let(:rank) { 'A' }
 
           before do
-            player1.cards = [Card.new(rank, 'Spades'), Card.new(rank, 'Hearts'), Card.new(rank, 'Diamonds')]
+            player1.hand.cards = [Card.new(rank, 'Spades'), Card.new(rank, 'Hearts'), Card.new(rank, 'Diamonds')]
             game.deck.cards = [taken_card]
           end
 
@@ -423,13 +423,13 @@ RSpec.describe GoFish::Implementation, type: :model do
         let(:taken_card) { Card.new(other_rank, 'Spades') }
 
         before do
-          opponent.cards = [Card.new('8', 'Diamonds')]
+          opponent.hand.cards = [Card.new('8', 'Diamonds')]
         end
 
         context 'when player cannot make book' do
           before do
             game.deck.cards = [taken_card]
-            player1.cards = [Card.new(rank, 'Hearts')]
+            player1.hand.cards = [Card.new(rank, 'Hearts')]
           end
 
           it 'takes from top of deck and gives to player' do
@@ -460,8 +460,8 @@ RSpec.describe GoFish::Implementation, type: :model do
           let(:taken_card) { Card.new(other_rank, 'Clubs') }
 
           before do
-            player1.cards = [Card.new(rank, 'Hearts'), Card.new(other_rank, 'Spades'),
-                             Card.new(other_rank, 'Hearts'), Card.new(other_rank, 'Diamonds')]
+            player1.hand.cards = [Card.new(rank, 'Hearts'), Card.new(other_rank, 'Spades'),
+                                  Card.new(other_rank, 'Hearts'), Card.new(other_rank, 'Diamonds')]
             game.deck.cards = [taken_card]
           end
 
@@ -494,8 +494,8 @@ RSpec.describe GoFish::Implementation, type: :model do
         let(:rank) { 'A' }
 
         before do
-          opponent.cards = [Card.new('8', 'Diamonds')]
-          player1.cards = [Card.new(rank, 'Hearts')]
+          opponent.hand.cards = [Card.new('8', 'Diamonds')]
+          player1.hand.cards = [Card.new(rank, 'Hearts')]
           game.deck.cards = []
         end
         it 'returns the correct turn result' do
