@@ -4,7 +4,7 @@ module CrazyEights
     attr_accessor :hand
 
     def cards
-      hand.cards
+      hand.cards.sort_by(&:value)
     end
 
     def initialize(user_id, cards: [], hand: nil)

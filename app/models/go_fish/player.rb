@@ -4,7 +4,7 @@ module GoFish
     attr_accessor :hand, :books, :was_book_made
 
     def cards
-      hand.cards
+      hand.cards.sort_by(&:value)
     end
 
     def initialize(user_id, cards: [], books: [], hand: nil)
