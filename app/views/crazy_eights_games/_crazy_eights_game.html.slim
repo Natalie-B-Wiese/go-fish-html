@@ -5,10 +5,7 @@
 	= render 'crazy_eights_games/lobby'
 - else
 	div.panel.panel--padded.game-view__game-board
-		header.panel__header.gap-xs
-			button.btn.btn--no-border.btn--icon.btn--small
-				i.ph.ph-caret-left.icon.icon--large
-			h2 #{@presenter.game.name}
+		= render 'game_header', game_name: @presenter.game.name
 		div.panel__content.op-stack.gap-xs.players
 			h3 Players
 
