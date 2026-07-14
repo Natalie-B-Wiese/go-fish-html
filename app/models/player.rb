@@ -12,15 +12,30 @@ class Player < ApplicationRecord
   private
 
   def on_player_joined
-    User.all.each do |user|
-      is_in_game = user.games.include?(game)
+    move_game_to_my_games(user)
 
-      if game.full? && !is_in_game
-        remove_game_from_index(user)
-      else
-        update_user_game_card(user, is_in_game)
-      end
+    User.all.each do |user|
+      update_index_page(user)
     end
+  end
+
+  def update_index_page(user)
+    is_in_game = user.games.include?(game)
+
+    if game.full? && !is_in_game
+      remove_game_from_index(user)
+    else
+      update_user_game_card(user, is_in_game)
+    end
+  end
+
+  # removes it from the All Games and adds it to My Games section
+  def move_game_to_my_games(user)
+    remove_game_from_index(user)
+    broadcast_append_to 'games', user,
+                        target: 'my_games_list',
+                        partial: 'application/game_card',
+                        locals: { game: game }
   end
 
   def remove_game_from_index(user)
