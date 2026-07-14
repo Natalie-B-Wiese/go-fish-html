@@ -21,6 +21,35 @@ RSpec.describe Card, type: :model do
     end
   end
 
+  describe '#key' do
+    let(:card1) { Card.new('5', 'Spades') }
+    let(:card2) { Card.new('J', 'Clubs') }
+
+    it 'converts cards into rank and single letter suit' do
+      result1 = card1.key
+      expected_result1 = '5S'
+      expect(result1).to eq expected_result1
+
+      result2 = card2.key
+      expected_result2 = 'JC'
+      expect(result2).to eq expected_result2
+    end
+  end
+
+  describe '.from_key' do
+    let(:key1) { '5S' }
+    let(:key2) { 'JC' }
+    let(:key3) { '4D' }
+    let(:key4) { 'AH' }
+
+    it 'creates a card from a key' do
+      expect(Card.from_key(key1)).to eq Card.new('5', 'Spades')
+      expect(Card.from_key(key2)).to eq Card.new('J', 'Clubs')
+      expect(Card.from_key(key3)).to eq Card.new('4', 'Diamonds')
+      expect(Card.from_key(key4)).to eq Card.new('A', 'Hearts')
+    end
+  end
+
   describe '#==' do
     it 'cards of the same rank and suit are equal' do
       card1 = Card.new('A', 'Spades')

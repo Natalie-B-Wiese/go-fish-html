@@ -1,11 +1,15 @@
 module GoFish
   class Player
     attr_reader :user_id
-    attr_accessor :cards, :books, :was_book_made
+    attr_accessor :hand, :books, :was_book_made
 
-    def initialize(user_id, cards: [], books: [])
+    def cards
+      hand.cards.sort_by(&:value)
+    end
+
+    def initialize(user_id, cards: [], books: [], hand: nil)
       @user_id = user_id
-      @cards = cards
+      @hand = hand || CardCollection.new(cards)
       @books = books
       @was_book_made = false
     end
@@ -23,20 +27,20 @@ module GoFish
     def as_json
       {
         user_id: user_id,
-        cards: cards.map(&:as_json),
+        hand: hand.as_json,
         books: books.map(&:as_json)
       }
     end
 
     def self.from_json(json)
-      json_cards = json['cards'].map { |card_json| Card.from_json(card_json) }
       json_books = json['books'].map { |book_json| Book.from_json(book_json) }
+      json_hand = CardCollection.from_json(json['hand'])
 
-      new(json['user_id'], cards: json_cards, books: json_books)
+      new(json['user_id'], hand: json_hand, books: json_books)
     end
 
     def add_card(card)
-      cards.push(card)
+      hand.push_cards(card)
       try_make_book(card.rank)
     end
 
@@ -50,7 +54,7 @@ module GoFish
 
     def take_cards_with_rank(rank)
       cards_taken = cards_with_rank(rank)
-      self.cards -= cards_taken
+      hand.cards -= cards_taken
       cards_taken
     end
 
@@ -88,7 +92,7 @@ module GoFish
 
     def make_book(cards)
       self.was_book_made = true
-      self.cards -= cards
+      hand.cards -= cards
       book = Book.new(cards.first.rank)
       books.push(book)
       book

@@ -1,5 +1,5 @@
 module GoFish
-  class Game
+  class Implementation
     SMALL_GAME_CARDS = 7
     BIG_GAME_CARDS = 5
     BOOKS_TO_WIN = (Card::SUITS.length * Card::RANKS.length) / Book::SIZE
@@ -7,6 +7,11 @@ module GoFish
     attr_reader :players, :deck, :feed
 
     attr_accessor :current_player_index
+
+    # keys are the user id and values are the Go Fish Players
+    def players_hash
+      players.index_by(&:user_id)
+    end
 
     def initialize(players, deck: Deck.new, current_player_index: 0, feed: [])
       @players = players
@@ -60,27 +65,29 @@ module GoFish
       obj.as_json
     end
 
-    def play_turn(opponent_user_id: nil, rank_requested: nil)
+    # returns nil if move could not be preformed, otherwise returns a turn result
+    def draw_deck_turn
+      return nil unless current_player.out_of_cards?
+
+      turn_result = TurnResult.new(current_user_id: current_user_id)
+      request_deck_card(turn_result)
+      finish_turn(turn_result)
+    end
+
+    # returns nil if move could not be preformed, otherwise returns a turn result
+    def request_opponent_turn(opponent_user_id:, rank_requested:)
+      return nil unless valid_opponent?(opponent_user_id) && valid_request_rank?(rank_requested)
+
       turn_result = TurnResult.new(current_user_id: current_user_id, opponent_user_id: opponent_user_id,
                                    rank_requested: rank_requested)
-      preform_move(turn_result)
-      turn_result.was_book_made = current_go_fish_player.book_made? if turn_result.rank_received
 
-      switch_turn unless turn_result.go_again?
-
-      feed.push(turn_result)
-
-      turn_result
+      preform_take_from_opponent_move(turn_result)
+      finish_turn(turn_result)
     end
 
-    def current_go_fish_player
-      player_from_user_id(current_user_id)
-    end
-
-    def valid_move?(opponent_user_id, rank)
-      return true if opponent_user_id.nil? && rank.nil? && current_go_fish_player.out_of_cards?
-
-      valid_opponent?(opponent_user_id) && valid_request_rank?(rank)
+    # the Go Fish player whose turn it is
+    def current_player
+      players[current_player_index]
     end
 
     # the player currently in the lead
@@ -102,25 +109,30 @@ module GoFish
 
     private
 
-    def valid_opponent?(opponent_user_id)
-      return true if opponents.find { |opponent| opponent.user_id == opponent_user_id }
+    def finish_turn(turn_result)
+      turn_result.was_book_made = current_player.book_made? if turn_result.rank_received
+      switch_turn unless turn_result.go_again?
+      feed.push(turn_result)
+      turn_result
+    end
 
-      false
+    def valid_opponent?(opponent_user_id)
+      opponents.any? { |opponent| opponent.user_id == opponent_user_id }
     end
 
     def valid_request_rank?(rank)
-      current_go_fish_player.includes_card_with_rank?(rank)
+      current_player.includes_card_with_rank?(rank)
     end
 
     def opponents
-      players - [current_go_fish_player]
+      players - [current_player]
     end
 
     def request_deck_card(turn_result = TurnResult.new(current_user_id: current_user_id))
       unless deck.empty?
-        card_taken = deck.take_top_card
+        card_taken = deck.shift_card
         turn_result.card_received_deck = card_taken
-        current_go_fish_player.add_card(card_taken)
+        current_player.add_card(card_taken)
       end
 
       turn_result
@@ -147,35 +159,23 @@ module GoFish
       self.current_player_index = 0 if current_player_index >= players.length
     end
 
-    def player_from_user_id(user_id)
-      players.find { |player| player.user_id == user_id }
-    end
-
     def deal_cards_to_players(num_cards_to_deal)
       num_cards_to_deal.times do
         players.each do |player|
-          player.add_card(deck.take_top_card)
+          player.add_card(deck.shift_card)
         end
       end
     end
 
-    def preform_move(turn_result)
-      if turn_result.opponent_user_id.nil? && turn_result.rank_requested.nil?
-        request_deck_card(turn_result)
-      else
-        preform_take_from_opponent_move(turn_result)
-      end
-    end
-
     def preform_take_from_opponent_move(turn_result)
-      opponent = player_from_user_id(turn_result.opponent_user_id)
+      opponent = players_hash[turn_result.opponent_user_id]
 
       cards_taken_from_opponent = opponent.take_cards_with_rank(turn_result.rank_requested)
 
       return request_deck_card(turn_result) if cards_taken_from_opponent.empty?
 
       turn_result.cards_received_opponent = cards_taken_from_opponent
-      current_go_fish_player.add_cards(cards_taken_from_opponent)
+      current_player.add_cards(cards_taken_from_opponent)
     end
   end
 end

@@ -1,20 +1,14 @@
 / Locals to pass:
-/ opponents (an array of User objects)
-/ my_ranks (an array of card ranks Player object)
 / is_my_turn (a boolean)
+/ cards_hash
 
 = simple_form_for :turn, url: play_turn_path(@presenter.game), html: { class: "game-actions" } do |f|
-	- unless my_ranks.empty?
+	- unless cards_hash.empty?
 		.game-actions__options
-			= f.input :player,
+			= f.input :card,
 			as: :select, 
-			collection: opponents,
-			selected: opponents.first
-
-			= f.input :rank,
-			as: :select, 
-			collection: my_ranks,
-			selected: my_ranks.first
+			collection: cards_hash,
+			selected: cards_hash.values.first
 
 	- if is_my_turn
 		= f.button :submit, 'Play'

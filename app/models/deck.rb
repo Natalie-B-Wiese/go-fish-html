@@ -1,40 +1,13 @@
 require_relative 'card'
 
 # holds a deck of cards
-class Deck
-  attr_accessor :cards
-
+class Deck < CardCollection
   def initialize(cards = sorted_deck)
-    @cards = cards
+    super
   end
 
-  def ==(other)
-    return false if other.nil?
-
-    as_json == other.as_json
-  end
-
-  def as_json
-    {
-      cards: cards.map(&:as_json)
-    }
-  end
-
-  def self.from_json(json)
-    # makes it not care whether json uses string or keys to index
-
-    json_cards = json['cards'].map { |card_json| Card.from_json(card_json) }
-    new(json_cards)
-  end
-
-  def cards_left
-    cards.length
-  end
-
-  delegate :empty?, to: :cards
-
-  def take_top_card
-    cards.shift
+  def top_card
+    cards.first
   end
 
   def shuffle

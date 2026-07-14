@@ -1,0 +1,32 @@
+/ @presenter
+
+div.panel.panel--padded.game-view__game-board
+	= render 'game_header', game_name: @presenter.game.name
+	div.panel__content.op-stack.gap-xs.players
+		h3 Players
+
+		- @presenter.game.users.each do |user|
+			p 
+				| #{user.name}
+
+		p 
+			| Waiting for more players to join...
+
+
+.game-view__game-feed.panel.panel--padded.panel--primary
+	header.panel__header.op-split
+		h2 Game Feed
+
+	.panel__content.op-stack.flex-grow-1.gap-none
+	
+
+div.game-view__hand.panel.panel--secondary
+	header.panel__header
+		h2 Hand
+	div.panel__content
+
+div.game-view__books.panel.panel--secondary
+		header.panel__header
+			h2 Deck
+		div.panel__content
+			

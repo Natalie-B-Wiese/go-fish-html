@@ -1,0 +1,7 @@
+/ Locals:
+/ game_name
+header.panel__header.gap-xs
+    = button_to games_path, method: :get, class: "btn btn--no-border btn--icon btn--small" do
+        i.ph.ph-caret-left.icon.icon--large
+    h2 #{game_name}
+					
