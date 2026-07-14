@@ -1,4 +1,4 @@
-= turbo_stream_from "games"
+= turbo_stream_from "games", Current.user
 
 - games = Game.all.reject(&:finished?)
 - games_in = Current.user.games.reject(&:finished?)
