@@ -80,6 +80,8 @@ class Game < ApplicationRecord
     users.each do |user|
       remove_game_from_index(user) if finished?
     end
+
+    broadcast_refresh_to self
   end
 
   def add_game_to_index(user)
