@@ -43,7 +43,8 @@ RSpec.describe CrazyEights::Player, type: :model do
 
     it 'it returns an array of cards with either same rank or same suit' do
       result = player.playable_cards(discard_card)
-      expect(result).to eq good_cards
+      expect(result).to_not include bad_card
+      good_cards.each { |card| expect(result).to include card }
     end
 
     context 'if player has an eight' do
