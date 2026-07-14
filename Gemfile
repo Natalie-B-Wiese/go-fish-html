@@ -90,3 +90,5 @@ end
 gem 'slim', '~> 5.2'
 
 gem 'slim-rails', '~> 4.0'
+
+gem "good_job", "~> 4.19"
