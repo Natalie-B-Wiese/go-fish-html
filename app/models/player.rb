@@ -32,10 +32,10 @@ class Player < ApplicationRecord
   # removes it from the All Games and adds it to My Games section
   def move_game_to_my_games(user)
     remove_game_from_index(user)
-    broadcast_append_to 'games', user,
-                        target: 'my_games_list',
-                        partial: 'application/game_card',
-                        locals: { game: game }
+    broadcast_append_later_to 'games', user,
+                              target: 'my_games_list',
+                              partial: 'application/game_card',
+                              locals: { game: game }
   end
 
   def remove_game_from_index(user)
@@ -43,7 +43,7 @@ class Player < ApplicationRecord
   end
 
   def update_user_game_card(user, is_in_game)
-    broadcast_replace_to 'games', user, target: dom_id(game), partial: 'application/game_card',
-                                        locals: { game: game, is_in_game: is_in_game }
+    broadcast_replace_later_to 'games', user, target: dom_id(game), partial: 'application/game_card',
+                                              locals: { game: game, is_in_game: is_in_game }
   end
 end
