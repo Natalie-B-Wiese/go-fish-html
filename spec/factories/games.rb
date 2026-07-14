@@ -6,6 +6,7 @@ FactoryBot.define do
     ended_at { nil }
     type { 'GoFishGame' }
     association :winner, factory: :player, strategy: :null
+    archived_at { nil }
 
     trait :go_fish do
       type { 'GoFishGame' }
@@ -21,6 +22,10 @@ FactoryBot.define do
 
     trait :completed do
       ended_at { Time.zone.now }
+    end
+
+    trait :archived do
+      archived_at { Time.zone.now }
     end
 
     # create :completed_game, :with_users_and_winner, users: [user1, user2, user3], user_won: user2
