@@ -9,6 +9,8 @@ class Game < ApplicationRecord
 
   validates :player_count, comparison: { greater_than: 1, less_than_or_equal_to: 6 }
 
+  after_create_commit :on_new_game_created
+
   def types
     { 'Go Fish' => 'GoFishGame',
       'Crazy Eights' => 'CrazyEightsGame' }
@@ -62,5 +64,14 @@ class Game < ApplicationRecord
     return false if game_state.nil?
 
     game_state.game_over?
+  end
+
+  private
+
+  def on_new_game_created
+    broadcast_append_to 'games',
+                        target: 'all_games_list',
+                        partial: 'application/game_card',
+                        locals: { game: self }
   end
 end

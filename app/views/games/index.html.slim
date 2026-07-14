@@ -1,3 +1,5 @@
+= turbo_stream_from "games"
+
 - games = Game.all.reject(&:finished?)
 - games_in = Current.user.games.reject(&:finished?)
 - games_not_in = games - games_in
@@ -26,7 +28,7 @@ div.op-page__main
 							| All Games
 					div.divider
 				
-				div.op-stack.gap-sm
+				div.op-stack.gap-sm#all_games_list
 					- games_not_in.each do |game|
 						- next if game.full?
 						
