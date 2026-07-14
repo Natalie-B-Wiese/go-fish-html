@@ -1,4 +1,7 @@
 class Game < ApplicationRecord
+  # allows dom_id to be used
+  include ActionView::RecordIdentifier
+
   has_many :players
   has_many :users, through: :players
 
@@ -10,6 +13,7 @@ class Game < ApplicationRecord
   validates :player_count, comparison: { greater_than: 1, less_than_or_equal_to: 6 }
 
   after_create_commit :on_new_game_created
+  after_update_commit :on_game_updated
 
   def types
     { 'Go Fish' => 'GoFishGame',
@@ -69,9 +73,23 @@ class Game < ApplicationRecord
   private
 
   def on_new_game_created
-    broadcast_append_to 'games',
+    User.all.each { |user| add_game_to_index(user) }
+  end
+
+  def on_game_updated
+    users.each do |user|
+      remove_game_from_index(user) if finished?
+    end
+  end
+
+  def add_game_to_index(user)
+    broadcast_append_to 'games', user,
                         target: 'all_games_list',
                         partial: 'application/game_card',
                         locals: { game: self }
+  end
+
+  def remove_game_from_index(user)
+    broadcast_remove_to 'games', user, target: dom_id(self)
   end
 end

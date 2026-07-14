@@ -12,14 +12,23 @@ class Player < ApplicationRecord
   private
 
   def on_player_joined
-    is_in_game = Current.user.games.include?(game)
+    User.all.each do |user|
+      is_in_game = user.games.include?(game)
 
-    # TODO: remove game from list if it is full and user is not in game
-    # TODO: if user joins game move it to correct section
+      if game.full? && !is_in_game
+        remove_game_from_index(user)
+      else
+        update_user_game_card(user, is_in_game)
+      end
+    end
+  end
 
-    broadcast_replace_to 'games',
-                         target: dom_id(game),
-                         partial: 'application/game_card',
-                         locals: { game: game, is_in_game: is_in_game }
+  def remove_game_from_index(user)
+    broadcast_remove_to 'games', user, target: dom_id(game)
+  end
+
+  def update_user_game_card(user, is_in_game)
+    broadcast_replace_to 'games', user, target: dom_id(game), partial: 'application/game_card',
+                                        locals: { game: game, is_in_game: is_in_game }
   end
 end
