@@ -18,7 +18,7 @@ div.op-page__main
 							| New Game
 					div.divider
 				
-				div.op-stack.gap-sm
+				div.op-stack.gap-sm#my_games_list
 					- games_in.each do |game|
 						= render 'game_card', game: game, is_in_game: true
 			div.all-games
