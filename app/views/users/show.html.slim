@@ -25,4 +25,4 @@ div.op-page__main
 					span.text-pair__title
 						| Address: 
 					span.text-pair__subtitle
-						| #{Current.user.country} #{Current.user.state}
+						| #{Data::Country.find(Current.user.country).name} #{Data::State.find(Current.user.state).name}
