@@ -4,6 +4,7 @@ FactoryBot.define do
     player_count { 2 }
     started_at { nil }
     ended_at { nil }
+    updated_at { Time.zone.now }
     type { 'GoFishGame' }
     association :winner, factory: :player, strategy: :null
     archived_at { nil }
