@@ -3,10 +3,26 @@ div.op-page__main
 		header.content-header
 			h2
 				| Profile
+			= button_to edit_user_path(Current.user), method: :get, class: "btn btn--primary" do
+					i.ph.ph-pencil-simple.icon.icon--large
+					| Edit
 			div.divider
 
 			div.op-stack
-				p
-					| #{Current.user.name}
-				p 
-					| #{Current.user.email_address}
+				div.text-pair.text-pair--inline
+					span.text-pair__title
+						| Name: 
+					span.text-pair__subtitle
+						| #{Current.user.name}
+
+				div.text-pair.text-pair--inline
+					span.text-pair__title
+						| Email: 
+					span.text-pair__subtitle
+						| #{Current.user.email_address}
+
+				div.text-pair.text-pair--inline
+					span.text-pair__title
+						| Address: 
+					span.text-pair__subtitle
+						| #{Current.user.address_country} #{Current.user.address_state}

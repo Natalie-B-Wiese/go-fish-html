@@ -1,0 +1,15 @@
+div.op-page__main
+	main.op-page__main-content.op-stack.gap-xl
+		header.content-header
+			h2
+				| Edit Profile
+			div.divider
+
+
+		= tag.div(flash[:alert], class: "flash flash--alert") if flash[:alert]
+		= tag.div(flash[:notice], class: "flash flash--notice") if flash[:notice]
+
+		= simple_form_for(@user, method: :patch) do |f|
+			= f.input :name
+			= f.input :email_address
+			= f.button :submit, 'Save'

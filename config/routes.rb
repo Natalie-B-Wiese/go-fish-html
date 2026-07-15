@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   # In a real application this should be protected and visible only to admins
   mount GoodJob::Engine => 'good_job'
 
-  resources :users, only: %i[new create]
+  resources :users, only: %i[new create edit update]
   get 'users/profile', to: 'users#show'
 
   resource :session
