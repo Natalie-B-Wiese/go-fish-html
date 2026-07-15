@@ -31,6 +31,7 @@ spiderman_ironman_go_fish_game = Game.find_or_create_by!(name: 'Spiderman and Fr
   game.player_count = 2
   game.type = 'GoFishGame'
   game.started_at = '2026-07-10 14:09:05.988333'
+  game.updated_at = Time.zone.now
 
   game.game_state = {
     deck: {
@@ -275,6 +276,8 @@ ironman_america_crazy_eights = Game.find_or_create_by!(name: 'Adults only Crazy 
   game.player_count = 2
   game.type = 'CrazyEightsGame'
   game.started_at = '2026-07-13 13:49:50.492984'
+  game.updated_at = Time.zone.now
+
   game.game_state = {
     deck: {
       cards: [
@@ -530,7 +533,7 @@ in_progress_go_fish_game = Game.find_or_create_by!(name: 'Everyone Go Fish Game'
   game.player_count = 3
   game.type = 'GoFishGame'
   game.started_at = '2026-07-13 14:49:57.697838'
-  game.updated_at = '2026-07-13 15:00:25.452064'
+  game.updated_at = Time.zone.now
   game.game_state = {
     deck: {
       cards: [
@@ -1050,3 +1053,1957 @@ in_progress_go_fish_game = Game.find_or_create_by!(name: 'Everyone Go Fish Game'
     current_player_index: 0
   }
 end
+Player.find_or_create_by!(user: ironman, game: in_progress_go_fish_game)
+Player.find_or_create_by!(user: spiderman, game: in_progress_go_fish_game)
+Player.find_or_create_by!(user: captain_america, game: in_progress_go_fish_game)
+
+finished_fish_game = Game.find_or_create_by!(name: 'Spider vs Ironman Go Fish') do |game|
+  game.player_count = 2
+  game.type = 'GoFishGame'
+  game.started_at = '2026-03-13 14:49:57.697838'
+  game.updated_at = '2026-07-15 14:21:13.71925'
+  game.ended_at = '2026-07-15 14:21:13.71925'
+  game.game_state =
+    {
+      deck: {
+        cards: []
+      },
+      feed: [
+        {
+          was_book_made: false,
+          rank_requested: '2',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: '6',
+            suit: 'Diamonds'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '5',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: '10',
+            suit: 'Hearts'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '2',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: '2',
+            suit: 'Diamonds'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '2',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: '9',
+            suit: 'Diamonds'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '5',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: '7',
+            suit: 'Clubs'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '2',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: '3',
+            suit: 'Hearts'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '5',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: '7',
+            suit: 'Spades'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '9',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: nil,
+          cards_received_opponent: [
+            {
+              rank: '9',
+              suit: 'Hearts'
+            }
+          ]
+        },
+        {
+          was_book_made: false,
+          rank_requested: '9',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: 'J',
+            suit: 'Hearts'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '5',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: '10',
+            suit: 'Diamonds'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: 'K',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: nil,
+          cards_received_opponent: [
+            {
+              rank: 'K',
+              suit: 'Diamonds'
+            }
+          ]
+        },
+        {
+          was_book_made: false,
+          rank_requested: 'J',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: 'A',
+            suit: 'Spades'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '8',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: '3',
+            suit: 'Diamonds'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '3',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: nil,
+          cards_received_opponent: [
+            {
+              rank: '3',
+              suit: 'Diamonds'
+            }
+          ]
+        },
+        {
+          was_book_made: false,
+          rank_requested: '9',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: '7',
+            suit: 'Hearts'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '10',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: '2',
+            suit: 'Clubs'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '2',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: nil,
+          cards_received_opponent: [
+            {
+              rank: '2',
+              suit: 'Clubs'
+            }
+          ]
+        },
+        {
+          was_book_made: false,
+          rank_requested: 'K',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: '6',
+            suit: 'Spades'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '10',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: '5',
+            suit: 'Clubs'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '2',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: 'A',
+            suit: 'Clubs'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '5',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: 'K',
+            suit: 'Spades'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: 'K',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: nil,
+          cards_received_opponent: [
+            {
+              rank: 'K',
+              suit: 'Spades'
+            }
+          ]
+        },
+        {
+          was_book_made: false,
+          rank_requested: '3',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: '4',
+            suit: 'Spades'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: true,
+          rank_requested: '10',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: '10',
+            suit: 'Spades'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '5',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: 'Q',
+            suit: 'Hearts'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '2',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: '8',
+            suit: 'Diamonds'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '5',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: '8',
+            suit: 'Hearts'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: 'K',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: '4',
+            suit: 'Clubs'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '5',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: 'J',
+            suit: 'Spades'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: 'J',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: nil,
+          cards_received_opponent: [
+            {
+              rank: 'J',
+              suit: 'Spades'
+            }
+          ]
+        },
+        {
+          was_book_made: true,
+          rank_requested: '9',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: '3',
+            suit: 'Spades'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '5',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: 'Q',
+            suit: 'Clubs'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: true,
+          rank_requested: 'J',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: 'K',
+            suit: 'Hearts'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: true,
+          rank_requested: '8',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: nil,
+          cards_received_opponent: [
+            {
+              rank: '8',
+              suit: 'Diamonds'
+            }
+          ]
+        },
+        {
+          was_book_made: true,
+          rank_requested: 'Q',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: '5',
+            suit: 'Hearts'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: true,
+          rank_requested: 'J',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: 'J',
+            suit: 'Clubs'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '2',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: '7',
+            suit: 'Diamonds'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: true,
+          rank_requested: '7',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: nil,
+          cards_received_opponent: [
+            {
+              rank: '7',
+              suit: 'Hearts'
+            },
+            {
+              rank: '7',
+              suit: 'Diamonds'
+            }
+          ]
+        },
+        {
+          was_book_made: false,
+          rank_requested: 'Q',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: '4',
+            suit: 'Diamonds'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '2',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: 'Q',
+            suit: 'Spades'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: true,
+          rank_requested: '4',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: nil,
+          cards_received_opponent: [
+            {
+              rank: '4',
+              suit: 'Hearts'
+            },
+            {
+              rank: '4',
+              suit: 'Spades'
+            },
+            {
+              rank: '4',
+              suit: 'Clubs'
+            }
+          ]
+        },
+        {
+          was_book_made: false,
+          rank_requested: 'Q',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: nil,
+          cards_received_opponent: [
+            {
+              rank: 'Q',
+              suit: 'Spades'
+            }
+          ]
+        },
+        {
+          was_book_made: false,
+          rank_requested: 'Q',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: '2',
+            suit: 'Hearts'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: true,
+          rank_requested: 'A',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: 'A',
+            suit: 'Diamonds'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: '6',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: '9',
+            suit: 'Clubs'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: false,
+          rank_requested: 'Q',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: {
+            rank: '6',
+            suit: 'Clubs'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: true,
+          rank_requested: '2',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: nil,
+          cards_received_opponent: [
+            {
+              rank: '2',
+              suit: 'Hearts'
+            }
+          ]
+        },
+        {
+          was_book_made: true,
+          rank_requested: '6',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: nil,
+          cards_received_opponent: [
+            {
+              rank: '6',
+              suit: 'Clubs'
+            }
+          ]
+        },
+        {
+          was_book_made: false,
+          rank_requested: '9',
+          current_user_id: spiderman.id,
+          opponent_user_id: ironman.id,
+          card_received_deck: {
+            rank: 'Q',
+            suit: 'Diamonds'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: true,
+          rank_requested: 'Q',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: nil,
+          cards_received_opponent: [
+            {
+              rank: 'Q',
+              suit: 'Diamonds'
+            }
+          ]
+        },
+        {
+          was_book_made: false,
+          rank_requested: nil,
+          current_user_id: ironman.id,
+          opponent_user_id: nil,
+          card_received_deck: {
+            rank: '9',
+            suit: 'Spades'
+          },
+          cards_received_opponent: []
+        },
+        {
+          was_book_made: true,
+          rank_requested: '9',
+          current_user_id: ironman.id,
+          opponent_user_id: spiderman.id,
+          card_received_deck: nil,
+          cards_received_opponent: [
+            {
+              rank: '9',
+              suit: 'Diamonds'
+            },
+            {
+              rank: '9',
+              suit: 'Hearts'
+            },
+            {
+              rank: '9',
+              suit: 'Clubs'
+            }
+          ]
+        }
+      ],
+      players: [
+        {
+          hand: {
+            cards: []
+          },
+          books: [
+            {
+              rank: '3'
+            },
+            {
+              rank: 'K'
+            },
+            {
+              rank: 'J'
+            },
+            {
+              rank: 'A'
+            },
+            {
+              rank: '2'
+            },
+            {
+              rank: '6'
+            }
+          ],
+          user_id: spiderman.id
+        },
+        {
+          hand: {
+            cards: []
+          },
+          books: [
+            {
+              rank: '10'
+            },
+            {
+              rank: '8'
+            },
+            {
+              rank: '5'
+            },
+            {
+              rank: '7'
+            },
+            {
+              rank: '4'
+            },
+            {
+              rank: 'Q'
+            },
+            {
+              rank: '9'
+            }
+          ],
+          user_id: ironman.id
+        }
+      ],
+      current_player_index: 1
+    }
+end
+
+ironman_player = Player.find_or_create_by!(user: ironman, game: finished_fish_game)
+Player.find_or_create_by!(user: spiderman, game: finished_fish_game)
+finished_fish_game.winner_id = ironman_player.id
+finished_fish_game.save!
+
+finished_eights_game = Game.find_or_create_by!(name: 'Spider vs Ironman Crazy Eights') do |game|
+  game.player_count = 2
+  game.started_at = '2026-03-13 14:49:57.697838'
+  game.updated_at = '2026-07-15 14:21:13.71925'
+  game.ended_at = '2026-07-15 14:32:12.560472'
+  game.type = 'CrazyEightsGame'
+  game.game_state = {
+    deck: {
+      cards: [
+        {
+          rank: '10',
+          suit: 'Diamonds'
+        },
+        {
+          rank: 'A',
+          suit: 'Clubs'
+        },
+        {
+          rank: '4',
+          suit: 'Clubs'
+        },
+        {
+          rank: 'Q',
+          suit: 'Clubs'
+        },
+        {
+          rank: '9',
+          suit: 'Spades'
+        },
+        {
+          rank: '5',
+          suit: 'Clubs'
+        },
+        {
+          rank: '9',
+          suit: 'Hearts'
+        },
+        {
+          rank: 'Q',
+          suit: 'Spades'
+        },
+        {
+          rank: 'K',
+          suit: 'Diamonds'
+        },
+        {
+          rank: '7',
+          suit: 'Diamonds'
+        },
+        {
+          rank: '2',
+          suit: 'Diamonds'
+        },
+        {
+          rank: 'A',
+          suit: 'Spades'
+        },
+        {
+          rank: '10',
+          suit: 'Spades'
+        },
+        {
+          rank: '4',
+          suit: 'Hearts'
+        },
+        {
+          rank: '8',
+          suit: 'Spades'
+        },
+        {
+          rank: '6',
+          suit: 'Spades'
+        },
+        {
+          rank: '3',
+          suit: 'Diamonds'
+        },
+        {
+          rank: '5',
+          suit: 'Hearts'
+        },
+        {
+          rank: '3',
+          suit: 'Spades'
+        },
+        {
+          rank: '5',
+          suit: 'Spades'
+        },
+        {
+          rank: '8',
+          suit: 'Hearts'
+        }
+      ]
+    },
+    feed: [
+      {
+        card_played: {
+          rank: '9',
+          suit: 'Hearts'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '3',
+          suit: 'Hearts'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '5',
+          suit: 'Hearts'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '8',
+          suit: 'Hearts'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '10',
+          suit: 'Hearts'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '8',
+          suit: 'Spades'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '2',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '4',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: 'J',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: 'A',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: {
+          rank: 'A',
+          suit: 'Spades'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '3',
+          suit: 'Spades'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '3',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: {
+          rank: '3',
+          suit: 'Diamonds'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '7',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: {
+          rank: '7',
+          suit: 'Diamonds'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '2',
+          suit: 'Diamonds'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '8',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: {
+          rank: '8',
+          suit: 'Spades'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '7',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: {
+          rank: '7',
+          suit: 'Spades'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: 'J',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: {
+          rank: 'J',
+          suit: 'Spades'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: 'J',
+          suit: 'Diamonds'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: 'Q',
+          suit: 'Hearts'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: 'A',
+          suit: 'Hearts'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '4',
+          suit: 'Hearts'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: 'Q',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: 'K',
+          suit: 'Clubs'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '9',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '2',
+          suit: 'Hearts'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '6',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: {
+          rank: '6',
+          suit: 'Diamonds'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '4',
+          suit: 'Diamonds'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '4',
+          suit: 'Hearts'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: 'K',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '4',
+          suit: 'Clubs'
+        }
+      },
+      {
+        card_played: {
+          rank: '4',
+          suit: 'Clubs'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '6',
+          suit: 'Clubs'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: 'A',
+          suit: 'Clubs'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: 'K',
+          suit: 'Clubs'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: 'K',
+          suit: 'Spades'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '9',
+          suit: 'Spades'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '6',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: {
+          rank: '6',
+          suit: 'Spades'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: 'Q',
+          suit: 'Spades'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '7',
+          suit: 'Hearts'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '5',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: {
+          rank: '5',
+          suit: 'Spades'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '5',
+          suit: 'Clubs'
+        }
+      },
+      {
+        card_played: {
+          rank: '5',
+          suit: 'Clubs'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '3',
+          suit: 'Clubs'
+        }
+      },
+      {
+        card_played: {
+          rank: '3',
+          suit: 'Clubs'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '10',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: 'J',
+          suit: 'Hearts'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: 'Q',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '5',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: 'A',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '6',
+          suit: 'Hearts'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '10',
+          suit: 'Clubs'
+        }
+      },
+      {
+        card_played: {
+          rank: '10',
+          suit: 'Clubs'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '10',
+          suit: 'Diamonds'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '5',
+          suit: 'Diamonds'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: 'K',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: {
+          rank: 'K',
+          suit: 'Diamonds'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: 'Q',
+          suit: 'Diamonds'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '2',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: 'J',
+          suit: 'Clubs'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '4',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: 'Q',
+          suit: 'Clubs'
+        }
+      },
+      {
+        card_played: {
+          rank: 'Q',
+          suit: 'Clubs'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: 'Q',
+          suit: 'Hearts'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '7',
+          suit: 'Hearts'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '2',
+          suit: 'Hearts'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '2',
+          suit: 'Spades'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '10',
+          suit: 'Spades'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '4',
+          suit: 'Spades'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '8',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: {
+          rank: '8',
+          suit: 'Diamonds'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '9',
+          suit: 'Clubs'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '2',
+          suit: 'Clubs'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: 'K',
+          suit: 'Hearts'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '7',
+          suit: 'Clubs'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: 'K',
+          suit: 'Clubs'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: 'Q',
+          suit: 'Hearts'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '9',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: {
+          rank: '9',
+          suit: 'Diamonds'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: 'A',
+          suit: 'Diamonds'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '4',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: {
+          rank: '4',
+          suit: 'Diamonds'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: 'J',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '10',
+          suit: 'Hearts'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '10',
+          suit: 'Clubs'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '5',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: {
+          rank: '5',
+          suit: 'Diamonds'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '2',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: ironman.id,
+        card_received_deck: {
+          rank: '8',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: {
+          rank: '8',
+          suit: 'Hearts'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '10',
+          suit: 'Hearts'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: 'Q',
+          suit: 'Hearts'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '6',
+          suit: 'Hearts'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: 'K',
+          suit: 'Hearts'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: 'J',
+          suit: 'Hearts'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: 'J',
+          suit: 'Clubs'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: 'J',
+          suit: 'Spades'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '2',
+          suit: 'Spades'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: 'J',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '3',
+          suit: 'Hearts'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '6',
+          suit: 'Clubs'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '7',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: {
+          rank: '7',
+          suit: 'Spades'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '7',
+          suit: 'Clubs'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '6',
+          suit: 'Clubs'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '2',
+          suit: 'Clubs'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '10',
+          suit: 'Clubs'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: '9',
+          suit: 'Clubs'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: 'Q',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: 'K',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '7',
+          suit: 'Hearts'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '2',
+          suit: 'Hearts'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '6',
+          suit: 'Diamonds'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '4',
+          suit: 'Spades'
+        }
+      },
+      {
+        card_played: nil,
+        current_user_id: spiderman.id,
+        card_received_deck: {
+          rank: '3',
+          suit: 'Clubs'
+        }
+      },
+      {
+        card_played: {
+          rank: '3',
+          suit: 'Clubs'
+        },
+        current_user_id: spiderman.id,
+        card_received_deck: nil
+      },
+      {
+        card_played: {
+          rank: 'K',
+          suit: 'Clubs'
+        },
+        current_user_id: ironman.id,
+        card_received_deck: nil
+      }
+    ],
+    players: [
+      {
+        hand: {
+          cards: []
+        },
+        user_id: ironman.id
+      },
+      {
+        hand: {
+          cards: [
+            {
+              rank: 'A',
+              suit: 'Hearts'
+            },
+            {
+              rank: 'J',
+              suit: 'Diamonds'
+            },
+            {
+              rank: '3',
+              suit: 'Hearts'
+            },
+            {
+              rank: 'Q',
+              suit: 'Diamonds'
+            },
+            {
+              rank: 'K',
+              suit: 'Spades'
+            },
+            {
+              rank: '7',
+              suit: 'Hearts'
+            },
+            {
+              rank: '2',
+              suit: 'Hearts'
+            },
+            {
+              rank: '6',
+              suit: 'Diamonds'
+            },
+            {
+              rank: '4',
+              suit: 'Spades'
+            }
+          ]
+        },
+        user_id: spiderman.id
+      }
+    ],
+    discard_pile: {
+      cards: [
+        {
+          rank: 'K',
+          suit: 'Clubs'
+        },
+        {
+          rank: '3',
+          suit: 'Clubs'
+        },
+        {
+          rank: '9',
+          suit: 'Clubs'
+        },
+        {
+          rank: '10',
+          suit: 'Clubs'
+        },
+        {
+          rank: '2',
+          suit: 'Clubs'
+        },
+        {
+          rank: '6',
+          suit: 'Clubs'
+        },
+        {
+          rank: '7',
+          suit: 'Clubs'
+        },
+        {
+          rank: '7',
+          suit: 'Spades'
+        },
+        {
+          rank: '2',
+          suit: 'Spades'
+        },
+        {
+          rank: 'J',
+          suit: 'Spades'
+        },
+        {
+          rank: 'J',
+          suit: 'Clubs'
+        },
+        {
+          rank: 'J',
+          suit: 'Hearts'
+        },
+        {
+          rank: 'K',
+          suit: 'Hearts'
+        },
+        {
+          rank: '6',
+          suit: 'Hearts'
+        },
+        {
+          rank: 'Q',
+          suit: 'Hearts'
+        },
+        {
+          rank: '10',
+          suit: 'Hearts'
+        },
+        {
+          rank: '8',
+          suit: 'Hearts'
+        },
+        {
+          rank: '5',
+          suit: 'Diamonds'
+        },
+        {
+          rank: '4',
+          suit: 'Diamonds'
+        },
+        {
+          rank: 'A',
+          suit: 'Diamonds'
+        },
+        {
+          rank: '9',
+          suit: 'Diamonds'
+        },
+        {
+          rank: '8',
+          suit: 'Diamonds'
+        }
+      ]
+    },
+    current_player_index: 1
+  }
+end
+
+Player.find_or_create_by!(user: ironman, game: finished_eights_game)
+Player.find_or_create_by!(user: spiderman, game: finished_eights_game)
+
+Player.find_or_create_by!(user: ironman, game: finished_eights_game)
+spiderman_player = Player.find_or_create_by!(user: spiderman, game: finished_eights_game)
+finished_eights_game.winner_id = spiderman_player.id
+finished_eights_game.save!
