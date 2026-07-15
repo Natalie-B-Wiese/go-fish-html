@@ -24,6 +24,7 @@ RSpec.describe Card, type: :model do
   describe '#key' do
     let(:card1) { Card.new('5', 'Spades') }
     let(:card2) { Card.new('J', 'Clubs') }
+    let(:card10) { Card.new('10', 'Clubs') }
 
     it 'converts cards into rank and single letter suit' do
       result1 = card1.key
@@ -33,6 +34,12 @@ RSpec.describe Card, type: :model do
       result2 = card2.key
       expected_result2 = 'JC'
       expect(result2).to eq expected_result2
+    end
+
+    it 'works with a 10' do
+      result = card10.key
+      expected_result = '10C'
+      expect(result).to eq expected_result
     end
   end
 
@@ -47,6 +54,10 @@ RSpec.describe Card, type: :model do
       expect(Card.from_key(key2)).to eq Card.new('J', 'Clubs')
       expect(Card.from_key(key3)).to eq Card.new('4', 'Diamonds')
       expect(Card.from_key(key4)).to eq Card.new('A', 'Hearts')
+    end
+
+    it 'works with a 10' do
+      expect(Card.from_key('10H')).to eq Card.new('10', 'Hearts')
     end
   end
 

@@ -1,5 +1,4 @@
 - games_in = Current.user.games.select(&:finished?)
-
 div.op-page__main
 	main.op-page__main-content.op-stack.gap-xl
 		header.content-header
@@ -7,25 +6,30 @@ div.op-page__main
 				| History
 			div.divider
 
-		table.table.table--primary.table--auto-layout.table--default-density.table--even-striped
-			thead
-				tr
-					th
-						| Name
-					th
-						| Players
-					th
-						| Winner
-					th
-						| Date Finished
-			tbody
-				- games_in.each do |game|
+		- if games_in.empty?
+			p
+				| There are no completed games yet!
+
+		- else 
+			table.table.table--primary.table--auto-layout.table--default-density.table--even-striped
+				thead
 					tr
-						td
-							= game.name
-						td
-							= game.users.map{|user| user.name}.join(', ')
-						td
-							= game.winner.user.name
-						td
-							= game.ended_at.strftime("%b %d, %Y")
+						th
+							| Name
+						th
+							| Players
+						th
+							| Winner
+						th
+							| Date Finished
+				tbody
+					- games_in.each do |game|
+						tr
+							td
+								= game.name
+							td
+								= game.users.map{|user| user.name}.join(', ')
+							td
+								= game.winner.user.name
+							td
+								= game.ended_at.strftime("%b %d, %Y")
