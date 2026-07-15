@@ -91,6 +91,23 @@ RSpec.describe 'Users', type: :system do
       expect(page.current_path).to eq users_profile_path
     end
 
+    it 'allows user to choose a country and state' do
+      select 'United States', from: 'Country'
+
+      click_button 'Save'
+      user.reload
+      expect(user.country).to eq 'US'
+    end
+
+    xit 'allows user to choose a state' do
+      select 'United States', from: 'Country'
+      select 'North Carolina', from: 'State'
+
+      click_button 'Save'
+      user.reload
+      expect(page.state).to eq 'NC'
+    end
+
     # TODO: add check to make sure new email is unique?
 
     it 'allows user to change their name to a valid name' do

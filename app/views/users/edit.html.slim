@@ -12,4 +12,9 @@ div.op-page__main
 		= simple_form_for(@user, method: :patch) do |f|
 			= f.input :name
 			= f.input :email_address
+			= f.input :country, collection: Data::Country.all, priority: ['US', 'CA', 'MX'], include_blank: true
+    		- if @user.country
+				= f.input :state, collection: Data::Country.find(@user.country).states | [Data::State.new(@user.state)]
+			- else 
+				= f.input :state, collection: []
 			= f.button :submit, 'Save'
