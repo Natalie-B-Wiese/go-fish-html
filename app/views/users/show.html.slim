@@ -1,3 +1,6 @@
+- country_name=Current.user.country ? Data::Country.find(Current.user.country).name : ''
+- state_name=Current.user.state ? Data::State.find(Current.user.state).name : ''
+
 div.op-page__main
 	main.op-page__main-content.op-stack.gap-xl
 		header.content-header
@@ -25,4 +28,4 @@ div.op-page__main
 					span.text-pair__title
 						| Address: 
 					span.text-pair__subtitle
-						| #{Data::Country.find(Current.user.country).name} #{Data::State.find(Current.user.state).name}
+						| #{country_name} #{state_name}

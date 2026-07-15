@@ -1,7 +1,7 @@
 = simple_form_for @user, method: :patch, data: { controller: 'turbo-fetch', turbo_fetch_url_value: turbo_fetch_url_value} do |f|
     = f.input :name
     = f.input :email_address
-    = f.input :country, as: :country, input_html: { data: { action: 'turbo-fetch#perform' } }, collection: Data::Country.all, priority: ['US', 'CA', 'MX'], include_blank: true
+    = f.input :country, input_html: { data: { action: 'turbo-fetch#perform' } }, collection: Data::Country.all, priority: ['US', 'CA', 'MX'], include_blank: true
     div#state-container
         - state_collection = @user.country ? Data::Country.find(@user.country).states : []
         - if @user.state
