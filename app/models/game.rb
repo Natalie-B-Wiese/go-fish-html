@@ -81,14 +81,14 @@ class Game < ApplicationRecord
       remove_game_from_index(user) if finished?
     end
 
-    broadcast_refresh_to self
+    broadcast_refresh_later_to self
   end
 
   def add_game_to_index(user)
-    broadcast_append_to 'games', user,
-                        target: 'all_games_list',
-                        partial: 'application/game_card',
-                        locals: { game: self }
+    broadcast_append_later_to 'games', user,
+                              target: 'all_games_list',
+                              partial: 'application/game_card',
+                              locals: { game: self }
   end
 
   def remove_game_from_index(user)

@@ -1,7 +1,8 @@
 = turbo_stream_from "games", Current.user
 
-- games = Game.all.reject(&:finished?)
-- games_in = Current.user.games.reject(&:finished?)
+- games = Game.where(ended_at: nil, archived_at: nil)
+- games_in = Current.user.games.where(ended_at: nil, archived_at: nil)
+
 - games_not_in = games - games_in
 
 div.op-page__main

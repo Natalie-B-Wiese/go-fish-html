@@ -15,6 +15,9 @@ RSpec.describe 'Games', type: :system do
       create :completed_game, :with_users_and_winner, name: finished_game_name, users: [user1, user2], user_won: user2
     end
 
+    let(:archived_game_name) { 'Archived Game' }
+    let!(:archived_game) { create :game, :archived, :with_users, name: archived_game_name, users: [user1, user2] }
+
     before do
       visit games_path
     end
@@ -27,6 +30,10 @@ RSpec.describe 'Games', type: :system do
 
     it 'does not show games already finished' do
       expect(page).to_not have_content finished_game_name
+    end
+
+    it 'does not show archived games' do
+      expect(page).to_not have_content archived_game_name
     end
 
     context 'when clicking the new game button' do
