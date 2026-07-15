@@ -2,7 +2,11 @@ Rails.application.routes.draw do
   # In a real application this should be protected and visible only to admins
   mount GoodJob::Engine => 'good_job'
 
-  resources :users, only: %i[new create edit update]
+  concern :turbo_fetch do
+    patch :turbo_fetch, on: :collection
+  end
+
+  resources :users, only: %i[new create edit update], concerns: %i[turbo_fetch]
   get 'users/profile', to: 'users#show'
 
   resource :session

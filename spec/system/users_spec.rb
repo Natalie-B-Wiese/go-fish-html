@@ -91,25 +91,6 @@ RSpec.describe 'Users', type: :system do
       expect(page.current_path).to eq users_profile_path
     end
 
-    it 'allows user to choose a country and state' do
-      select 'United States', from: 'Country'
-
-      click_button 'Save'
-      user.reload
-      expect(user.country).to eq 'US'
-    end
-
-    xit 'allows user to choose a state' do
-      select 'United States', from: 'Country'
-      select 'North Carolina', from: 'State'
-
-      click_button 'Save'
-      user.reload
-      expect(page.state).to eq 'NC'
-    end
-
-    # TODO: add check to make sure new email is unique?
-
     it 'allows user to change their name to a valid name' do
       new_name = 'Jeff Jefferson'
       fill_in 'Name', with: new_name
@@ -117,6 +98,82 @@ RSpec.describe 'Users', type: :system do
       user.reload
       expect(user.name).to eq new_name
       expect(page.current_path).to eq users_profile_path
+    end
+
+    context 'countries and states' do
+      let(:country) { 'Australia' }
+      let(:country_code) { 'AU' }
+      let(:state) { 'Victoria' }
+      let(:state_code) { 'VIC' }
+
+      it 'allows user to choose a country' do
+        select country, from: 'Country'
+
+        click_button 'Save'
+        user.reload
+        expect(user.country).to eq country_code
+      end
+
+      it 'allows user to choose a state after choosing a country', :js do
+        select country, from: 'Country'
+        sleep(1)
+        select state, from: 'State'
+
+        click_button 'Save'
+        user.reload
+        expect(user.state).to eq state_code
+      end
+
+      context 'when user selects the empty country and saves' do
+        it 'sets it as null in database' do
+          select '', from: 'Country'
+          click_button 'Save'
+          user.reload
+          expect(user.country).to be_nil
+        end
+      end
+
+      context 'when user selects the empty state and saves' do
+        it 'sets it as null in database' do
+          select '', from: 'State'
+          click_button 'Save'
+          user.reload
+          expect(user.state).to be_nil
+        end
+      end
+
+      context 'when user has a country and state' do
+        before do
+          user.country = country_code
+          user.state = state_code
+          user.save
+          user.reload
+          visit edit_user_path(user)
+        end
+
+        it 'will show same country and state for reload', :js do
+          expect(page).to have_select('Country', selected: country)
+          expect(page).to have_select('State', selected: state)
+        end
+
+        context 'when user selects the empty country and saves' do
+          it 'sets it as null in database' do
+            select '', from: 'Country'
+            click_button 'Save'
+            user.reload
+            expect(user.country).to be_nil
+          end
+        end
+
+        context 'when user selects the empty state and saves' do
+          it 'sets it as null in database' do
+            select '', from: 'State'
+            click_button 'Save'
+            user.reload
+            expect(user.state).to be_nil
+          end
+        end
+      end
     end
   end
 end

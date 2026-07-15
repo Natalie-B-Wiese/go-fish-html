@@ -9,12 +9,4 @@ div.op-page__main
 		= tag.div(flash[:alert], class: "flash flash--alert") if flash[:alert]
 		= tag.div(flash[:notice], class: "flash flash--notice") if flash[:notice]
 
-		= simple_form_for(@user, method: :patch) do |f|
-			= f.input :name
-			= f.input :email_address
-			= f.input :country, collection: Data::Country.all, priority: ['US', 'CA', 'MX'], include_blank: true
-    		- if @user.country
-				= f.input :state, collection: Data::Country.find(@user.country).states | [Data::State.new(@user.state)]
-			- else 
-				= f.input :state, collection: []
-			= f.button :submit, 'Save'
+		= render 'users/form', turbo_fetch_url_value: turbo_fetch_users_url(@user)

@@ -28,13 +28,16 @@ class UsersController < ApplicationController
       redirect_to users_profile_path
     else
       # TODO: do stuff
-      # binding.irb
     end
+  end
+
+  def turbo_fetch
+    @user = User.new(params.require(:user).permit(:email_address, :name, :country, :state))
   end
 
   private
 
   def user_params
-    params.require(:user).permit(:email_address, :name, :password, :password_confirmation, :country)
+    params.require(:user).permit(:email_address, :name, :password, :password_confirmation, :country, :state)
   end
 end
