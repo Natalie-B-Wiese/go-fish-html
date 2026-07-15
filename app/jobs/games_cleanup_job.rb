@@ -1,7 +1,7 @@
 class GamesCleanupJob < ApplicationJob
   queue_as :default
 
-  def perform(*args)
+  def perform
     old_nonarchived_games.update_all(archived_at: Time.zone.now)
   end
 
