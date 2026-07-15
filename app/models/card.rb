@@ -28,7 +28,11 @@ class Card
 
   def self.from_key(key)
     rank = key[0]
-    suit = SUIT_SYMBOLS[key[1]]
+
+    # if the number is two digits (eg 10)
+    rank += key[1] if key.length > 2
+
+    suit = SUIT_SYMBOLS[key[-1]]
     Card.new(rank, suit)
   end
 
