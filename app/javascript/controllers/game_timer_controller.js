@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = [ "countdown" ]
-  static values = { time: {type: Number, default: 30 }, offset: {type: Number, default: 0} }
+  static values = { time: {type: Number, default: 15 }, offset: {type: Number, default: 0} }
 
   connect() {
     console.log("It has been connected to game timer")
