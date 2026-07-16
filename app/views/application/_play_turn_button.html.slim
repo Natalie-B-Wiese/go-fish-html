@@ -11,6 +11,6 @@
             | 10
 
 - if is_my_turn
-	= f.button :submit, 'Play' 
+	= f.button :submit, 'Play', data: {'autorun-turn_target': 'submitButton'}
 - else 
 	= f.button :submit, 'Play', disabled: true

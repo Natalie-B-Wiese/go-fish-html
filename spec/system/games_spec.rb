@@ -325,6 +325,16 @@ RSpec.describe 'Games', type: :system do
 
       expect(time_remaining_refresh).to eq time_remaining
     end
+
+    it 'turn will be played when timer runs out', :js do
+      countdown_element = page.find('#countdown')
+      time_remaining = countdown_element.text.to_i
+      game.updated_at -= time_remaining
+      game.save!
+      game.reload
+      visit show_game_path(game)
+      expect(find_all('.feed-bubble').count).to_not eq 0
+    end
   end
 
   context '/games/history' do

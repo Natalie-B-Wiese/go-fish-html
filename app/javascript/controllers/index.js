@@ -12,3 +12,6 @@ application.register("turbo-fetch", TurboFetchController)
 
 import GameTimerController from "./game_timer_controller"
 application.register("game-timer", GameTimerController)
+
+import AutorunTurnController from "./autorun_turn_controller"
+application.register("autorun-turn", AutorunTurnController)

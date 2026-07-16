@@ -3,7 +3,7 @@
 / cards_hash
 / updated at (a datetime)
 
-= simple_form_for :turn, url: play_turn_path(@presenter.game), html: { class: "game-actions" } do |f|
+= simple_form_for :turn, url: play_turn_path(@presenter.game), html: { class: "game-actions", data: {controller: 'turbo-fetch autorun-turn', action: 'game-timer:timer-over@window->autorun-turn#submit'} } do |f|
 	- unless cards_hash.empty?
 		.game-actions__options
 			= f.input :card,

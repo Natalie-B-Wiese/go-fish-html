@@ -24,7 +24,22 @@ export default class extends Controller {
     // Set an interval and update every second (1000ms = 1 second)
     this.refreshTimer = setInterval(() => {
       this.decrementTimeLeft()
+
+      if (this.timeValue<=0)
+      {
+        this.outOfTime();
+      }
+
     }, 1000)
+  }
+
+  outOfTime()
+  {
+    console.log('out of time!')
+    this.dispatch('timer-over', {
+      details: { autoPlay: true }
+    })
+    this.stopTimer();
   }
 
   stopTimer() {
