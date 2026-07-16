@@ -1,82 +1,81 @@
-div.op-page__main
-	main.op-page__main-content.op-stack.gap-xl
-		header.content-header
-			h2
-				| Rules
-			div.divider
+main.op-page__main-content.op-stack.gap-xl
+	header.content-header
+		h2
+			| Rules
+		div.divider
+	
+	div
+		p
+			| Jump to game:
+		ul
+			li 
+				a href="#go_fish"
+					| Go Fish
+			li
+				a href="#crazy_eights"
+					| Crazy Eights
+
+	section#go_fish.op-stack.gap-xl.card.card--padded
+		h2 
+			| Go Fish 
 		
+		.text-pair.text-pair--inline
+			span.text-pair__title
+				| Players:
+			span
+				| 2-6
+
 		div
+			h3
+				| Goal			
 			p
-				| Jump to game:
-			ul
-				li 
-					a href="#go_fish"
-						| Go Fish
-				li
-					a href="#crazy_eights"
-						| Crazy Eights
-
-		section#go_fish.op-stack.gap-xl.card.card--padded
-			h2 
-				| Go Fish 
-			
-			.text-pair.text-pair--inline
-				span.text-pair__title
-					| Players:
-				span
-					| 2-6
-
-			div
-				h3
-					| Goal			
-				p
-					| The goal is to win the most "books" of cards. A book is any four of a kind, such as four kings, four aces, and so on.
+				| The goal is to win the most "books" of cards. A book is any four of a kind, such as four kings, four aces, and so on.
 
 
-			div
-				h3 Gameplay
-				p
-					| The player requests a rank from an opponent. The opponent who is addressed must hand over all the cards requested. If the opponent has none, they say, "Go fish!" and the player who made the request draws the top card of the stock and places it in their hand.
-				p 
-					| If a player gets one or more cards of the rank they requested (either from opponent or stock), they get to go again. Otherwise, the turn passes to the next player.
-				p 
-					| If a player runs out of cards, they may (when it's their turn to play), draw from the stock and then ask for cards of that rank. If there are no cards left in the stock, they are out of the game.
+		div
+			h3 Gameplay
+			p
+				| The player requests a rank from an opponent. The opponent who is addressed must hand over all the cards requested. If the opponent has none, they say, "Go fish!" and the player who made the request draws the top card of the stock and places it in their hand.
+			p 
+				| If a player gets one or more cards of the rank they requested (either from opponent or stock), they get to go again. Otherwise, the turn passes to the next player.
+			p 
+				| If a player runs out of cards, they may (when it's their turn to play), draw from the stock and then ask for cards of that rank. If there are no cards left in the stock, they are out of the game.
 
-			div
-				h3 Winner
-				p
-					| The game ends when all thirteen books have been won. The winner is the player with the most books. If there is a tie between multiple players, then the winner is the player who also has the highest value book.
+		div
+			h3 Winner
+			p
+				| The game ends when all thirteen books have been won. The winner is the player with the most books. If there is a tie between multiple players, then the winner is the player who also has the highest value book.
 
 
 
-		section#crazy_eights.op-stack.gap-xl.card.card--padded
-			h2 
-				| Crazy Eights
-			
-			.text-pair.text-pair--inline
-				span.text-pair__title
-					| Players:
-				span
-					| 2-6
+	section#crazy_eights.op-stack.gap-xl.card.card--padded
+		h2 
+			| Crazy Eights
+		
+		.text-pair.text-pair--inline
+			span.text-pair__title
+				| Players:
+			span
+				| 2-6
 
-			div
-				h3
-					| Goal			
-				p
-					| The goal is to run out of cards
+		div
+			h3
+				| Goal			
+			p
+				| The goal is to run out of cards
 
 
-			div
-				h3 Gameplay
-				p
-					| A card from the deck is placed face-up on the discard pile. The player must place either the same suit or rank as that card. Then the next player must play a card that matches the rank or suit as the card that the previous player layed down. 
-				p 
-					| If the player has an 8, they can lay it on the pile and declare the suit they want their 8 to take (Hearts, Spades, Clubs, or Diamonds).
-				p 
-					| If a player cannot play a card, they must draw from the deck until they can play. 
+		div
+			h3 Gameplay
+			p
+				| A card from the deck is placed face-up on the discard pile. The player must place either the same suit or rank as that card. Then the next player must play a card that matches the rank or suit as the card that the previous player layed down. 
+			p 
+				| If the player has an 8, they can lay it on the pile and declare the suit they want their 8 to take (Hearts, Spades, Clubs, or Diamonds).
+			p 
+				| If a player cannot play a card, they must draw from the deck until they can play. 
 
-			div
-				h3 Winner
-				p
-					| The game ends when a player runs out of cards. The first player without cards is the winner.
+		div
+			h3 Winner
+			p
+				| The game ends when a player runs out of cards. The first player without cards is the winner.
 

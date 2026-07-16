@@ -1,31 +1,30 @@
 - country_name=Current.user.country ? Data::Country.find(Current.user.country).name : ''
 - state_name=Current.user.state ? Data::State.find(Current.user.state).name : ''
 
-div.op-page__main
-	main.op-page__main-content.op-stack.gap-xl
-		header.content-header
-			h2
-				| Profile
-			= link_to edit_user_path(Current.user), class: 'btn btn--primary', data: { turbo_frame: 'modal' } do 
-					i.ph.ph-pencil-simple.icon.icon--large
-					| Edit
-			div.divider
+main.op-page__main-content.op-stack.gap-xl
+	header.content-header
+		h2
+			| Profile
+		= link_to edit_user_path(Current.user), class: 'btn btn--primary', data: { turbo_frame: 'modal' } do 
+				i.ph.ph-pencil-simple.icon.icon--large
+				| Edit
+		div.divider
 
-			div.op-stack
-				div.text-pair.text-pair--inline
-					span.text-pair__title
-						| Name: 
-					span.text-pair__subtitle
-						| #{Current.user.name}
+		div.op-stack
+			div.text-pair.text-pair--inline
+				span.text-pair__title
+					| Name: 
+				span.text-pair__subtitle
+					| #{Current.user.name}
 
-				div.text-pair.text-pair--inline
-					span.text-pair__title
-						| Email: 
-					span.text-pair__subtitle
-						| #{Current.user.email_address}
+			div.text-pair.text-pair--inline
+				span.text-pair__title
+					| Email: 
+				span.text-pair__subtitle
+					| #{Current.user.email_address}
 
-				div.text-pair.text-pair--inline
-					span.text-pair__title
-						| Address: 
-					span.text-pair__subtitle
-						| #{country_name} #{state_name}
+			div.text-pair.text-pair--inline
+				span.text-pair__title
+					| Address: 
+				span.text-pair__subtitle
+					| #{country_name} #{state_name}
