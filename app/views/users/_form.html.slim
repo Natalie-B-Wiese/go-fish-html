@@ -4,8 +4,5 @@
     = f.input :country, input_html: { data: { action: 'turbo-fetch#perform' } }, collection: Data::Country.all, priority: ['US', 'CA', 'MX'], include_blank: true
     div#state-container
         - state_collection = @user.country ? Data::Country.find(@user.country).states : []
-        - if @user.state || @user.country
-            = f.input :state, collection: state_collection, selected: @user.state, include_blank: true
-		- else
-			= f.input :state, as: :select
+        = f.input :state, collection: state_collection, selected: @user.state, include_blank: true
     = f.button :submit, 'Save'

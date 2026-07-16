@@ -10,6 +10,8 @@ class User < ApplicationRecord
   normalizes :email_address, with: ->(e) { e.strip.downcase }
   validates :email_address, uniqueness: { case_sensitive: false, message: 'An account with that email already exists!' }
 
+  validates :name, presence: true
+
   # turn empty string to nil
   normalizes :state, :country, with: ->(value) { value.presence }
 end

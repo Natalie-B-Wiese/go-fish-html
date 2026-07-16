@@ -8,3 +8,11 @@ document.addEventListener('turbo:morph', (event) => {
     controller.connect()
   })
 })
+
+document.addEventListener('turbo:frame-missing', (event) => {
+  if (event.target.id === 'modal') {
+    event.preventDefault()
+
+    event.detail.visit(event.detail.response.url, { action: 'replace' })
+  }
+})

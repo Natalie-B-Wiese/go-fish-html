@@ -6,7 +6,7 @@ div.op-page__main
 		header.content-header
 			h2
 				| Profile
-			= button_to edit_user_path(Current.user), method: :get, class: "btn btn--primary" do
+			= link_to edit_user_path(Current.user), class: 'btn btn--primary', data: { turbo_frame: 'modal' } do 
 					i.ph.ph-pencil-simple.icon.icon--large
 					| Edit
 			div.divider

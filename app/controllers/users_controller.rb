@@ -19,15 +19,16 @@ class UsersController < ApplicationController
 
   def edit
     @user = Current.user
+    render layout: 'modal'
   end
 
   def update
     @user = Current.user
 
-    if @user.update!(user_params)
+    if @user.update(user_params)
       redirect_to users_profile_path
     else
-      # TODO: do stuff
+      render :edit, status: :unprocessable_content, layout: 'modal'
     end
   end
 

@@ -4,14 +4,17 @@
 
 import { application } from "./application"
 
+import AutorunTurnController from "./autorun_turn_controller"
+application.register("autorun-turn", AutorunTurnController)
+
+import DialogueController from "./dialogue_controller"
+application.register("dialogue", DialogueController)
+
+import GameTimerController from "./game_timer_controller"
+application.register("game-timer", GameTimerController)
+
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
 import TurboFetchController from "./turbo_fetch_controller"
 application.register("turbo-fetch", TurboFetchController)
-
-import GameTimerController from "./game_timer_controller"
-application.register("game-timer", GameTimerController)
-
-import AutorunTurnController from "./autorun_turn_controller"
-application.register("autorun-turn", AutorunTurnController)
