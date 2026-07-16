@@ -26,7 +26,7 @@
 			.feed-content.op-stack.gap-xs.flex-grow-1
 				- @presenter.implementation.feed.each do |turn_action|
 					= render 'feed_bubble', turn_action: turn_action
-			= render 'request_card_form', is_my_turn: @presenter.my_turn?, my_ranks: @presenter.my_implementation_player.card_ranks , opponents: @presenter.opponent_users, updated_at: @presenter.game.updated_at
+			= render 'request_card_form', is_my_turn: @presenter.my_turn?, my_ranks: @presenter.my_implementation_player.card_ranks , opponents: @presenter.opponent_users
 
 	div.game-view__hand.panel.panel--secondary
 		header.panel__header

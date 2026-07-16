@@ -2,7 +2,6 @@
 / opponents (an array of User objects)
 / my_ranks (an array of card ranks Player object)
 / is_my_turn (a boolean)
-/ updated_at (a timestamp)
 = simple_form_for :turn, url: play_turn_path(@presenter.game), html: { class: "game-actions", data: {controller: 'turbo-fetch autorun-turn', action: 'game-timer:timer-over@window->autorun-turn#submit'}} do |f|
 	- unless my_ranks.empty?
 		.game-actions__options
@@ -16,4 +15,4 @@
 			collection: my_ranks,
 			selected: my_ranks.first
 
-	= render 'play_turn_button', f: f, is_my_turn: is_my_turn, updated_at: updated_at
+	= render 'play_turn_button', f: f, is_my_turn: is_my_turn
