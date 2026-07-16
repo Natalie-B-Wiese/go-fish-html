@@ -4,4 +4,4 @@
     div#state-container
         - state_collection = @user.country ? Data::Country.find(@user.country).states : []
         = f.input :state, collection: state_collection, selected: @user.state, include_blank: true
-    = f.button :submit, 'Save'
+    = f.button :submit, 'Save', form: f.id

@@ -7,6 +7,10 @@ html
 				.modal-wrapper.modal-wrapper--active
 					.modal-wrapper__backdrop
 					.modal
-						= yield
+						.modal__header
+							= yield :modal_header
+						.modal__body	
+							= yield
 						.modal__footer
 							= button_tag 'Close', class: 'btn', data: { action: 'dialogue#close' }
+							= yield :modal_footer
