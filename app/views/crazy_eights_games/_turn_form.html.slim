@@ -1,6 +1,7 @@
 / Locals to pass:
 / is_my_turn (a boolean)
 / cards_hash
+/ updated at (a datetime)
 
 = simple_form_for :turn, url: play_turn_path(@presenter.game), html: { class: "game-actions" } do |f|
 	- unless cards_hash.empty?
@@ -10,7 +11,4 @@
 			collection: cards_hash,
 			selected: cards_hash.values.first
 
-	- if is_my_turn
-		= f.button :submit, 'Play'
-	- else 
-		= f.button :submit, 'Play', disabled: true
+	= render 'play_turn_button', f: f, is_my_turn: is_my_turn, updated_at: updated_at

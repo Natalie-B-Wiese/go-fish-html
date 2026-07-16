@@ -9,3 +9,6 @@ application.register("hello", HelloController)
 
 import TurboFetchController from "./turbo_fetch_controller"
 application.register("turbo-fetch", TurboFetchController)
+
+import GameTimerController from "./game_timer_controller"
+application.register("game-timer", GameTimerController)

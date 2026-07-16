@@ -1,0 +1,16 @@
+/ Locals:
+/ f: the form
+/ is_my_turn: a boolean
+/ updated_at: a datetime for when it was last updated
+
+- offset_time = -(Time.current - updated_at).round
+
+- if is_my_turn
+    div data-controller='game-timer' data-game-timer-offset-value="#{offset_time}"
+        div#countdown data-game-timer-target="countdown"
+            | 10
+
+- if is_my_turn
+	= f.button :submit, 'Play' 
+- else 
+	= f.button :submit, 'Play', disabled: true

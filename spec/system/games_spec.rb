@@ -289,6 +289,44 @@ RSpec.describe 'Games', type: :system do
     end
   end
 
+  context 'show timer' do
+    # - offset_time = -(Time.current - updated_at).round
+    let(:game_name) { "Penelope's Game" }
+    let!(:game) do
+      create :game, :with_users, updated_at: Time.current, name: game_name, player_count: 3,
+                                 users: [user1, user2, user3]
+    end
+
+    let(:wait) { 2 }
+
+    before do
+      visit show_game_path(game)
+      expect(game.reload).to be_started
+      visit show_game_path(game)
+    end
+
+    it 'countdown timer counts down', :js do
+      countdown_element = page.find('#countdown')
+      time_remaining = countdown_element.text.to_i
+      sleep(wait)
+      time_remaining_new = countdown_element.text.to_i
+
+      expect(time_remaining_new + wait).to eq time_remaining
+    end
+
+    it 'time on countdown does not reset on refresh', :js do
+      countdown_element = page.find('#countdown')
+      sleep(wait)
+      time_remaining = countdown_element.text.to_i
+      visit show_game_path(game)
+
+      countdown_element = page.find('#countdown')
+      time_remaining_refresh = countdown_element.text.to_i
+
+      expect(time_remaining_refresh).to eq time_remaining
+    end
+  end
+
   context '/games/history' do
     context 'when there are completed games' do
       let!(:game1) do
