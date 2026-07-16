@@ -78,17 +78,7 @@ RSpec.describe 'Users', type: :system do
     end
 
     it 'has the user information in the fields' do
-      expect(page).to have_field('Email address', with: user.email_address)
       expect(page).to have_field('Name', with: user.name)
-    end
-
-    it 'allows user to change their email to a valid email' do
-      new_email = 'email2@example.com'
-      fill_in 'Email address', with: new_email
-      click_button 'Save'
-      user.reload
-      expect(user.email_address).to eq new_email
-      expect(page.current_path).to eq users_profile_path
     end
 
     it 'allows user to change their name to a valid name' do

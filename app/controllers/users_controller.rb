@@ -33,7 +33,7 @@ class UsersController < ApplicationController
   end
 
   def turbo_fetch
-    @user = User.new(params.require(:user).permit(:email_address, :name, :country, :state))
+    @user = User.new(params.require(:user).permit(:name, :country, :state))
   end
 
   private
