@@ -335,6 +335,27 @@ RSpec.describe 'Games', type: :system do
       visit show_game_path(game)
       expect(find_all('.feed-bubble').count).to_not eq 0
     end
+
+    it 'timer works after successful autoplay when player goes twice in a row', :js do
+      game.game_state.players.first.hand.cards = []
+      game.save
+      game.reload
+      visit show_game_path(game)
+
+      countdown_element = page.find('#countdown')
+      time_remaining = countdown_element.text.to_i
+      game.updated_at -= time_remaining + 1
+      game.save!
+      game.reload
+      visit show_game_path(game)
+
+      sleep(5)
+      countdown_element = page.find('#countdown')
+      time_remaining = countdown_element.text.to_i
+      expect(time_remaining).to be > 0
+      sleep(wait)
+      expect(countdown_element.text.to_i).to be < time_remaining
+    end
   end
 
   context '/games/history' do
