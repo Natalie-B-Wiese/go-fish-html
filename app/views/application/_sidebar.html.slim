@@ -2,8 +2,8 @@ div.op-page__sidebar
 	nav.sidebar.sidebar--drawer.sidebar--padded.sidebar--primary
 		
 		a.sidebar__brand href="/"
-			h2.content-header__title
-				| Game Platform
+			= image_tag "logo.png", alt: "Game Platform"
+			
 	
 		div.sidebar__content.sidebar__content--start
 			a.btn.btn--no-border href=games_url class=class_names('btn--active' => (request.path==root_path||request.path==games_path))
