@@ -1,0 +1,9 @@
+/ Locals: 
+/ classes: a string of additional classes to add (exclude badge and badge--primary)
+
+- all_classes="badge badge--primary #{classes}"
+
+- if @presenter.my_turn?
+    div class="#{all_classes}" Your Turn
+- else
+    div class="#{all_classes}" #{@presenter.implementation_current_user.name}'s Turn

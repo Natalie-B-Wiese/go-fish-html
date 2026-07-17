@@ -21,3 +21,30 @@
     }
   }
 }
+
+/*
+Mobile Styles: Screens less than 768px
+--op-breakpoint-small
+*/
+@media (width<768px)
+{
+  :root {
+    /* 164px*/
+    --game-actions-height: calc(var(--op-size-unit)*41);
+  }
+  
+  .game-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--game-actions-height);
+  }
+
+  /* The spacer is inside the feed and is the same height as game actions
+  This is so that the bottom messages can be seen when game-actions has a fixed position */
+  .game-actions-spacer {
+    flex-shrink: 0;
+    height: var(--game-actions-height);
+  }
+}

@@ -1,0 +1,7 @@
+/ Locals:
+/ feed: an array of feed objects
+
+.feed-content.op-stack.gap-xs.flex-grow-1
+    - feed.each do |turn_action|
+        = render 'feed_bubble', turn_action: turn_action
+    .game-actions-spacer

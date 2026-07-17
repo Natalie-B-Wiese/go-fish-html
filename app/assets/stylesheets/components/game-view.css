@@ -44,3 +44,29 @@
     border-left: var(--op-border-width) solid var(--op-color-border);
   }
 }
+
+
+/*
+Mobile Styles: Screens less than 768px
+--op-breakpoint-small
+*/
+@media (width<768px)
+{
+  .game-view {
+    --gf-side-panel-width: calc(var(--op-size-unit) * 84); /* 336 pixels */
+
+    overflow: auto;
+    
+    --gf-side-panel-height: calc(var(--op-size-unit) * 100); /* 400 pixels */
+
+    display: grid;
+    grid-template-rows: 400px 250px 200px 500px;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "game-board"
+      "cards"
+      "books"
+      "game-feed"
+      ;
+  }
+}

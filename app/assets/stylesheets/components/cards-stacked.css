@@ -12,3 +12,23 @@
   }
   
 }
+
+/*
+Mobile Styles: Screens less than 768px
+--op-breakpoint-small
+*/
+@media (width<768px)
+{
+  .cards-stacked>*:not(:first-child)
+  {
+    &.playing-card--sm
+    {
+      margin-left: calc(var(--op-space-scale-unit)*-7);
+    }
+
+    &.playing-card--lg
+    {
+      margin-left: calc(var(--op-space-scale-unit)*-9);
+    }
+  }
+}

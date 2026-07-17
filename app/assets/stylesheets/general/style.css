@@ -8,6 +8,19 @@ body
   overflow: hidden;
 }
 
+/*
+Mobile Styles: Screens less than 768px
+--op-breakpoint-small
+*/
+@media (width<768px)
+{
+  body
+  {
+    overflow: auto;
+  }
+}
+
+
 .gap-none
 {
   gap: 0px;
