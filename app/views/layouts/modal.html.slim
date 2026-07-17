@@ -1,0 +1,16 @@
+doctype html
+html
+  head = render 'head'  
+  body.op-page#app
+  	= turbo_frame_tag 'modal' do
+      = tag.dialog class:'dialog', open: response.message.start_with?('Unprocessable'), data: { controller: 'dialogue' }
+				.modal-wrapper.modal-wrapper--active
+					.modal-wrapper__backdrop
+					.modal
+						.modal__header
+							= yield :modal_header
+						.modal__body	
+							= yield
+						.modal__footer
+							= button_tag 'Close', class: 'btn', data: { action: 'dialogue#close' }
+							= yield :modal_footer

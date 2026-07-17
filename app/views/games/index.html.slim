@@ -5,33 +5,32 @@
 
 - games_not_in = games - games_in
 
-div.op-page__main
-	main.op-page__main-content
-		div.op-stack.gap-xl
-			div.my-games
-				header.content-header
-					div.content-header__details
-						h2.content-header__title
-							| Your Games
-					div.content-header__aside
-						a.btn.btn--primary.margin-right-md href=new_game_url
-							i.ph.ph-plus.icon.icon--large
-							| New Game
-					div.divider
-				
-				div.op-stack.gap-sm#my_games_list
-					- games_in.each do |game|
-						= render 'game_card', game: game, is_in_game: true
-			div.all-games
-				header.content-header
-					div.content-header__details
-						h2.content-header__title
-							| All Games
-					div.divider
-				
-				div.op-stack.gap-sm#all_games_list
-					- games_not_in.each do |game|
-						- next if game.full?
-						
-						= render 'game_card', game: game, is_in_game: false
-								
+main.op-page__main-content
+	div.op-stack.gap-xl
+		div.my-games
+			header.content-header
+				div.content-header__details
+					h2.content-header__title
+						| Your Games
+				div.content-header__aside
+					a.btn.btn--primary.margin-right-md href=new_game_url
+						i.ph.ph-plus.icon.icon--large
+						| New Game
+				div.divider
+			
+			div.op-stack.gap-sm#my_games_list
+				- games_in.each do |game|
+					= render 'game_card', game: game, is_in_game: true
+		div.all-games
+			header.content-header
+				div.content-header__details
+					h2.content-header__title
+						| All Games
+				div.divider
+			
+			div.op-stack.gap-sm#all_games_list
+				- games_not_in.each do |game|
+					- next if game.full?
+					
+					= render 'game_card', game: game, is_in_game: false
+							

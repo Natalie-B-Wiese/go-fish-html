@@ -1,6 +1,9 @@
 doctype html
 html
   head = render 'head'
-  body.op-page
+  
+  body.op-page#app
     = render 'sidebar'
-    = yield
+    .op-page__main
+      = turbo_frame_tag 'modal'
+      = yield

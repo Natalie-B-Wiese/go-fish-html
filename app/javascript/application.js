@@ -1,9 +1,18 @@
 import '@hotwired/turbo-rails'
-import { Application } from "@hotwired/stimulus"
+import './controllers'
 
-const application = Application.start()
+document.addEventListener('turbo:morph', (event) => {
+  // Reconnect Stimulus controllers after morphing
+  window.Stimulus.controllers.forEach(controller => {
+    controller.disconnect()
+    controller.connect()
+  })
+})
 
-application.debug = false
-window.Stimulus   = application
+document.addEventListener('turbo:frame-missing', (event) => {
+  if (event.target.id === 'modal') {
+    event.preventDefault()
 
-export { application }
+    event.detail.visit(event.detail.response.url, { action: 'replace' })
+  }
+})

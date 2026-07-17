@@ -4,21 +4,20 @@
 - lose_count=finished_games.count-win_count
 - win_percentage=(win_count.to_f/finished_games.count)*100
 
-.op-page__main
-	main.op-page__main-content
-		.op-stack.gap-xl
-			header.content-header
-				h2
-					| Stats
-				div.divider
-			.op-stack.gap-sm.items-center
-				div.ratio-bar.ratio-bar--flipped
-					div.ratio-bar__bar
-						div.ratio-bar__fill style="width: #{win_percentage}%;"
-					div.ratio-bar__footer
-						span
-							| #{lose_count} losses
-						span
-							| #{win_count} wins
-				p
-					| Games Played: #{finished_games.count}
+main.op-page__main-content
+	.op-stack.gap-xl
+		header.content-header
+			h2
+				| Stats
+			div.divider
+		.op-stack.gap-sm.items-center
+			div.ratio-bar.ratio-bar--flipped
+				div.ratio-bar__bar
+					div.ratio-bar__fill style="width: #{win_percentage}%;"
+				div.ratio-bar__footer
+					span
+						| #{lose_count} losses
+					span
+						| #{win_count} wins
+			p
+				| Games Played: #{finished_games.count}

@@ -289,6 +289,75 @@ RSpec.describe 'Games', type: :system do
     end
   end
 
+  context 'show timer' do
+    # - offset_time = -(Time.current - updated_at).round
+    let(:game_name) { "Penelope's Game" }
+    let!(:game) do
+      create :game, :with_users, updated_at: Time.current, name: game_name, player_count: 3,
+                                 users: [user1, user2, user3]
+    end
+
+    let(:wait) { 2 }
+
+    before do
+      visit show_game_path(game)
+      expect(game.reload).to be_started
+      visit show_game_path(game)
+    end
+
+    it 'countdown timer counts down', :js do
+      countdown_element = page.find('#countdown')
+      time_remaining = countdown_element.text.to_i
+      sleep(wait)
+      time_remaining_new = countdown_element.text.to_i
+
+      expect(time_remaining_new + wait).to eq time_remaining
+    end
+
+    it 'time on countdown does not reset on refresh', :js do
+      countdown_element = page.find('#countdown')
+      sleep(wait)
+      time_remaining = countdown_element.text.to_i
+      visit show_game_path(game)
+
+      countdown_element = page.find('#countdown')
+      time_remaining_refresh = countdown_element.text.to_i
+
+      expect(time_remaining_refresh).to eq time_remaining
+    end
+
+    it 'turn will be played when timer runs out', :js do
+      countdown_element = page.find('#countdown')
+      time_remaining = countdown_element.text.to_i
+      game.updated_at -= time_remaining
+      game.save!
+      game.reload
+      visit show_game_path(game)
+      expect(find_all('.feed-bubble').count).to_not eq 0
+    end
+
+    it 'timer works after successful autoplay when player goes twice in a row', :js do
+      game.game_state.players.first.hand.cards = []
+      game.save
+      game.reload
+      visit show_game_path(game)
+
+      countdown_element = page.find('#countdown')
+      time_remaining = countdown_element.text.to_i
+      game.updated_at -= time_remaining + 1
+      game.save!
+      game.reload
+      visit show_game_path(game)
+
+      sleep(5)
+      countdown_element = page.find('#countdown')
+      time_remaining = countdown_element.text.to_i
+      expect(time_remaining).to be > 0
+      sleep(wait)
+      expect(countdown_element.text.to_i).to be < time_remaining
+    end
+  end
+
   context '/games/history' do
     context 'when there are completed games' do
       let!(:game1) do
