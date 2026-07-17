@@ -25,11 +25,9 @@ class UsersController < ApplicationController
   def update
     @user = Current.user
 
-    if @user.update(user_params)
-      redirect_to users_profile_path
-    else
-      render :edit, status: :unprocessable_content, layout: 'modal'
-    end
+    return redirect_to users_profile_path if @user.update(update_user_params)
+
+    render :edit, status: :unprocessable_content, layout: 'modal'
   end
 
   def turbo_fetch
@@ -40,5 +38,9 @@ class UsersController < ApplicationController
 
   def user_params
     params.require(:user).permit(:email_address, :name, :password, :password_confirmation, :country, :state)
+  end
+
+  def update_user_params
+    params.require(:user).permit(:name, :country, :state)
   end
 end
