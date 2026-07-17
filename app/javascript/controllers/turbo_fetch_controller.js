@@ -7,7 +7,6 @@ export default class extends Controller {
     async perform() {
         const body=new FormData(this.element)
         const response=await patch(this.urlValue, {body, responseKind: 'turbo-stream'})
-        console.log('hello world')
         if (response.ok) this.countValue+=1
     }
 }
