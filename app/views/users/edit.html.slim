@@ -1,0 +1,14 @@
+= content_for :modal_header do 
+	h2
+		| Edit Profile
+
+ 	
+= simple_form_for @user, method: :patch, data: { controller: 'turbo-fetch', turbo_fetch_url_value: turbo_fetch_users_url(@user)} do |f|
+	= f.input :name
+	= f.input :country, input_html: { data: { action: 'turbo-fetch#perform' } }, collection: Data::Country.all, include_blank: true
+	div#state-container
+		- state_collection = @user.country ? Data::Country.find(@user.country).states : []
+		= f.input :state, collection: state_collection, selected: @user.state, include_blank: true
+
+	= content_for :modal_footer do 
+		= f.button :submit, 'Save', form: f.id
