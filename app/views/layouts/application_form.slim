@@ -1,5 +1,5 @@
 doctype html
 html
   head = render 'head'
-  body.page-form
+  body.page-form data-controller="service-worker" data-service-worker-url-value=pwa_service_worker_path
     = yield

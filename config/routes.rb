@@ -33,6 +33,10 @@ Rails.application.routes.draw do
   # Stats page ( stats#index ). Player stats (static/placeholder content for now), in a StatsController
   resources :stats, only: [:index]
 
+  resources :offlines, only: [:index]
+
+  get '/offline', to: 'offlines#index'
+
   Rails.application.routes.draw do
     # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
     get 'manifest' => 'rails/pwa#manifest', as: :pwa_manifest

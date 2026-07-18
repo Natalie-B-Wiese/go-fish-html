@@ -19,6 +19,10 @@ RSpec.configure do |config|
     driven_by :playwright_headless
   end
 
+  config.before(:each, :capybara, type: :system) do
+    driven_by :selenium_chrome_headless
+  end
+
   config.before(:each, :chrome, type: :system) do
     driven_by :chrome
   end
@@ -33,7 +37,7 @@ RSpec.configure do |config|
       headless: true,
       viewport: { width: 1400, height: 1400 },
       browser_options: {
-        args: [ '--disable-backgrounding-occluded-windows' ]
+        args: ['--disable-backgrounding-occluded-windows']
       }
     }
 

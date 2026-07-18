@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>You're offline</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+
+    /* system fonts, flex center, dark mode media query */
+    :root {
+      box-sizing: border-box;
+      color-scheme: light dark;
+
+      /* Theme colors */
+      --op-color-primary-h: 284;
+      --op-color-primary-s: 90%;
+      --op-color-primary-l: 40%;
+      --op-color-border: hsl(279, 32%, 86%);
+
+      /* Optics color scales needed */
+      --op-color-primary-plus-five: light-dark(hsl(var(--op-color-primary-h), var(--op-color-primary-s), 90%), hsl(var(--op-color-primary-h), var(--op-color-primary-s), 24%));
+
+      --op-color-primary-plus-max: light-dark(white, black);
+      --op-color-primary-on-plus-max: light-dark(black, white);
+
+      --op-color-primary-base: hsl(var(--op-color-primary-h), var(--op-color-primary-s), 40%);
+      --op-color-primary-on-base: white;      
+    }
+
+    h2 {
+      font-weight: normal;
+      font-size: 24px;
+      margin: 0px;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100dvh;
+      background-color: var(--op-color-primary-plus-five);
+    }
+
+    .panel {
+      width: 500px;
+
+      font-family: 'Noto Sans', sans-serif;
+      text-align: center;
+      border: 1px solid var(--op-color-border);
+
+      background-color: var(--op-color-primary-plus-max);
+      color: var(--op-color-primary-on-plus-max);
+
+      display: flex;
+      flex-flow: column;
+
+      .panel__header {        
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: stretch;
+
+        text-align: center;
+
+        color: black;
+        border-bottom: 1px solid var(--color-dark);
+        padding: 20px;
+      }
+
+      .panel__body {
+        flex-grow: 1;
+        padding: 20px;
+        font-size:18px;
+        text-wrap: pretty;
+      }
+
+      .panel__footer {
+        padding-bottom: 20px;
+      }
+    }
+
+    button {
+      width: 200px;
+      height: 40px;
+
+      background-color: var(--op-color-primary-base);
+      color: var(--op-color-primary-on-base);
+
+      border: 1px solid var(--op-color-border);
+      font-size: large;
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <div class="panel__header">
+      <h2>You're offline</h2>
+    </div>
+
+    <div class="panel__body">
+      <p>Unable to connect to the server.</p>
+      <p>Check your internet connection and try again.</p>
+    </div>
+
+    <div class="panel__footer">
+      <form action="." method="get" aria-label="Retry loading this page">
+        <button type="submit">Try again</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
