@@ -5,9 +5,6 @@ html
   body.op-page#app
     = render 'sidebar'
     .op-page__main
-      header class="bg-zinc-500 hidden" data-controller="offline"
-        p class="text-white text-center py-2"
-          | You are offline - Content may be outdated
       = turbo_frame_tag 'modal'
       = yield
 
