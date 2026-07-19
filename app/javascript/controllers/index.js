@@ -24,3 +24,6 @@ application.register("service-worker", ServiceWorkerController)
 
 import OfflineController from "./offline_controller"
 application.register("offline", OfflineController)
+
+import SideBarSizeController from "./sidebar_size_controller"
+application.register("sidebar-size", SideBarSizeController)
