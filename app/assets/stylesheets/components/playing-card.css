@@ -5,6 +5,11 @@
   aspect-ratio: 63.5 / 88.9;  /* official playing card */ 
   box-shadow: var(--op-shadow-x-small);
 
+  &.playing-card--xl
+  {
+    height: calc(var(--op-size-unit)*65); /* 320 px */
+  }
+
   &.playing-card--lg
   {
     height: calc(var(--op-size-unit)*38); /* 152 px */

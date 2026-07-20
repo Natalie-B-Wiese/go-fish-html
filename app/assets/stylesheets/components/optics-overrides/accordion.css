@@ -2,6 +2,8 @@
 .accordion
 {
   border-radius: var(--op-radius-medium);
+  background-color: var(--op-color-neutral-plus-max);
+  color: var(--op-color-primary-on-plus-max);
 
   .accordion__header
   {

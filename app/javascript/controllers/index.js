@@ -18,3 +18,12 @@ application.register("hello", HelloController)
 
 import TurboFetchController from "./turbo_fetch_controller"
 application.register("turbo-fetch", TurboFetchController)
+
+import ServiceWorkerController from "./service_worker_controller"
+application.register("service-worker", ServiceWorkerController)
+
+import OfflineController from "./offline_controller"
+application.register("offline", OfflineController)
+
+import SideBarSizeController from "./sidebar_size_controller"
+application.register("sidebar-size", SideBarSizeController)

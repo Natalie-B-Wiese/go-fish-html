@@ -2,5 +2,6 @@ doctype html
 html
   head = render 'head'
   body
+    = render 'offline_banner'
     main.game-view id=dom_id(@presenter.game)
       = yield
