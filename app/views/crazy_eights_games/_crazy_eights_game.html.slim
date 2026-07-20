@@ -6,13 +6,11 @@
 - else
 	div.panel.panel--padded.game-view__game-board
 		= render 'game_header', game_name: @presenter.game.name
-		div.panel__content.op-stack.gap-xs.players
-			h3 Players
 
-			- @presenter.opponent_users.each do |opponent|
-					div.players__hand.op-stack.gap-xs
-						= render 'crazy_eights_games/player_accordion', user: opponent, player: @presenter.implementation_players_hash[opponent.id]
-
+		div.panel__content
+			h3
+				| Discard
+			= image_tag "cards/#{@presenter.discard_card.to_image_name}", alt: "#{@presenter.discard_card.to_s}", class: "playing-card playing-card--xl"
 
 	.game-view__game-feed.panel.panel--padded.panel--primary
 		header.panel__header.op-split
@@ -32,7 +30,11 @@
 					= image_tag "cards/#{card.to_image_name}", alt: "#{card.to_s}", class: "playing-card playing-card--lg playing-card--hover"
 
 	div.game-view__books.panel.panel--secondary
-			header.panel__header
-				h2 Deck
-			div.panel__content
-				= image_tag "cards/#{@presenter.discard_card.to_image_name}", alt: "#{@presenter.discard_card.to_s}", class: "playing-card playing-card--lg"
+		header.panel__header
+			h2 Players
+
+		div.panel__content.players
+			- @presenter.opponent_users.each do |opponent|
+					div.players__hand.op-stack.gap-xs
+						= render 'crazy_eights_games/player_accordion', user: opponent, player: @presenter.implementation_players_hash[opponent.id]
+		
