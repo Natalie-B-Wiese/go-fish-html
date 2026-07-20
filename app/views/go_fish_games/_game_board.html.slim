@@ -1,0 +1,8 @@
+div.panel.panel--padded.game-view__game-board
+	= render 'game_header', game_name: @presenter.game.name
+	div.panel__content.op-stack.gap-xs.players
+		h3 Players
+
+		- @presenter.opponent_users.each do |opponent|
+			div.players__hand.op-stack.gap-xs
+				= render 'go_fish_games/player_accordion', user: opponent, player: @presenter.implementation_players_hash[opponent.id]

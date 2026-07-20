@@ -1,0 +1,7 @@
+.game-lobby
+{
+  background-color: var(--op-color-neutral-plus-max);
+  color: var(--op-color-neutral-on-plus-max);
+  height: 100vh;
+  overflow: auto;
+}

@@ -1,0 +1,13 @@
+/ @presenter
+
+div.panel.panel--padded
+	= render 'game_header', game_name: @presenter.game.name
+	div.panel__content.op-stack.gap-xs.players
+		h3 Players
+
+		- @presenter.game.users.each do |user|
+			p 
+				| #{user.name}
+
+		p 
+			| Waiting for more players to join...

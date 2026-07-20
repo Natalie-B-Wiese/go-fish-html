@@ -12,7 +12,7 @@
   grid-template-columns: 1fr var(--gf-side-panel-width);
   grid-template-areas:
     "game-board game-feed"
-    "cards books";
+    "hand extra";
 
   .game-view__game-board
   {
@@ -36,11 +36,11 @@
   }
 
   .game-view__hand {
-    grid-area: cards; 
+    grid-area: hand; 
   }
 
-  .game-view__books {
-    grid-area: books;
+  .game-view__extra {
+    grid-area: extra;
     border-left: var(--op-border-width) solid var(--op-color-border);
   }
 }
@@ -64,8 +64,8 @@ Mobile Styles: Screens less than 768px
     grid-template-columns: 1fr;
     grid-template-areas:
       "game-board"
-      "cards"
-      "books"
+      "hand"
+      "extra"
       "game-feed"
       ;
   }

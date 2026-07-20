@@ -1,0 +1,8 @@
+div.game-view__extra.panel.panel--secondary
+	header.panel__header
+		h2 Players
+
+	div.panel__content.players
+		- @presenter.opponent_users.each do |opponent|
+				div.players__hand.op-stack.gap-xs
+					= render 'crazy_eights_games/player_accordion', user: opponent, player: @presenter.implementation_players_hash[opponent.id]

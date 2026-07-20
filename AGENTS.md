@@ -58,6 +58,8 @@ The engine is stored in the `games.game_state` jsonb column and (de)serialized t
 
 **Live updates:** models broadcast Turbo Streams (`broadcast_*_to`) on create/update to refresh lobby cards and game boards; there is no custom Action Cable channel beyond the connection.
 
+**View composition:** the board is a 4-panel CSS grid whose *shared* skeleton lives in `app/views/application/` (`_hand`, `_game_feed`, `_lobby`, plus `_game_header`, `_feed_content`, `_turn_badge`, `_play_turn_button`). A game supplies only its **region partials** in `app/views/<game>_games/` — `_game_board`, `_extra`, `_turn_form`, `_player_accordion` — and a thin entry partial (`_<game>_game.html.slim`) that renders those regions in order (passing its turn form to the shared feed as `render 'game_feed', turn_form_partial: '<game>_games/turn_form'`). Region partials read `@presenter` directly (no locals). `games/show.html.slim` forks on `@presenter.implementation?`: started → `render @presenter.game` (dispatched by `to_partial_path`) → the game's entry partial; not started → the shared `application/_lobby`. The layout (`layouts/application_game.slim`) sets the container class accordingly — `game-view` (the 4-panel grid: `game-board` / `game-feed` / `hand` / `extra`) when playing, `game-lobby` (a simple centered list, not a grid) in the lobby. Grid CSS is scoped under `.game-view` in `app/assets/stylesheets/components/game-view.css`; the lobby's in `game-lobby.css`.
+
 ## Conventions worth knowing
 
 See [docs/conventions.md](docs/conventions.md) for the full list. The ones you'll trip on:
@@ -67,12 +69,13 @@ See [docs/conventions.md](docs/conventions.md) for the full list. The ones you'l
 - **`as_json` / `from_json` symmetry**: every game-engine object serializes both ways. Change one, change the other — a mismatch silently drops state instead of raising.
 - **Prefer RESTful routes** (RoleModel house style). **Avoid instance variables in plain Ruby objects** (engine, presenters) — they're fine in controllers, as usual for Rails.
 - **Presenters** hold view-facing helpers for reading `game_state`; use them so views don't dig into the engine.
+- **Shared board partials live in `app/views/application/`.** Don't copy the board skeleton per game — a new game adds only its region partials (`_game_board`, `_extra`, `_turn_form`, `_player_accordion`) and a thin entry partial. See the View composition note above.
 - **Never hand-edit `db/schema.rb`** (use migrations) or `app/javascript/controllers/index.js` (regenerate with `bin/rails stimulus:manifest:update`).
 - Authentication is a hand-rolled `Session`/`Current` cookie scheme (`app/controllers/concerns/authentication.rb`), not Devise. `Current.user` / `Current.session` carry request-scoped identity.
 
 ## Key context
 
-- [docs/architecture.md](docs/architecture.md) — the AR/engine split, jsonb serialization, request flow, presenters, live updates, lobby visibility, and how to add a new game.
+- [docs/architecture.md](docs/architecture.md) — the AR/engine split, jsonb serialization, request flow, presenters, live updates, view composition, lobby visibility, and how to add a new game.
 - [docs/conventions.md](docs/conventions.md) — house style and project rules (7-line limit, TDD, RESTful routes, serialization symmetry).
 - [docs/go-fish-rules.md](docs/go-fish-rules.md) — Go Fish rules as implemented.
 - [docs/crazy-eights-rules.md](docs/crazy-eights-rules.md) — Crazy Eights rules as implemented.

@@ -75,7 +75,24 @@ it automatically.
 
 ---
 
-## Item 2 — DRY the per-game views into a shared board shell
+## Item 2 — DRY the per-game views into a shared board shell  ✅ DONE
+
+> **Status: implemented.** The result diverged from the proposal below in three intentional ways,
+> decided during implementation:
+> - **No `_game_shell` partial.** The shared skeleton was factored into `application/_hand` and
+>   `application/_game_feed` (the latter takes a `turn_form_partial:` local); each game's thin
+>   `_<game>_game.html.slim` renders the four panels directly. A wrapping shell was judged to add
+>   indirection without enough payoff.
+> - **The lobby became its own standalone screen**, not a branch inside the board shell. The
+>   started-vs-lobby fork lives in `games/show.html.slim`; the layout swaps the container class
+>   (`game-view` grid vs. a new non-grid `game-lobby`), and one shared `application/_lobby` shows
+>   just player names. Both per-game `_lobby.slim` were deleted.
+> - **The 4th grid slot was renamed** `books` → `extra` (and `cards` → `hand`) so no Go-Fish-only
+>   concept leaks into shared layout. Each game's `_extra` owns its own panel header, so no
+>   header local was needed.
+>
+> See [architecture.md → Views & rendering](architecture.md#views--rendering-the-board-shell) for
+> the final structure.
 
 ### What & why
 Collapse the duplicated Slim skeleton so a new game supplies only its game-specific regions, not a

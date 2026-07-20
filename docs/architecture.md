@@ -60,6 +60,38 @@ Every value object in the engine (`Player`, `Card`, `CardCollection`, `Deck`, `B
 
 Models broadcast Turbo Streams on commit (`broadcast_*_to 'games', user, ...` in `Game` and `Player`; `broadcast_refresh_later_to` for game boards) to update lobby cards and game state in real time. There is no custom Action Cable channel beyond `ApplicationCable::Connection`.
 
+## Views & rendering (the board shell)
+
+The game screen is a **4-panel CSS grid**, and its shared skeleton is factored into
+`app/views/application/` so games don't copy it:
+
+- **Shared partials** — `_hand` (the "Hand" panel), `_game_feed` (the "Game Feed" panel skeleton;
+  takes a `turn_form_partial:` local so the game-specific form drops in by name), and `_lobby`
+  (one game-neutral waiting room showing the game name + player names). Plus the smaller shared
+  bits already used across the app: `_game_header`, `_feed_content`, `_turn_badge`,
+  `_play_turn_button`.
+- **Per-game region partials** in `app/views/<game>_games/` — `_game_board`, `_extra`,
+  `_turn_form`, `_player_accordion`. These genuinely differ per game (e.g. Go Fish's `_extra` shows
+  your Books; Crazy Eights' shows the opponent list). Region partials **read `@presenter`
+  directly** rather than taking locals, which is what lets the shared feed render any game's turn
+  form generically.
+- **Thin entry partial** — `_<game>_game.html.slim` is just the four renders in order:
+  `game_board`, `game_feed` (with `turn_form_partial:`), `hand`, `extra`.
+
+**The fork between lobby and board is in `games/show.html.slim`**, keyed on
+`@presenter.implementation?` (nil until the game starts): started → `render @presenter.game`
+(dispatched to the entry partial by `to_partial_path`); not started → shared `application/_lobby`.
+`turbo_stream_from @presenter.game` lives here so both states live-update (the lobby flips to the
+board on its own when the game fills).
+
+**The layout picks the container class, not the content.** `layouts/application_game.slim` sets
+`main`'s class to `game-view` when playing or `game-lobby` in the lobby (reading `@presenter`,
+which `GamesController#show` sets — the view renders before the layout, so it's always present).
+All grid rules are scoped under `.game-view` in
+`app/assets/stylesheets/components/game-view.css` (grid areas: `game-board` / `game-feed` /
+`hand` / `extra`); the lobby's non-grid centered layout is `game-lobby.css`. Swapping the class is
+enough to opt the lobby out of the grid entirely.
+
 ## Lobby visibility & cleanup
 
 The index (`app/views/games/index.html.slim`) splits games into "Your Games" and "All Games", with these visibility rules:
@@ -74,6 +106,10 @@ The whole design exists to make this straightforward:
 
 1. Add a `NewGame < Game` STI subclass with `serialize :game_state, coder: NewGame::Implementation`, a `create_and_start_game`, and a `play_turn?`.
 2. Build the engine under `app/models/new_game/` (`Implementation`, `Player`, `TurnResult`, …) with `as_json`/`from_json` on every object.
-3. Add it to `Game#types`, add a presenter, views under `app/views/new_game_games/`, and specs mirroring `spec/models/new_game/`.
+3. Add it to `Game#types`, add a presenter, and specs mirroring `spec/models/new_game/`.
+4. For views, you only need the **region partials** under `app/views/new_game_games/`
+   (`_game_board`, `_extra`, `_turn_form`, `_player_accordion`) plus a thin `_new_game_game.html.slim`
+   entry partial — the board shell, hand, feed, and lobby are already shared in
+   `app/views/application/`. See [Views & rendering](#views--rendering-the-board-shell).
 
 Keep every method (and every spec `it` block) to **7 lines or fewer** — see [conventions.md](conventions.md).
