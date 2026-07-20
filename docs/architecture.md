@@ -1,0 +1,79 @@
+# Architecture & model relationships
+
+This project deliberately splits **persistence** (Active Record) from **game rules** (plain Ruby). Understanding that boundary is the key to working here.
+
+## The two halves
+
+### 1. Active Record layer (the lobby & persistence)
+
+- **`Game`** — STI base class (`app/models/game.rb`). Concrete types: **`GoFishGame`**, **`CrazyEightsGame`** (the `type` column). Tracks lobby state: `name`, `player_count`, `started_at`, `ended_at`, `archived_at`, `winner`, and the serialized `game_state` (jsonb).
+- **`Player`** — join model between `User` and `Game`. This is *not* the in-game player; it just records "this user is in this game."
+- **`User`** — `has_secure_password`; `has_many :games, through: :players`.
+- **`Session`** / **`Current`** — hand-rolled cookie auth (see `app/controllers/concerns/authentication.rb`). `Current.user` / `Current.session` carry request-scoped identity.
+
+The AR layer knows *almost* nothing about game rules. The one intentional exception: the STI subclass's `play_turn?` will draw from the deck for a player who has no valid card to play (a "draw" turn). Otherwise rules live entirely in the engine.
+
+### 2. Game engine layer (plain Ruby, no DB)
+
+Under `app/models/go_fish/` and `app/models/crazy_eights/`, each game has:
+
+- **`Implementation`** — the rules engine. Holds `players`, `deck`, `feed`, turn index, and (Crazy Eights) `discard_pile`. Exposes turn methods (`request_opponent_turn`, `draw_deck_turn`, `play_turn`), `game_over?`, `winning_player`, `current_user_id`.
+- **`Player`** (`GoFish::Player` / `CrazyEights::Player`) — an in-game player holding a hand. Linked to the AR `User`/`Player` **only by `user_id`**. There are deliberately two "Player" concepts; don't conflate them.
+- **`TurnResult`** — a record of what happened on one turn; used to render the game feed (see below).
+- Game-specific pieces: `GoFish::Book`, `CrazyEights::DiscardPile`.
+
+Shared primitives used by both engines: **`Card`**, **`CardCollection`**, **`Deck`** (all plain Ruby).
+
+The engine knows nothing about the database.
+
+## Serialization: the jsonb boundary
+
+`game_state` is a **jsonb** column. Rails' `serialize` uses each `Implementation` as a **custom coder**:
+
+```ruby
+class GoFishGame < Game
+  serialize :game_state, coder: GoFish::Implementation
+end
+```
+
+- `Implementation.dump(obj)` → `obj.as_json`
+- `Implementation.load(json)` → `Implementation.from_json(json)` (nil-safe)
+
+Every value object in the engine (`Player`, `Card`, `CardCollection`, `Deck`, `Book`, `TurnResult`, `Implementation`) implements a matching `as_json` / `self.from_json` pair.
+
+**The rule that bites people: if you add or change a field, update BOTH `as_json` and `from_json`.** A mismatch doesn't raise — the field silently fails to persist or round-trip. (In practice jsonb itself has caused no trouble as long as the two stay in sync.)
+
+## Request flow
+
+1. **`GamesController#show`** builds a presenter, then **lazily starts the game** (`game.start!`) once it's full, and **ends it** (`game.end!` → redirect to history) once `game.game_over?`. Note this means a **GET can mutate state** — intentional for now, though a more RESTful approach is a possible future improvement.
+2. **`GamesController#play`** checks `game.valid_turn?` (is it this user's turn?) then calls the STI subclass's `play_turn?(**turn_params)`, which translates params into an engine call and returns truthy on success. On success the game is saved (re-serializing `game_state`).
+3. **Presenters** (`app/presenters/`) wrap a `game` + the current `user`. They are *convenience helpers* for views to read engine data (my hand vs. opponents', whose turn, etc.) without reaching deep into `game_state`. Using them is preferred, but there's no hard "views must never touch the implementation" rule.
+
+## The feed (game log)
+
+`Implementation#feed` is an array of `TurnResult`s rendered as chat-like "bubbles":
+
+- **Crazy Eights:** one `TurnResult` → **one** feed bubble.
+- **Go Fish:** one `TurnResult` → **up to three** bubbles (`request_message`, `action_message`, `result_message`), fewer when a player has run out of cards.
+
+## Live updates (Turbo Streams)
+
+Models broadcast Turbo Streams on commit (`broadcast_*_to 'games', user, ...` in `Game` and `Player`; `broadcast_refresh_later_to` for game boards) to update lobby cards and game state in real time. There is no custom Action Cable channel beyond `ApplicationCable::Connection`.
+
+## Lobby visibility & cleanup
+
+The index (`app/views/games/index.html.slim`) splits games into "Your Games" and "All Games", with these visibility rules:
+
+- Only games where `ended_at` **and** `archived_at` are nil appear at all.
+- **A game that is full and does not include the current player does not show up on that player's index page** — you can only see a full game if you're in it. (Non-full games remain visible so others can join.)
+- **`GamesCleanupJob`** (GoodJob) archives games untouched for more than a day: `Game.where(archived_at: nil).where('updated_at <= ?', 1.day.ago).update_all(archived_at: ...)`. This keeps stale in-progress games from cluttering the lobby.
+
+## Adding a new card game (the extension point)
+
+The whole design exists to make this straightforward:
+
+1. Add a `NewGame < Game` STI subclass with `serialize :game_state, coder: NewGame::Implementation`, a `create_and_start_game`, and a `play_turn?`.
+2. Build the engine under `app/models/new_game/` (`Implementation`, `Player`, `TurnResult`, …) with `as_json`/`from_json` on every object.
+3. Add it to `Game#types`, add a presenter, views under `app/views/new_game_games/`, and specs mirroring `spec/models/new_game/`.
+
+Keep every method (and every spec `it` block) to **7 lines or fewer** — see [conventions.md](conventions.md).
