@@ -50,12 +50,20 @@ current_player.playable_cards(discard_pile.top_card).include?(Card.new(rank, sui
 - **Incremental shipping**: not really applicable. Because `playable_cards` unifies hand-possession and discard-legality into one check (and the same check drives both the play and draw guards), there's no natural smaller increment — splitting any of this out would mean writing (and later replacing) a second parallel validation, which is more work, not less.
 
 ## Implementation Plan
-- [ ] Add specs to `spec/models/crazy_eights/implementation_spec.rb` for `#play_turn` covering: card not in hand at all, card in hand but illegal against the discard pile, `8` played when the player holds no `8`, and `8` played when the player does hold one (any suit) — each asserting `nil` is returned and `feed`/`current_player_index`/hand/`discard_pile` are all unchanged
-- [ ] Restructure the existing `#draw_deck_turn` examples under a new "when player has no playable cards" context, adjusting `player1_cards`/discard setup so player1 genuinely has no legal play
-- [ ] Add a new "when player has a playable card" context for `#draw_deck_turn` asserting `nil` is returned and `feed`/`current_player_index`/deck/hand/`discard_pile` are all unchanged
-- [ ] Run all the new/restructured specs, confirm they fail for the expected reason (nothing currently blocks any of these plays/draws)
-- [ ] Add a private `valid_card_play?(rank, suit)` method to `CrazyEights::Implementation` using `current_player.playable_cards(discard_pile.top_card).include?(Card.new(rank, suit))`
-- [ ] Add `return nil unless valid_card_play?(rank, suit)` as the first line of `play_turn`
-- [ ] Replace `draw_deck_turn`'s dead commented-out lines with `return nil if current_player.playable_cards(discard_pile.top_card).any?`
-- [ ] Confirm all new/restructured specs pass and no existing `Implementation`/`Player` specs regress
-- [ ] Run full suite (`bundle exec rspec`) and `bin/rubocop` to confirm no regressions or style violations
+- [x] Add specs to `spec/models/crazy_eights/implementation_spec.rb` for `#play_turn` covering card
+  not in hand at all and card in hand but illegal against the discard pile (the `8`-wildcard cases
+  are covered by `Player#playable_cards`'s existing spec in `player_spec.rb` rather than duplicated
+  here, since `play_turn`'s guard delegates to it directly)
+- [x] Restructure the existing `#draw_deck_turn` examples under a new "when player has no playable
+  cards" context, adjusting `player1_cards`/discard setup so player1 genuinely has no legal play
+- [x] Add a new "when player has a playable card" context for `#draw_deck_turn` asserting `nil` is
+  returned and `feed`/`current_player_index`/deck/hand/`discard_pile` are all unchanged
+- [x] Run all the new/restructured specs, confirm they fail for the expected reason
+- [x] ~~Add a private `valid_card_play?(rank, suit)` method~~ — deviated: inlined the
+  `current_player.playable_cards(discard_pile.top_card).include?(...)` check directly into
+  `play_turn` instead of extracting a predicate; a single call site didn't justify the indirection
+- [x] Add the guard as the first line of `play_turn`
+- [x] Replace `draw_deck_turn`'s dead commented-out lines with
+  `return nil if current_player.playable_cards(discard_pile.top_card).any?`
+- [x] Confirm all new/restructured specs pass and no existing `Implementation`/`Player` specs regress
+- [x] Run full suite and `bin/rubocop` to confirm no regressions or style violations

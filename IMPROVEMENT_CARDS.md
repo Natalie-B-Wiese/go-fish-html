@@ -56,16 +56,20 @@ then implement. Estimate: 2 points, low risk, no dependency on Cards 2 or 3.
 
 ---
 
-## Card 2: Reject Crazy Eights card plays for cards not in the player's hand  🔶 PARTIALLY DONE
+## Card 2: Reject Crazy Eights card plays for cards not in the player's hand  ✅ DONE
 
-> **Status: `play_turn` half implemented** (2026-07-21). `Implementation#play_turn` now guards with
+> **Status: implemented** (2026-07-21), in two passes. `Implementation#play_turn` guards with
 > `return nil unless current_player.playable_cards(discard_pile.top_card).include?(Card.new(rank, suit))`
 > inline (no separate `valid_card_play?` predicate extracted — judged unnecessary for a single call
-> site). `Player#take_card` was left untouched, as planned. Tests added under
-> `spec/models/crazy_eights/implementation_spec.rb`'s `#play_turn` block. **Still open:** the
-> `draw_deck_turn` half of this card's agreed approach (replacing the dead commented-out check with
-> `return nil if current_player.playable_cards(discard_pile.top_card).any?`, plus restructuring the
-> `#draw_deck_turn` specs) has not been done yet.
+> site). `Implementation#draw_deck_turn` guards with
+> `return nil if current_player.playable_cards(discard_pile.top_card).any?`, replacing the dead
+> commented-out check. `Player#take_card` was left untouched, as planned — both guards short-circuit
+> before it's ever called with an invalid play. Tests added/restructured under
+> `spec/models/crazy_eights/implementation_spec.rb`'s `#play_turn` and `#draw_deck_turn` blocks; the
+> `#draw_deck_turn` fixture needed care to avoid a flaky test (a recycled discard card could
+> coincidentally share a suit with the reshuffled top card, intermittently making the hand
+> "playable" mid-test) — fixed by drawing all discard/reshuffle cards from one non-aliased,
+> non-clashing fixture set (`card1`/`card2`/`card3`) with a single `draw_deck_turn` call per example.
 
 **Title**: Validate `CrazyEights::Player#take_card` against the player's actual hand
 
