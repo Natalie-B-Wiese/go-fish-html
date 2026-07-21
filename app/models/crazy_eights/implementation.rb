@@ -43,6 +43,8 @@ module CrazyEights
     end
 
     def play_turn(rank:, suit:)
+      return nil unless current_player.playable_cards(discard_pile.top_card).include?(Card.new(rank, suit))
+
       card_played = play_card(rank, suit)
       turn_result = TurnResult.new(current_user_id: current_user_id, card_played: card_played)
       switch_turn

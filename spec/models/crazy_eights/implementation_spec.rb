@@ -154,39 +154,113 @@ RSpec.describe CrazyEights::Implementation, type: :model do
   describe '#play_turn' do
     let!(:game) { described_class.new([player1, player2], current_player_index: 0) }
     let(:card1) { Card.new('5', 'Spades') }
-    let(:player1_cards) { [card1, Card.new(rank8, 'Diamonds'), Card.new(rank8, 'Hearts')] }
     let(:rank8) { '8' }
     let(:discard_cards) { [Card.new('3', 'Spades'), Card.new('2', 'Diamonds')] }
 
     before do
       game.start!
-      player1.hand.cards = player1_cards.dup
       game.discard_pile.cards = discard_cards
     end
 
-    it 'adds 1 turn result to the feed' do
-      game.draw_deck_turn
-      expect(game.feed.length).to eq 1
+    context 'when the card is in the player hand and playable against the discard pile' do
+      let(:player1_cards) { [card1, Card.new(rank8, 'Diamonds'), Card.new(rank8, 'Hearts')] }
+
+      before do
+        player1.hand.cards = player1_cards.dup
+      end
+
+      it 'adds 1 turn result to the feed' do
+        game.draw_deck_turn
+        expect(game.feed.length).to eq 1
+      end
+
+      it 'removes the card from the player hand and adds it to top of discard pile' do
+        game.play_turn(rank: card1.rank, suit: card1.suit)
+        expect(player1.hand.cards).to_not include card1
+        expect(player1.hand.cards.length).to eq 2
+        expect(game.discard_pile.top_card).to eq card1
+        expect(game.discard_pile.cards).to include discard_cards.first
+      end
+
+      it 'returns the correct turn result' do
+        result = game.play_turn(rank: card1.rank, suit: card1.suit)
+        expect(result.current_user_id).to eq player1.user_id
+        expect(result.card_played).to eq card1
+        expect(result.card_received_deck).to be_nil
+      end
+
+      it 'switches turns' do
+        game.play_turn(rank: card1.rank, suit: card1.suit)
+        expect(game.current_player_index).to eq 1
+      end
     end
 
-    it 'removes the card from the player hand and adds it to top of discard pile' do
-      game.play_turn(rank: card1.rank, suit: card1.suit)
-      expect(player1.hand.cards).to_not include card1
-      expect(player1.hand.cards.length).to eq 2
-      expect(game.discard_pile.top_card).to eq card1
-      expect(game.discard_pile.cards).to include discard_cards.first
+    context 'when the card is not in the player hand at all' do
+      let(:player1_cards) { [card1, Card.new(rank8, 'Diamonds'), Card.new(rank8, 'Hearts')] }
+      let(:missing_card) { Card.new('6', 'Clubs') }
+
+      before do
+        player1.hand.cards = player1_cards.dup
+      end
+
+      it 'does not change the player hand' do
+        game.play_turn(rank: missing_card.rank, suit: missing_card.suit)
+        expect(player1.hand.cards).to eq player1_cards
+      end
+
+      it 'does not change the discard pile' do
+        game.play_turn(rank: missing_card.rank, suit: missing_card.suit)
+        expect(game.discard_pile.cards).to eq discard_cards
+      end
+
+      it 'does not switch turns' do
+        game.play_turn(rank: missing_card.rank, suit: missing_card.suit)
+        expect(game.current_player_index).to eq 0
+      end
+
+      it 'does not add a turn result to the feed' do
+        game.play_turn(rank: missing_card.rank, suit: missing_card.suit)
+        expect(game.feed).to be_empty
+      end
+
+      it 'returns nil' do
+        result = game.play_turn(rank: missing_card.rank, suit: missing_card.suit)
+        expect(result).to be_nil
+      end
     end
 
-    it 'returns the correct turn result' do
-      result = game.play_turn(rank: card1.rank, suit: card1.suit)
-      expect(result.current_user_id).to eq player1.user_id
-      expect(result.card_played).to eq card1
-      expect(result.card_received_deck).to be_nil
-    end
+    context 'when the card is in the player hand but not playable against the discard pile' do
+      let(:unplayable_card) { Card.new('6', 'Clubs') }
+      let(:player1_cards) { [card1, unplayable_card, Card.new(rank8, 'Diamonds')] }
 
-    it 'switches turns' do
-      game.play_turn(rank: card1.rank, suit: card1.suit)
-      expect(game.current_player_index).to eq 1
+      before do
+        player1.hand.cards = player1_cards.dup
+      end
+
+      it 'does not change the player hand' do
+        game.play_turn(rank: unplayable_card.rank, suit: unplayable_card.suit)
+        expect(player1.hand.cards).to eq player1_cards
+      end
+
+      it 'does not change the discard pile' do
+        game.play_turn(rank: unplayable_card.rank, suit: unplayable_card.suit)
+        expect(game.discard_pile.cards).to eq discard_cards
+      end
+
+      it 'does not switch turns' do
+        game.play_turn(rank: unplayable_card.rank, suit: unplayable_card.suit)
+        expect(game.current_player_index).to eq 0
+      end
+
+      it 'does not add a turn result to the feed' do
+        game.play_turn(rank: unplayable_card.rank, suit: unplayable_card.suit)
+        expect(game.feed).to be_empty
+      end
+
+      it 'returns nil' do
+        result = game.play_turn(rank: unplayable_card.rank, suit: unplayable_card.suit)
+        expect(result).to be_nil
+      end
     end
   end
 

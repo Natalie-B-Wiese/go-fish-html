@@ -56,7 +56,16 @@ then implement. Estimate: 2 points, low risk, no dependency on Cards 2 or 3.
 
 ---
 
-## Card 2: Reject Crazy Eights card plays for cards not in the player's hand
+## Card 2: Reject Crazy Eights card plays for cards not in the player's hand  🔶 PARTIALLY DONE
+
+> **Status: `play_turn` half implemented** (2026-07-21). `Implementation#play_turn` now guards with
+> `return nil unless current_player.playable_cards(discard_pile.top_card).include?(Card.new(rank, suit))`
+> inline (no separate `valid_card_play?` predicate extracted — judged unnecessary for a single call
+> site). `Player#take_card` was left untouched, as planned. Tests added under
+> `spec/models/crazy_eights/implementation_spec.rb`'s `#play_turn` block. **Still open:** the
+> `draw_deck_turn` half of this card's agreed approach (replacing the dead commented-out check with
+> `return nil if current_player.playable_cards(discard_pile.top_card).any?`, plus restructuring the
+> `#draw_deck_turn` specs) has not been done yet.
 
 **Title**: Validate `CrazyEights::Player#take_card` against the player's actual hand
 
