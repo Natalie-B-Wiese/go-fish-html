@@ -366,7 +366,9 @@ RSpec.describe 'Games', type: :system do
       let!(:game2) do
         create :completed_game, :with_users_and_winner, name: 'Game no user1', users: [user2, user3], user_won: user3
       end
-      let!(:game3) { create :game, :with_users, name: 'Unfinished Game', users: [user1, user2, user3] }
+      let!(:game3) do
+        create :game, :with_users, name: 'Unfinished Game', player_count: 3, users: [user1, user2, user3]
+      end
       let!(:game4) do
         create :completed_game, :with_users_and_winner, name: 'Game 4', users: [user1, user3], user_won: user3
       end

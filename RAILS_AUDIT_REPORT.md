@@ -316,7 +316,7 @@ Counted under D3.
 
 ### Quick Wins (Immediate Action — see IMPROVEMENT_CARDS.md for the 3 selected for this pass)
 
-1. [ ] Add `game.full?` guard to `GamesController#join` (C1)
+1. [x] Add `game.full?` guard to `GamesController#join` (C1)
 2. [ ] Fix `CrazyEights::Player#take_card` to reject cards not in hand (S1)
 3. [ ] Fix N+1 `User.find` in `TurnResult#current_user_name`/`opponent_user_name` (M2/P1)
 

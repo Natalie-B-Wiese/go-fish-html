@@ -31,8 +31,6 @@ class GamesController < ApplicationController
   def join
     game = Game.find(params[:id])
 
-    # TODO: don't let them join a game that is full
-
     # prevents user from joining a game they are already in
     if Player.create(user: Current.user, game: game)
       redirect_to show_game_path(game)

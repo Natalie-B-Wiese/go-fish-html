@@ -2,14 +2,21 @@ class Player < ApplicationRecord
   # allows dom_id to be used
   include ActionView::RecordIdentifier
 
+  GAME_FULL_MESSAGE = 'This game is already full'.freeze
+
   belongs_to :game
   belongs_to :user
 
   validates :game_id, uniqueness: { scope: :user_id, message: 'You already joined the game' }
+  validate :game_not_full, on: :create
 
   after_create_commit :on_player_joined
 
   private
+
+  def game_not_full
+    errors.add(:base, GAME_FULL_MESSAGE) if game.full?
+  end
 
   def on_player_joined
     move_game_to_my_games(user)

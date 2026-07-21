@@ -49,6 +49,13 @@ deferred, so nothing gets lost. Each item can be picked up as a separate task.
 > shows only its own cards — matched via `File.basename(card.to_image_name, '.*')` against the
 > rendered `src`, since Propshaft fingerprints filenames as `name-hash.ext` and a naive
 > full-filename substring match on `img[src]` breaks).
+>
+> **Update (2026-07-21):** the `:with_users` factory this item relies on (`spec/factories/games.rb`)
+> gained a capacity fix while closing `IMPROVEMENT_CARDS.md` Card 1 — it now sets
+> `game.player_count = evaluator.users.count` during its own player-creation loop, mirroring
+> `:with_users_and_winner`, so bulk-adding users can't trip the new `Player#game_not_full`
+> validation. The game's actual configured `player_count` is unaffected (the override never
+> persists past `game.reload`).
 
 ### What & why
 Lock in the two invariants the live path depends on, so the foundation can be refactored fearlessly:
@@ -179,6 +186,16 @@ Captured so they aren't lost; each is a good standalone future task.
 - **Duplicated `self.load`/`self.dump` coder boilerplate** across `GoFish::Implementation` and
   `CrazyEights::Implementation` — candidate for the same shared-coder-module fix as the AR
   round-trip test item above. See `RAILS_AUDIT_REPORT.md` D2.
+- **`Player#game_not_full` can crash on a blank `player_count`** (`app/models/player.rb`): the
+  validation calls `game.full?` on whatever `game` it's given, including the brand-new, unsaved
+  `Game.new(game_params)` built in `GamesController#create`. If the "Player count" field is
+  submitted blank — nothing stops that; the form has no `required` and `Game` only has a
+  `comparison` validator, not a presence one — `game.player_count` is `nil`, and `0 >= nil` raises
+  `ArgumentError: comparison of Integer with nil failed` instead of failing validation gracefully
+  (confirmed via `bin/rails runner` reproduction). Previously this reached `Game`'s own comparison
+  validator on `@game.save` and produced a normal "can't be blank" error. Likely fix: scope the
+  check to persisted games, e.g. `game.persisted? && game.full?`, since a brand-new game can't be
+  full yet anyway. No test currently covers a blank `player_count` on game creation.
 - **Coverage gaps:** `passwords_controller.rb` (55% line coverage) and `PasswordsMailer` (0%) are
   the lowest-covered files in the app. See `RAILS_AUDIT_REPORT.md` T1/T2.
 

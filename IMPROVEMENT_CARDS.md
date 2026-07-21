@@ -4,7 +4,16 @@ Selected from the `/rails-audit` (see `RAILS_AUDIT_REPORT.md`) and `/improve-cod
 
 ---
 
-## Card 1: Prevent joining a game that's already full
+## Card 1: Prevent joining a game that's already full  ✅ DONE
+
+> **Status: implemented**, with one deliberate deviation from the agreed approach: no controller
+> changes were needed at all — `Player#game_not_full` runs `on: :create` only (so it can't affect
+> `Game#end!`'s `winner` update), and the existing `GamesController#join` generic-failure branch
+> already handles it. The stale `# TODO` comment was removed. Fixing this also surfaced a real bug
+> in the `:with_users` factory trait (`spec/factories/games.rb`) — it never set `player_count` to
+> match its `users` list the way `:with_users_and_winner` does, so one caller in
+> `spec/system/games_spec.rb` was silently over-joining a game past capacity. Fixed at the source
+> by adding the same `game.player_count = evaluator.users.count` line to `:with_users`.
 
 **Title**: Add capacity check to `GamesController#join`
 
