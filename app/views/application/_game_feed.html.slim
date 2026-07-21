@@ -1,0 +1,11 @@
+/ Locals:
+/ turn_form_partial: the name of the partial for the turn form
+
+.game-view__game-feed.panel.panel--padded.panel--primary
+	header.panel__header.op-split
+		h2 Game Feed
+		= render 'turn_badge', classes: ''
+
+	.panel__content.op-stack.flex-grow-1.gap-none
+		= render 'feed_content'
+		= render turn_form_partial

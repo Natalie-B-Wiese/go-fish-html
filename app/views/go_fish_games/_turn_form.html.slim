@@ -1,7 +1,7 @@
-/ Locals to pass:
-/ opponents (an array of User objects)
-/ my_ranks (an array of card ranks Player object)
-/ is_my_turn (a boolean)
+- is_my_turn=@presenter.my_turn?
+- my_ranks=@presenter.my_implementation_player.card_ranks
+- opponents= @presenter.opponent_users
+
 = simple_form_for :turn, url: play_turn_path(@presenter.game), html: { class: "game-actions", data: {controller: 'autorun-turn', action: 'game-timer:timer-over@window->autorun-turn#submit'}} do |f|
 	- unless my_ranks.empty?
 		.game-actions__options

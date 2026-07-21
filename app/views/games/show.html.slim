@@ -1,4 +1,9 @@
 = turbo_stream_from @presenter.game
 
 - @presenter ||= presenter
-= render @presenter.game
+
+/ Note: @presenter.implementation is nil if game is not started yet
+- if @presenter.implementation?
+    = render @presenter.game
+- else 
+    = render 'application/lobby'

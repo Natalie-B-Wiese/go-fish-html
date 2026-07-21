@@ -1,6 +1,5 @@
-/ Locals to pass:
-/ is_my_turn (a boolean)
-/ cards_hash
+- is_my_turn=@presenter.my_turn?
+- cards_hash= @presenter.playable_cards_h
 
 = simple_form_for :turn, url: play_turn_path(@presenter.game), html: { class: "game-actions", data: {controller: 'autorun-turn', action: 'game-timer:timer-over@window->autorun-turn#submit'} } do |f|
 	- unless cards_hash.empty?

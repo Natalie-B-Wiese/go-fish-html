@@ -3,5 +3,7 @@ html
   head = render 'head'
   body
     = render 'offline_banner'
-    main.game-view id=dom_id(@presenter.game)
+
+    / Note: @presenter.implementation is nil if game is not started yet
+    main id=dom_id(@presenter.game) class=(@presenter.implementation? ? 'game-view' : 'game-lobby')
       = yield

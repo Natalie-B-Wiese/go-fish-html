@@ -1,0 +1,13 @@
+div.panel.panel--padded.game-view__game-board
+	= render 'game_header', game_name: @presenter.game.name
+
+	div.panel__content
+		div.flex.flex-no-wrap.justify-center.items-center.gap-xl
+			div
+				h3
+					| Discard: #{@presenter.implementation.discard_pile.card_count}
+				= image_tag "cards/#{@presenter.discard_card.to_image_name}", alt: "#{@presenter.discard_card.to_s}", class: "playing-card playing-card--xl"
+			div
+				h3
+					| Deck: #{@presenter.implementation.deck.card_count}
+				= image_tag "cards/playing-card-back.jpg", alt: "Back of card", class: "playing-card playing-card--xl"
