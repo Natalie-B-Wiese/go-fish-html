@@ -19,6 +19,11 @@ On your turn you either **play a card** or **draw** from the deck.
   - Playing a card advances to the next player. There is no "go again" for playing.
 - **Drawing** (`draw_deck_turn`): if you have no playable card, you take the top card of the deck. Drawing **does not end your turn** — you **keep drawing (and going again) until you draw a card you can play**, then play it. If the deck runs out mid-draw, it is **rebuilt from the discard pile** (all cards except the current top card, shuffled back in) so you can keep drawing.
 
+> **Known gap (as of 2026-07-21):** the "no playable card" check and "card must be in your hand"
+> validation described above are not currently enforced — `Implementation#draw_deck_turn` has the
+> check commented out, and `CrazyEights::Player#take_card` doesn't verify the played card is in
+> hand. See `IMPROVEMENT_CARDS.md` Card 2. Remove this note once fixed.
+
 ## Winning
 
 - The game is over as soon as **any player empties their hand** (`game_over?`); that player is the winner.

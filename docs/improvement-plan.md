@@ -170,6 +170,17 @@ Captured so they aren't lost; each is a good standalone future task.
   (`app/models/game.rb`) and the all-games param union in the controller
   (`app/controllers/games_controller.rb`) are minor extension friction; could be derived from STI
   subclasses later.
+- **Duplicated cross-user broadcast fan-out** (`Game#on_new_game_created`, `Player#on_player_joined`):
+  both loop `User.all.each` and hardcode Turbo Stream partial/target names in AR callbacks. Extract
+  a shared `GameIndexBroadcaster` PORO. See `RAILS_AUDIT_REPORT.md` M1.
+- **Presenter contract gap:** `crazy_eights_games/_game_board` reaches past `CrazyEightsGamePresenter`
+  directly into `implementation.discard_pile`/`deck`; `GoFishGamePresenter` is an empty stub. See
+  `RAILS_AUDIT_REPORT.md` D1.
+- **Duplicated `self.load`/`self.dump` coder boilerplate** across `GoFish::Implementation` and
+  `CrazyEights::Implementation` — candidate for the same shared-coder-module fix as the AR
+  round-trip test item above. See `RAILS_AUDIT_REPORT.md` D2.
+- **Coverage gaps:** `passwords_controller.rb` (55% line coverage) and `PasswordsMailer` (0%) are
+  the lowest-covered files in the app. See `RAILS_AUDIT_REPORT.md` T1/T2.
 
 ---
 
