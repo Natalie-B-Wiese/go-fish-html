@@ -36,6 +36,15 @@ Selected from the `/rails-audit` (see `RAILS_AUDIT_REPORT.md`) and `/improve-cod
   end
   ```
 
+**Agreed approach** (from BRAVE breakdown, 2026-07-21): add `validate :game_not_full` on
+`Player` alongside the existing `game_id` uniqueness validation, rather than branching in the
+controller — this reuses the existing `Player.create` failure path in `GamesController#join`
+(generic flash, no controller changes needed). No custom validation proc; use a named private
+method to match house style. TDD order is outside-in: extend the system spec in
+`spec/system/games_spec.rb` (`'join game flow'` > `'when game is full'` >
+`'when player is not in the game'`), then add a `Player` model spec for `game_not_full` directly,
+then implement. Estimate: 2 points, low risk, no dependency on Cards 2 or 3.
+
 ---
 
 ## Card 2: Reject Crazy Eights card plays for cards not in the player's hand
@@ -63,6 +72,32 @@ Selected from the `/rails-audit` (see `RAILS_AUDIT_REPORT.md`) and `/improve-cod
 - `app/models/crazy_eights/implementation.rb:140-144` (`play_card`, calls `take_card` with no nil check) and `:33-43` (`draw_deck_turn`'s dead commented-out validation, same theme)
 - `app/models/crazy_eights_game.rb:15-24` (`play_turn?`, where a `nil`/false result needs to propagate to stop `GamesController#play` from saving)
 - Reference pattern already correct in `app/models/go_fish/implementation.rb:119-125` (`valid_opponent?`/`valid_request_rank?`) and `app/models/go_fish/player.rb:60-65` (`includes_card_with_rank?`)
+
+**Agreed approach** (from BRAVE breakdown, 2026-07-21): scope expanded beyond hand-possession to also
+enforce discard-pile legality (matching rank/suit, or an `8`), since that was an equally unenforced gap
+and `Player#playable_cards(discard_card)` already encodes both checks in one pass — no separate parallel
+validation needed. Add a private `valid_card_play?(rank, suit)` predicate to `CrazyEights::Implementation`
+using `current_player.playable_cards(discard_pile.top_card).include?(Card.new(rank, suit))`, and guard
+`play_turn` with `return nil unless valid_card_play?(rank, suit)` before any mutation — same shape as
+`GoFish::Implementation#request_opponent_turn`'s guard clause. `Player#take_card` stays untouched (no
+defensive nil-check of its own), mirroring how `GoFish::Player#take_cards_with_rank` trusts its caller's
+guard rather than re-validating. Invalid plays are a silent no-op (return `nil`), consistent with the Go
+Fish behavior — no new flash/error state.
+
+Scope also grew to include `draw_deck_turn`: its dead commented-out code (copied from Go Fish, not the
+correct Crazy Eights rule) gets replaced with `return nil if current_player.playable_cards(discard_pile.top_card).any?`
+— a player can only draw from the deck when they have no legal play, using the same `playable_cards` check.
+This requires restructuring the existing `#draw_deck_turn` specs: `player1`'s fixture hand currently
+includes a playable `8`, so every existing example needs to move under a new "when player has no playable
+cards" context (with the fixture adjusted), plus a new "when player has a playable card" context asserting
+`nil`/no state change.
+
+TDD starts at `spec/models/crazy_eights/implementation_spec.rb` (`#play_turn` and `#draw_deck_turn`), not a
+system spec or `Player` spec — this is an engine-internal guard. Estimate: 2 points (re-checked after the
+`draw_deck_turn` addition — restructuring existing specs was judged small enough to stay in this bucket),
+low-to-moderate risk (reusing `playable_cards` promotes it from a UI helper to a security boundary — worth
+confirming its `8`-wildcard edge case holds up in both call sites), no dependency on Cards 1 or 3. Full
+breakdown: `scratchpad/brave-breakdown-card-2.md`.
 
 ---
 
