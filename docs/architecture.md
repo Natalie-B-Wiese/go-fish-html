@@ -60,6 +60,11 @@ Every value object in the engine (`Player`, `Card`, `CardCollection`, `Deck`, `B
 
 Models broadcast Turbo Streams on commit (`broadcast_*_to 'games', user, ...` in `Game` and `Player`; `broadcast_refresh_later_to` for game boards) to update lobby cards and game state in real time. There is no custom Action Cable channel beyond `ApplicationCable::Connection`.
 
+**`broadcast_refresh_later_to` carries no content** — it only signals connected clients to
+re-fetch the current page, so each browser re-renders `show` against its own `Current.user`.
+This is why the live path can't leak one player's hand to another's screen just by being
+live-updated; `spec/system/live_updates_spec.rb` locks this in.
+
 ## Views & rendering (the board shell)
 
 The game screen is a **4-panel CSS grid**, and its shared skeleton is factored into

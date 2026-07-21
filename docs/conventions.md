@@ -12,6 +12,12 @@ RoleModel house style and project-specific rules that you won't infer from readi
 - **TDD is the expected workflow** — write the failing spec first.
 - Run tests with **`bundle exec rspec`** (the RoleModel training standard), not the parallel runner, unless you have a reason.
 - Model specs mirror `app/models/` (including `go_fish/` and `crazy_eights/` subdirs); system specs live in `spec/system/` and drive a real browser via Capybara + Playwright.
+- **Asserting on card images in system specs**: `img[src]` is fingerprinted by Propshaft
+  (`name-hash.ext`), so a full-filename substring match breaks (`to_image_name` includes the
+  extension). Match on the base name only: `File.basename(card.to_image_name, '.*')`.
+- **GoodJob broadcasts fire fine in `:js` specs as-is** — `broadcast_refresh_later_to` reaches an
+  already-open page via GoodJob's default async execution; no test-env queue-adapter change or
+  `perform_enqueued_jobs` is needed.
 
 ## Ruby style (rubocop-rails-omakase + overrides in `.rubocop.yml`)
 

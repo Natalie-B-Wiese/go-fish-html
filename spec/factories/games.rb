@@ -60,7 +60,19 @@ FactoryBot.define do
       end
     end
 
-    factory :started_game, traits: [:started]
+    # create :started_game, users: [user1, user2], player_count: 2
+    factory :started_game do
+      transient do
+        users { [] }
+      end
+
+      after(:create) do |game, evaluator|
+        evaluator.users.each do |user|
+          create(:player, game: game, user: user)
+        end
+        Game.find(game.id).start!
+      end
+    end
     factory :completed_game, traits: %i[started completed]
 
     # games in different states with players attached:

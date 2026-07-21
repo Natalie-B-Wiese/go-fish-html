@@ -30,7 +30,25 @@ deferred, so nothing gets lost. Each item can be picked up as a separate task.
 
 ---
 
-## Item 1 — Prove the real-time path with tests (tests only; no behavior change)
+## Item 1 — Prove the real-time path with tests (tests only; no behavior change)  ✅ DONE
+
+> **Status: implemented.** The result diverged from the proposal below in two intentional ways,
+> decided during implementation:
+> - **No multi-session harness.** The originally-planned `Capybara.using_session` helper turned out
+>   unnecessary: a single already-signed-in session (opened before the update, asserted against
+>   with no manual `visit`/refresh in between) is enough to prove both invariants — GoodJob's
+>   default async execution actually delivers the `broadcast_refresh_later_to` refresh to the open
+>   page during a `:js` spec, with no test-env queue-adapter change required.
+> - **One game type, not shared examples across games.** `spec/system/live_updates_spec.rb`
+>   exercises the default factory game type (Go Fish) only. The mechanism under test — Turbo
+>   refresh broadcast + presenter scoping by `Current.user` — is shared code, not per-game, so this
+>   is treated as sufficient proof rather than a gap to fill per game.
+>
+> See `spec/system/live_updates_spec.rb` for the final two examples: propagation (an opponent's
+> move produces a feed bubble with no manual refresh) and no-leak (the open session's hand region
+> shows only its own cards — matched via `File.basename(card.to_image_name, '.*')` against the
+> rendered `src`, since Propshaft fingerprints filenames as `name-hash.ext` and a naive
+> full-filename substring match on `img[src]` breaks).
 
 ### What & why
 Lock in the two invariants the live path depends on, so the foundation can be refactored fearlessly:
@@ -157,8 +175,8 @@ Captured so they aren't lost; each is a good standalone future task.
 
 ## Verification
 
-- **Item 1:** `bundle exec rspec spec/system/live_updates_spec.rb` — passes for both game types;
-  confirm it *fails* if you temporarily swap `broadcast_refresh_later_to` for a content broadcast
+- **Item 1:** `bundle exec rspec spec/system/live_updates_spec.rb` — passes; confirm it *fails* if
+  you temporarily swap `broadcast_refresh_later_to` for a content broadcast
   (proves the leak guard bites) and if you stub the refresh to no-op (proves the propagation test
   bites). Then revert.
 - **Item 2:** `bundle exec rspec spec/system/go_fish_games_spec.rb spec/system/crazy_eights_games_spec.rb`
