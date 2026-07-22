@@ -378,4 +378,34 @@ RSpec.describe CrazyEights::Implementation, type: :model do
       end
     end
   end
+
+  describe '#as_json, .from_json, and #==' do
+    let(:game) { described_class.new([player1, player2], current_player_index: 1) }
+
+    before { game.start! }
+
+    it 'round-trips including the discard pile' do
+      restored = described_class.load(described_class.dump(game).as_json)
+      expect(restored).to eq game
+    end
+
+    it 'is equal to a separately restored copy' do
+      json = described_class.dump(game).as_json
+      expect(described_class.load(json)).to eq described_class.load(json)
+    end
+
+    it 'serializes the discard pile' do
+      expect(game.as_json).to have_key(:discard_pile)
+    end
+
+    it 'is not equal when only the discard pile differs' do
+      restored = described_class.load(described_class.dump(game).as_json)
+      restored.discard_pile.cards.pop
+      expect(restored).to_not eq game
+    end
+
+    it 'is not equal to nil' do
+      expect(game).to_not eq(nil)
+    end
+  end
 end

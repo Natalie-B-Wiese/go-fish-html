@@ -17,7 +17,7 @@ The AR layer knows *almost* nothing about game rules. The one intentional except
 
 Under `app/models/go_fish/` and `app/models/crazy_eights/`, each game has:
 
-- **`Implementation`** — the rules engine. Holds `players`, `deck`, `feed`, turn index, and (Crazy Eights) `discard_pile`. Exposes turn methods (`request_opponent_turn`, `draw_deck_turn`, `play_turn`), `game_over?`, `winning_player`, `current_user_id`.
+- **`Implementation`** — the rules engine. `GoFish::Implementation` and `CrazyEights::Implementation` both subclass a shared **`::Implementation`** base (`app/models/implementation.rb`) that owns the common state (`players`, `deck`, `feed`, turn index) and shared behavior (serialization, `==`, `switch_turn`, dealing); subclasses add their own state (Crazy Eights' `discard_pile`) and fill in hooks. Exposes turn methods (`request_opponent_turn`, `draw_deck_turn`, `play_turn`), `game_over?`, `winning_player`, `current_user_id`.
 - **`Player`** (`GoFish::Player` / `CrazyEights::Player`) — an in-game player holding a hand. Linked to the AR `User`/`Player` **only by `user_id`**. There are deliberately two "Player" concepts; don't conflate them.
 - **`TurnResult`** — a record of what happened on one turn; used to render the game feed (see below).
 - Game-specific pieces: `GoFish::Book`, `CrazyEights::DiscardPile`.
@@ -40,6 +40,8 @@ end
 - `Implementation.load(json)` → `Implementation.from_json(json)` (nil-safe)
 
 Every value object in the engine (`Player`, `Card`, `CardCollection`, `Deck`, `Book`, `TurnResult`, `Implementation`) implements a matching `as_json` / `self.from_json` pair.
+
+The shared `::Implementation` base implements the common half: `dump`/`load`, `as_json`, `from_json` (via an overridable `self.json_attributes` hook), and value `==`. A game with extra state *extends* rather than replaces these — Crazy Eights adds `discard_pile` by overriding `as_json` and `json_attributes` with `super.merge(discard_pile: …)` (hashes) and `==` with `super && discard_pile == other.discard_pile` (boolean). The per-game `self.player_class` / `self.turn_result_class` class methods tell the inherited `from_json` which objects to build.
 
 **The rule that bites people: if you add or change a field, update BOTH `as_json` and `from_json`.** A mismatch doesn't raise — the field silently fails to persist or round-trip. (In practice jsonb itself has caused no trouble as long as the two stay in sync.)
 
@@ -110,7 +112,7 @@ The index (`app/views/games/index.html.slim`) splits games into "Your Games" and
 The whole design exists to make this straightforward:
 
 1. Add a `NewGame < Game` STI subclass with `serialize :game_state, coder: NewGame::Implementation`, a `create_and_start_game`, and a `play_turn?`.
-2. Build the engine under `app/models/new_game/` (`Implementation`, `Player`, `TurnResult`, …) with `as_json`/`from_json` on every object.
+2. Build the engine under `app/models/new_game/` (`Implementation`, `Player`, `TurnResult`, …). `NewGame::Implementation` **subclasses `::Implementation`** and implements the hooks it raises `NotImplementedError` for: `self.player_class`, `self.turn_result_class`, `start!`, `game_over?`, `winning_player`, and private `starting_hand_size`. It inherits `from_json`, `as_json`, `==`, `switch_turn`, and dealing — only override `as_json` + `self.json_attributes` + `==` (via `super`) if the game adds state beyond the shared `players`/`deck`/`feed`/`current_player_index`. Every value object still needs its own `as_json`/`from_json`.
    **Validate turn input against actual game state before mutating** — mirror Go Fish's
    `valid_request_rank?`/`includes_card_with_rank?` guards before acting on a turn. Crazy Eights
    shipped without this and allowed playing a card not in the player's hand.
