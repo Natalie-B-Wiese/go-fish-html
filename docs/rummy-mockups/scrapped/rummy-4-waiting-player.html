@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Rummy — Idea 4: Waiting player</title>
+<link rel="stylesheet" href="optics-css/optics+phosphor_icons.css">
+<link rel="stylesheet" href="mockup-extras.css">
+</head>
+<body>
+<div class="mock-flag">IDEA 4 — Not your turn: feed fills the panel, controls disabled, board updates live</div>
+
+<div class="game-view">
+
+  <div class="panel panel--padded game-view__game-board">
+    <header class="panel__header gap-xs">
+      <button class="btn btn--no-border btn--icon btn--small"><i class="ph ph-caret-left icon icon--large"></i></button>
+      <h2>Rummy Round 3</h2>
+    </header>
+
+    <div class="panel__content">
+      <div class="tab-group" style="margin-bottom: var(--op-space-medium);">
+        <a href="#" class="tab">Piles</a>
+        <a href="#" class="tab tab--active">Melds <span class="badge badge--primary">5</span></a>
+      </div>
+
+      <div class="melds-board">
+        <div class="meld meld--run-collapsed">
+          <div class="meld__label"><span>Meld 1 · Run</span><span class="badge">6 cards</span></div>
+          <div class="meld__cards">
+            <img src="cards/4_of_hearts.png" class="playing-card playing-card--sm">
+            <span class="meld__ellipsis">…</span>
+            <img src="cards/9_of_hearts.png" class="playing-card playing-card--sm">
+          </div>
+        </div>
+        <div class="meld">
+          <div class="meld__label"><span>Meld 2 · Set</span><span class="badge">3 cards</span></div>
+          <div class="meld__cards">
+            <img src="cards/king_of_spades.png" class="playing-card playing-card--sm">
+            <img src="cards/king_of_hearts.png" class="playing-card playing-card--sm">
+            <img src="cards/king_of_diamonds.png" class="playing-card playing-card--sm">
+          </div>
+        </div>
+        <div class="meld">
+          <div class="meld__label"><span>Meld 5 · Set <span style="font-weight:normal; opacity:.7;">(just laid)</span></span><span class="badge">3 cards</span></div>
+          <div class="meld__cards">
+            <img src="cards/jack_of_clubs.png" class="playing-card playing-card--sm">
+            <img src="cards/jack_of_diamonds.png" class="playing-card playing-card--sm">
+            <img src="cards/jack_of_spades.png" class="playing-card playing-card--sm">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-view__game-feed panel panel--padded panel--primary">
+    <header class="panel__header op-split">
+      <h2>Game Feed</h2>
+      <div class="badge badge--primary">Peter Parker's Turn</div>
+    </header>
+
+    <div class="panel__content op-stack flex-grow-1 gap-none">
+      <div class="feed-content op-stack gap-xs flex-grow-1">
+        <div class="feed-bubble feed-bubble--action">
+          <div class="feed-bubble__content">Peter Parker drew a card from the deck.</div>
+        </div>
+        <div class="feed-bubble feed-bubble--action">
+          <div class="feed-bubble__content">Peter Parker made a meld: Jacks (Meld 5).</div>
+        </div>
+        <div class="feed-bubble feed-bubble--action">
+          <div class="feed-bubble__content">Peter Parker tried to lay off the 2 of Hearts onto Meld 3.</div>
+        </div>
+        <div class="feed-bubble feed-bubble--response feed-bubble--unsuccess">
+          <i class="ph ph-arrow-bend-down-right icon icon--medium"></i>
+          <div class="feed-bubble__content">Not a valid lay-off for that meld.</div>
+        </div>
+        <div class="game-actions-spacer"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-view__hand panel panel--secondary">
+    <header class="panel__header"><h2>Hand</h2></header>
+    <div class="panel__content disabled-overlay">
+      <div class="cards-stacked flex margin-top-md">
+        <img src="cards/5_of_clubs.png" class="playing-card playing-card--lg">
+        <img src="cards/9_of_spades.png" class="playing-card playing-card--lg">
+        <img src="cards/8_of_diamonds.png" class="playing-card playing-card--lg">
+        <img src="cards/3_of_hearts.png" class="playing-card playing-card--lg">
+        <img src="cards/queen_of_diamonds.png" class="playing-card playing-card--lg">
+      </div>
+    </div>
+  </div>
+
+  <div class="game-view__extra panel panel--secondary">
+    <header class="panel__header"><h2>Players</h2></header>
+    <div class="panel__content players">
+      <div class="players__hand op-stack gap-xs">
+        <details class="accordion" open>
+          <summary>
+            <div class="accordion__marker"><i class="ph ph-caret-right icon icon--small"></i></div>
+            <span class="accordion__header">Peter Parker</span>
+            <div>Cards: <strong>6</strong></div>
+          </summary>
+          <div class="accordion__content">
+            <div class="flex cards-stacked">
+              <img src="cards/playing-card-back.jpg" class="playing-card playing-card--sm">
+              <img src="cards/playing-card-back.jpg" class="playing-card playing-card--sm">
+              <img src="cards/playing-card-back.jpg" class="playing-card playing-card--sm">
+              <img src="cards/playing-card-back.jpg" class="playing-card playing-card--sm">
+              <img src="cards/playing-card-back.jpg" class="playing-card playing-card--sm">
+              <img src="cards/playing-card-back.jpg" class="playing-card playing-card--sm">
+            </div>
+          </div>
+        </details>
+        <details class="accordion">
+          <summary>
+            <div class="accordion__marker"><i class="ph ph-caret-right icon icon--small"></i></div>
+            <span class="accordion__header">Tony Stark</span>
+            <div>Cards: <strong>6</strong></div>
+          </summary>
+        </details>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Rummy — Idea 1: Phase 1 (Draw)</title>
+<link rel="stylesheet" href="optics-css/optics+phosphor_icons.css">
+<link rel="stylesheet" href="mockup-extras.css">
+</head>
+<body>
+<div class="mock-flag">IDEA 1 — Phase 1: Draw choice, tabbed board (Piles tab active)</div>
+
+<div class="game-view">
+
+  <div class="panel panel--padded game-view__game-board">
+    <header class="panel__header gap-xs">
+      <button class="btn btn--no-border btn--icon btn--small"><i class="ph ph-caret-left icon icon--large"></i></button>
+      <h2>Rummy Round 3</h2>
+    </header>
+
+    <div class="panel__content">
+      <div class="tab-group" style="margin-bottom: var(--op-space-medium);">
+        <a href="#" class="tab tab--active">Piles</a>
+        <a href="#" class="tab">Melds <span class="badge">4</span></a>
+      </div>
+
+      <div class="flex flex-no-wrap justify-center items-center gap-xl">
+        <div>
+          <h3>Discard: 1</h3>
+          <img src="cards/8_of_spades.png" alt="8 of Spades" class="playing-card playing-card--xl">
+        </div>
+        <div>
+          <h3>Deck: 73</h3>
+          <img src="cards/playing-card-back.jpg" alt="Back of card" class="playing-card playing-card--xl">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-view__game-feed panel panel--padded panel--primary">
+    <header class="panel__header op-split">
+      <h2>Game Feed</h2>
+      <div class="badge badge--primary">Your Turn</div>
+    </header>
+
+    <div class="panel__content op-stack flex-grow-1 gap-none">
+      <div class="feed-collapsed feed-content op-stack gap-xs">
+        <div class="feed-bubble feed-bubble--action">
+          <div class="feed-bubble__content">Peter Parker drew a card from the deck.</div>
+        </div>
+        <div class="feed-bubble feed-bubble--action">
+          <div class="feed-bubble__content">Peter Parker discarded the 8 of Spades.</div>
+        </div>
+      </div>
+
+      <form class="game-actions">
+        <h4>Phase 1 — Draw</h4>
+        <p class="margin-top-none">You must draw before you can meld, lay off, or discard.</p>
+        <div class="game-actions__options">
+          <button type="submit" class="btn btn--primary">Draw from Deck</button>
+          <button type="submit" class="btn btn--secondary">Take Discard (8♠)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="game-view__hand panel panel--secondary">
+    <header class="panel__header"><h2>Hand</h2></header>
+    <div class="panel__content">
+      <div class="cards-stacked flex margin-top-md">
+        <img src="cards/5_of_clubs.png" class="playing-card playing-card--lg playing-card--hover">
+        <img src="cards/ace_of_hearts.png" class="playing-card playing-card--lg playing-card--hover">
+        <img src="cards/ace_of_clubs.png" class="playing-card playing-card--lg playing-card--hover">
+        <img src="cards/8_of_spades.png" class="playing-card playing-card--lg playing-card--hover">
+        <img src="cards/8_of_diamonds.png" class="playing-card playing-card--lg playing-card--hover">
+        <img src="cards/3_of_hearts.png" class="playing-card playing-card--lg playing-card--hover">
+        <img src="cards/queen_of_diamonds.png" class="playing-card playing-card--lg playing-card--hover">
+      </div>
+      <p class="margin-top-md" style="opacity:.6; font-size: var(--op-font-x-small);">Selection disabled until you've drawn.</p>
+    </div>
+  </div>
+
+  <div class="game-view__extra panel panel--secondary">
+    <header class="panel__header"><h2>Players</h2></header>
+    <div class="panel__content players">
+      <div class="players__hand op-stack gap-xs">
+        <details class="accordion">
+          <summary>
+            <div class="accordion__marker"><i class="ph ph-caret-right icon icon--small"></i></div>
+            <span class="accordion__header">Tony Stark</span>
+            <div>Cards: <strong>7</strong></div>
+          </summary>
+        </details>
+        <details class="accordion">
+          <summary>
+            <div class="accordion__marker"><i class="ph ph-caret-right icon icon--small"></i></div>
+            <span class="accordion__header">Natasha Romanoff</span>
+            <div>Cards: <strong>9</strong></div>
+          </summary>
+        </details>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

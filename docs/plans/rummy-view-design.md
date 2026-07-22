@@ -17,7 +17,7 @@ This document is the agreed **view design only** — the engine (`Implementation
 - **Lay off** — add a hand card onto an existing meld. Repeatable. Can be interleaved with melding in any order.
 - **Discard** — lay exactly one card on the discard pile. Always available (a player who doesn't want to meld at all can just discard immediately). **This ends the turn.** No separate "end turn" button.
 
-These are surfaced as **three distinct forms** co-present in the turn-form region, each its own server round-trip. Every action in both phases is server-judged (see below); the view never re-implements Rummy rules in JavaScript.
+**Make a Meld and Lay Off are merged into a single form** — a "target" dropdown (`New Meld` or an existing meld's stable label) plus hand-card checkboxes plus one submit button. They turned out to be nearly identical controls (both are "pick hand cards, pick a target"), so a separate Lay Off form was redundant. Discard remains its own, separate form. See `docs/rummy-mockups/rummy-final-design.html`. Every action in both phases is server-judged (see below); the view never re-implements Rummy rules in JavaScript.
 
 > Rules detail for the engine phase: confirm whether lay-off is allowed before a player has made their own first meld (standard Rummy requires an initial meld first). The view supports either — it's an engine-side eligibility check, not a form-structure change.
 
@@ -25,15 +25,14 @@ These are surfaced as **three distinct forms** co-present in the turn-form regio
 
 The grid areas are `game-board` / `game-feed` (top row) and `hand` / `extra` (bottom row). New game adds only its region partials in `app/views/rummy_games/` plus a thin entry partial that renders them in order (mirror `app/views/crazy_eights_games/_crazy_eights_game.html.slim`).
 
-- **`game-board` (largest) — the melds table + the piles, as two tabs.**
-  - Tab A: **stock (deck back + count) + discard pile (top card + count)** — mirror `crazy_eights_games/_game_board.html.slim`.
-  - Tab B: **all players' melds**, laid out flat (NOT grouped by owner — ownership is irrelevant since melds have no points). Each meld carries a **stable label** ("Meld 1", "Meld 2", …) so it can be referenced from the lay-off dropdown.
+- **`game-board` (largest) — the melds table + the piles, stacked in one scrollable panel (melds first, piles below).**
+  - **Stock (deck back + count) + discard pile (top card + count)** — mirror `crazy_eights_games/_game_board.html.slim`.
+  - **All players' melds**, laid out flat (NOT grouped by owner — ownership is irrelevant since melds have no points). Each meld carries a **stable label** ("Meld 1", "Meld 2", …) so it can be referenced from the lay-off dropdown.
     - **Runs render collapsed to their endpoints** — e.g. `4♥ … 9♥` with a "6 cards" badge — since a *validated* run is fully determined by its first and last card (no information lost), and the endpoints are exactly where lay-offs attach. This saves space so more melds fit. **Sets** (≤ 4 cards, same rank) render in full. Requires the presenter to expose each meld's **type** (run vs set). Optional nicety: click a collapsed run to expand the full sequence.
-  - **Auto-switch by phase:** Phase 1 → piles tab; Phase 2 → melds tab. Player can freely switch tabs at any time (client-side Stimulus controller).
-  - Implementation note to confirm when rendered: an alternative to tabs is **pinning the two-card pile to a fixed corner** of the melds board (always visible, melds wrap/scroll in the rest). Decide visually.
+  - **Decided against tabs and against pinning the pile to a fixed corner** — both were explored in `docs/rummy-mockups/scrapped/` (`rummy-2-melds-tabs.html`, `rummy-3-tabs-experiment.html`, `rummy-3-pinned-corner.html`). Stacking both sections and letting the panel scroll read more clearly with 5+ melds on the table. See `docs/rummy-mockups/rummy-final-design.html` for the chosen layout.
 
 - **`game-feed` — adaptive: turn form(s) vs feed history.** Injected via `render 'game_feed', turn_form_partial: 'rummy_games/turn_form'` (same seam as the other games). The panel rebalances by whose turn it is, because the feed's importance flips: it's noise to the active player and the whole show to a waiting one.
-  - **On your turn:** the forms fill the panel; the feed collapses to a small scrollable strip (or hides). **Phase 1** shows a single deck/discard choice (dropdown). **Phase 2** shows *three distinct forms* together — Make a Meld, Lay Off, Discard — each posting to `play_turn_path` with an action discriminator (hidden field / distinct param) so the controller+engine knows which was submitted. Used in any order; discard ends the turn.
+  - **On your turn:** the forms fill the panel; the feed collapses to a small scrollable strip (or hides). **Phase 1** shows a single deck/discard choice (dropdown). **Phase 2** shows the merged Meld/Lay-off form together with the Discard form — each posting to `play_turn_path` with an action discriminator (hidden field / distinct param) so the controller+engine knows which was submitted. Used in any order; discard ends the turn.
   - **When waiting:** no forms to show, so the feed fills the panel (keeps the waiting player engaged as melds/actions land live).
   - **Error messaging rides with the forms** — invalid-meld and other rule errors must render next to the Phase-2 forms, not buried in the collapsed feed.
 
@@ -58,13 +57,12 @@ Named here only so the view has something to read — to be designed separately:
 ## Files to create / mirror
 
 - `app/views/rummy_games/_rummy_game.html.slim` — entry partial (renders the 4 regions in order).
-- `app/views/rummy_games/_game_board.html.slim` — tabbed piles + melds.
+- `app/views/rummy_games/_game_board.html.slim` — piles + melds, stacked.
 - `app/views/rummy_games/_turn_form.html.slim` — phase-aware form.
 - `app/views/rummy_games/_extra.html.slim`, `_player_accordion.slim` — mirror Crazy Eights.
 - Hand: extend `app/views/application/_hand.html.slim` (or a Rummy-specific variant) for checkbox selection.
 - `app/presenters/rummy_game_presenter.rb` — view-facing helpers.
-- CSS: extend `app/assets/stylesheets/components/game-view.css` scope for the tab UI + meld layout.
-- A Stimulus controller for tab switching (auto-switch on phase + manual toggle).
+- CSS: extend `app/assets/stylesheets/components/game-view.css` scope for the meld layout.
 
 ## Verification (once built)
 
