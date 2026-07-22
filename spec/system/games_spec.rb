@@ -96,6 +96,30 @@ RSpec.describe 'Games', type: :system do
     end
   end
 
+  context 'creating a Go Fish game' do
+    it 'creates the game and shows it in the lobby' do
+      create_game(name: 'My Go Fish Game', game_type: 'Go Fish')
+
+      expect(page).to have_content 'My Go Fish Game'
+    end
+  end
+
+  context 'creating a Crazy Eights game' do
+    it 'creates the game and shows it in the lobby' do
+      create_game(name: 'My Crazy Eights Game', game_type: 'Crazy Eights')
+
+      expect(page).to have_content 'My Crazy Eights Game'
+    end
+  end
+
+  context 'creating a Rummy game' do
+    it 'creates the game and shows it in the lobby' do
+      create_game(name: 'My Rummy Game', game_type: 'Rummy')
+
+      expect(page).to have_content 'My Rummy Game'
+    end
+  end
+
   context 'join game flow' do
     let(:game1_name) { 'Cool game' }
     let!(:game) { create :game, :with_users, name: game1_name, player_count: 3, users: [user1] }

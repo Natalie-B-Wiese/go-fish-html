@@ -17,6 +17,10 @@ FactoryBot.define do
       type { 'CrazyEightsGame' }
     end
 
+    trait :rummy do
+      type { 'RummyGame' }
+    end
+
     trait :started do
       started_at { Time.zone.now }
     end

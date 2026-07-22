@@ -48,7 +48,7 @@ bin/ci               # runs setup + rubocop + audits together
 
 ## Architecture (big picture)
 
-**Persistence vs. game logic are deliberately separated.** `Game` (STI: `GoFishGame`, `CrazyEightsGame`) is the Active Record model that lives in the lobby and tracks players, turns started/ended, and the winner. The *actual game rules* live in plain Ruby objects under `app/models/go_fish/` and `app/models/crazy_eights/` — each has an `Implementation` (the game engine, subclassing a shared `::Implementation` base in `app/models/implementation.rb`), `Player`, `TurnResult`, and game-specific pieces (`Book`, `DiscardPile`). None of these are Active Record.
+**Persistence vs. game logic are deliberately separated.** `Game` (STI: `GoFishGame`, `CrazyEightsGame`, `RummyGame`) is the Active Record model that lives in the lobby and tracks players, turns started/ended, and the winner. The *actual game rules* live in plain Ruby objects under `app/models/go_fish/` and `app/models/crazy_eights/` — each has an `Implementation` (the game engine, subclassing a shared `::Implementation` base in `app/models/implementation.rb`), `Player`, `TurnResult`, and game-specific pieces (`Book`, `DiscardPile`). None of these are Active Record.
 
 The engine is stored in the `games.game_state` jsonb column and (de)serialized through Rails' `serialize` with a **custom coder**: each `Implementation` implements `self.dump`/`self.load` and every value object implements `as_json`/`self.from_json`. When adding a field to any game object, you must update both `as_json` and `from_json` or it silently won't persist.
 

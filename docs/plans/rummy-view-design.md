@@ -54,15 +54,26 @@ Named here only so the view has something to read — to be designed separately:
 - **Melds collection** with stable per-meld identifiers/labels **and each meld's type (run vs set)** so the view can collapse runs to endpoints, exposed via a `RummyGamePresenter` (subclass `GamePresenter`, like `CrazyEightsGamePresenter`).
 - Presenter helpers analogous to `discard_card` / `playable_cards_h` for: discard top, deck count, meldable/laid-off targets.
 
+## Engine decisions made so far
+
+- **Starting hand size:** 2 players → 10 cards, 3–4 players → 7 cards, 5–6 players → 6 cards
+  (`Rummy::Implementation::SMALL_GAME_CARDS`/`MEDIUM_GAME_CARDS`/`BIG_GAME_CARDS`).
+- **Win condition:** a round ends when a player empties their hand (standard Rummy). **Not yet
+  implemented** — `game_over?`/`winning_player` are temporary stubs (`false`/`nil`, flagged
+  `# TODO` in the code) so the show page doesn't crash once a game starts; real logic lands once
+  melding/laying-off/discarding exist.
+- Still open: whether lay-off is allowed before a player's own first meld (see Turn structure
+  above) — unchanged from before this session.
+
 ## Files to create / mirror
 
-- `app/views/rummy_games/_rummy_game.html.slim` — entry partial (renders the 4 regions in order).
-- `app/views/rummy_games/_game_board.html.slim` — piles + melds, stacked.
-- `app/views/rummy_games/_turn_form.html.slim` — phase-aware form.
-- `app/views/rummy_games/_extra.html.slim`, `_player_accordion.slim` — mirror Crazy Eights.
-- Hand: extend `app/views/application/_hand.html.slim` (or a Rummy-specific variant) for checkbox selection.
-- `app/presenters/rummy_game_presenter.rb` — view-facing helpers.
-- CSS: extend `app/assets/stylesheets/components/game-view.css` scope for the meld layout.
+- ✅ `app/views/rummy_games/_rummy_game.html.slim` — scaffolded; `game_feed` render still commented out pending the turn form.
+- ✅ `app/views/rummy_games/_game_board.html.slim` — placeholder only ("Nothing here yet!"); still needs the real piles + melds layout.
+- ⬜ `app/views/rummy_games/_turn_form.html.slim` — phase-aware form. Not started.
+- ✅ `app/views/rummy_games/_extra.html.slim`, `_player_accordion.slim` — mirror Crazy Eights; working (renders opponent hand counts).
+- ⬜ Hand: extend `app/views/application/_hand.html.slim` (or a Rummy-specific variant) for checkbox selection. Not started — hand currently renders cards read-only.
+- ✅ `app/presenters/rummy_game_presenter.rb` — created as an empty `GamePresenter` subclass (same pattern as Go Fish); no Rummy-specific helpers needed yet since the base presenter already covers dealing/hand display.
+- ⬜ CSS: extend `app/assets/stylesheets/components/game-view.css` scope for the meld layout. Not started.
 
 ## Verification (once built)
 

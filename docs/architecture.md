@@ -6,7 +6,7 @@ This project deliberately splits **persistence** (Active Record) from **game rul
 
 ### 1. Active Record layer (the lobby & persistence)
 
-- **`Game`** — STI base class (`app/models/game.rb`). Concrete types: **`GoFishGame`**, **`CrazyEightsGame`** (the `type` column). Tracks lobby state: `name`, `player_count`, `started_at`, `ended_at`, `archived_at`, `winner`, and the serialized `game_state` (jsonb).
+- **`Game`** — STI base class (`app/models/game.rb`). Concrete types: **`GoFishGame`**, **`CrazyEightsGame`**, **`RummyGame`** (the `type` column). Tracks lobby state: `name`, `player_count`, `started_at`, `ended_at`, `archived_at`, `winner`, and the serialized `game_state` (jsonb).
 - **`Player`** — join model between `User` and `Game`. This is *not* the in-game player; it just records "this user is in this game."
 - **`User`** — `has_secure_password`; `has_many :games, through: :players`.
 - **`Session`** / **`Current`** — hand-rolled cookie auth (see `app/controllers/concerns/authentication.rb`). `Current.user` / `Current.session` carry request-scoped identity.
@@ -116,6 +116,11 @@ The whole design exists to make this straightforward:
    **Validate turn input against actual game state before mutating** — mirror Go Fish's
    `valid_request_rank?`/`includes_card_with_rank?` guards before acting on a turn. Crazy Eights
    shipped without this and allowed playing a card not in the player's hand.
+   **`game_over?`/`winning_player` can't be deferred past `start!`** — `GamesController#show`
+   calls `game.game_over?` unconditionally on every request once `game_state` exists, not only
+   when a turn is played. A real win-condition engine can come later, but these two hooks must
+   return *something* (even a placeholder `false`/`nil`) the moment the game starts, or the show
+   page raises.
 3. Add it to `Game#types`, add a presenter, and specs mirroring `spec/models/new_game/`.
 4. For views, you only need the **region partials** under `app/views/new_game_games/`
    (`_game_board`, `_extra`, `_turn_form`, `_player_accordion`) plus a thin `_new_game_game.html.slim`

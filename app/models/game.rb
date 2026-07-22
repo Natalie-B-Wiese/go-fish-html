@@ -17,7 +17,8 @@ class Game < ApplicationRecord
 
   def types
     { 'Go Fish' => 'GoFishGame',
-      'Crazy Eights' => 'CrazyEightsGame' }
+      'Crazy Eights' => 'CrazyEightsGame',
+      'Rummy' => 'RummyGame' }
   end
 
   def presenter_class
