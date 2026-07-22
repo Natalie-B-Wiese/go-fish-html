@@ -31,10 +31,7 @@ module CrazyEights
     end
 
     def draw_deck_turn
-      # return nil unless current_player.out_of_cards?
-      # To draw from the deck, player must not have any playable cards
-      # Add a safe check here
-      # return nil unless current_player.playable_cards(discard_pile.top_card)
+      return nil if current_player.playable_cards(discard_pile.top_card).any?
 
       turn_result = TurnResult.new(current_user_id: current_user_id)
       draw_from_deck(turn_result)
@@ -43,6 +40,8 @@ module CrazyEights
     end
 
     def play_turn(rank:, suit:)
+      return nil unless current_player.playable_cards(discard_pile.top_card).include?(Card.new(rank, suit))
+
       card_played = play_card(rank, suit)
       turn_result = TurnResult.new(current_user_id: current_user_id, card_played: card_played)
       switch_turn

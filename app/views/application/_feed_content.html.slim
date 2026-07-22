@@ -1,6 +1,7 @@
 - feed= @presenter.implementation.feed
+- user_names_by_id = @presenter.user_names_by_id
 
 .feed-content.op-stack.gap-xs.flex-grow-1
     - feed.each do |turn_action|
-        = render 'feed_bubble', turn_action: turn_action
+        = render 'feed_bubble', turn_action: turn_action, user_names_by_id: user_names_by_id
     .game-actions-spacer

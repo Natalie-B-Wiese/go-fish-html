@@ -53,6 +53,7 @@ FactoryBot.define do
       end
 
       after(:create) do |game, evaluator|
+        game.player_count = evaluator.users.count
         evaluator.users.each do |user|
           create(:player, game: game, user: user)
         end

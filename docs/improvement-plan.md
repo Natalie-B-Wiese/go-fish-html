@@ -49,6 +49,13 @@ deferred, so nothing gets lost. Each item can be picked up as a separate task.
 > shows only its own cards — matched via `File.basename(card.to_image_name, '.*')` against the
 > rendered `src`, since Propshaft fingerprints filenames as `name-hash.ext` and a naive
 > full-filename substring match on `img[src]` breaks).
+>
+> **Update (2026-07-21):** the `:with_users` factory this item relies on (`spec/factories/games.rb`)
+> gained a capacity fix while closing `IMPROVEMENT_CARDS.md` Card 1 — it now sets
+> `game.player_count = evaluator.users.count` during its own player-creation loop, mirroring
+> `:with_users_and_winner`, so bulk-adding users can't trip the new `Player#game_not_full`
+> validation. The game's actual configured `player_count` is unaffected (the override never
+> persists past `game.reload`).
 
 ### What & why
 Lock in the two invariants the live path depends on, so the foundation can be refactored fearlessly:
@@ -170,6 +177,33 @@ Captured so they aren't lost; each is a good standalone future task.
   (`app/models/game.rb`) and the all-games param union in the controller
   (`app/controllers/games_controller.rb`) are minor extension friction; could be derived from STI
   subclasses later.
+- **Duplicated cross-user broadcast fan-out** (`Game#on_new_game_created`, `Player#on_player_joined`):
+  both loop `User.all.each` and hardcode Turbo Stream partial/target names in AR callbacks. Extract
+  a shared `GameIndexBroadcaster` PORO. See `RAILS_AUDIT_REPORT.md` M1.
+- **Presenter contract gap:** `crazy_eights_games/_game_board` reaches past `CrazyEightsGamePresenter`
+  directly into `implementation.discard_pile`/`deck`; `GoFishGamePresenter` is an empty stub. See
+  `RAILS_AUDIT_REPORT.md` D1.
+- **Duplicated `self.load`/`self.dump` coder boilerplate** across `GoFish::Implementation` and
+  `CrazyEights::Implementation` — candidate for the same shared-coder-module fix as the AR
+  round-trip test item above. See `RAILS_AUDIT_REPORT.md` D2.
+- **`Player#game_not_full` can crash on a blank `player_count`** (`app/models/player.rb`): the
+  validation calls `game.full?` on whatever `game` it's given, including the brand-new, unsaved
+  `Game.new(game_params)` built in `GamesController#create`. If the "Player count" field is
+  submitted blank — nothing stops that; the form has no `required` and `Game` only has a
+  `comparison` validator, not a presence one — `game.player_count` is `nil`, and `0 >= nil` raises
+  `ArgumentError: comparison of Integer with nil failed` instead of failing validation gracefully
+  (confirmed via `bin/rails runner` reproduction). Previously this reached `Game`'s own comparison
+  validator on `@game.save` and produced a normal "can't be blank" error. Likely fix: scope the
+  check to persisted games, e.g. `game.persisted? && game.full?`, since a brand-new game can't be
+  full yet anyway. No test currently covers a blank `player_count` on game creation.
+- **Coverage gaps:** `passwords_controller.rb` (55% line coverage) and `PasswordsMailer` (0%) are
+  the lowest-covered files in the app. See `RAILS_AUDIT_REPORT.md` T1/T2.
+- **`Implementation#feed` grows unbounded:** confirmed while fixing the game-feed N+1
+  (`IMPROVEMENT_CARDS.md` Card 3) — nothing trims, paginates, or windows the feed array; it's
+  appended to every turn and persisted whole in the `game_state` jsonb column, and every render
+  re-processes the full history. The N+1 query fix doesn't address this — a long-running game
+  still means an ever-growing jsonb blob and linear per-render work. Candidate fix: cap/paginate
+  the rendered feed (e.g. last N turns) or archive older entries out of the hot jsonb column.
 
 ---
 

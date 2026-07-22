@@ -37,26 +37,26 @@ module CrazyEights
         card_played == other.card_played
     end
 
-    def request_message
+    def request_message(user_names_by_id)
       if card_played
-        "#{current_user_name} #{PLAY_CARD} #{card_played}."
+        "#{current_user_name(user_names_by_id)} #{PLAY_CARD} #{card_played}."
       else
-        "#{current_user_name} #{TAKE_DECK} card from the deck."
+        "#{current_user_name(user_names_by_id)} #{TAKE_DECK} card from the deck."
       end
     end
 
-    def action_message
+    def action_message(_user_names_by_id)
       ''
     end
 
-    def result_message
+    def result_message(_user_names_by_id)
       ''
     end
 
     private
 
-    def current_user_name
-      User.find(current_user_id).name
+    def current_user_name(user_names_by_id)
+      user_names_by_id.fetch(current_user_id)
     end
   end
 end

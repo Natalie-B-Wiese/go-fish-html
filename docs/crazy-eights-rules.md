@@ -17,7 +17,7 @@ On your turn you either **play a card** or **draw** from the deck.
 - **Playing a card** (`play_turn`): the card must match the top of the discard pile by **rank or suit** — unless it's an **8, which is wild** and may be played on anything.
   - An 8 lets you **declare the suit** in play: the engine takes any 8 from your hand and records the suit you chose (`take_card`), so the next player must match that declared suit.
   - Playing a card advances to the next player. There is no "go again" for playing.
-- **Drawing** (`draw_deck_turn`): if you have no playable card, you take the top card of the deck. Drawing **does not end your turn** — you **keep drawing (and going again) until you draw a card you can play**, then play it. If the deck runs out mid-draw, it is **rebuilt from the discard pile** (all cards except the current top card, shuffled back in) so you can keep drawing.
+- **Drawing** (`draw_deck_turn`): if you have no playable card, you take the top card of the deck — attempting to draw while holding a playable card is rejected (returns `nil`, no state change). Drawing **does not end your turn** — you **keep drawing (and going again) until you draw a card you can play**, then play it. If the deck runs out mid-draw, it is **rebuilt from the discard pile** (all cards except the current top card, shuffled back in) so you can keep drawing.
 
 ## Winning
 

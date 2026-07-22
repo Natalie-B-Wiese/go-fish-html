@@ -3,13 +3,14 @@ require 'rails_helper'
 RSpec.describe CrazyEights::TurnResult, type: :model do
   let!(:user) { create(:user1) }
   let(:card) { Card.new('2', 'Diamonds') }
+  let(:user_names_by_id) { { user.id => user.name } }
 
   describe '#request_message' do
     context 'when card_played is not nil' do
       let!(:turn_result) do
         described_class.new(current_user_id: user.id, card_played: card)
       end
-      let(:result) { turn_result.request_message }
+      let(:result) { turn_result.request_message(user_names_by_id) }
 
       it 'returns a played card message' do
         expect(result).to match(/#{CrazyEights::TurnResult::PLAY_CARD}/)
@@ -27,7 +28,7 @@ RSpec.describe CrazyEights::TurnResult, type: :model do
         described_class.new(current_user_id: user.id, card_received_deck: card)
       end
 
-      let(:result) { turn_result.request_message }
+      let(:result) { turn_result.request_message(user_names_by_id) }
 
       it 'return a draw from deck message without saying the card' do
         expect(result).to match(/#{CrazyEights::TurnResult::TAKE_DECK}/)
