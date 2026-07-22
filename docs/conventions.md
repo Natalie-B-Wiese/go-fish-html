@@ -33,7 +33,9 @@ RoleModel house style and project-specific rules that you won't infer from readi
 
 ## Serialization symmetry
 
-Every game-engine object implements `as_json` / `self.from_json`. **If you touch one, touch the other** — a mismatch silently drops state rather than raising. See [architecture.md](architecture.md#serialization-the-jsonb-boundary).
+Every game-engine **value object** (`Card`, `Deck`, `CardCollection`, `Player`, `Book`, `TurnResult`, …) implements a matching `as_json` / `self.from_json` pair. **If you touch one, touch the other** — a mismatch silently drops state rather than raising. See [architecture.md](architecture.md#serialization-the-jsonb-boundary).
+
+**`Implementation` subclasses are the exception — don't override `self.from_json`.** The `::Implementation` base owns `from_json` and rebuilds the game from `self.json_attributes` (a hash of constructor keywords). A game with extra state keeps `as_json` and `self.json_attributes` in sync instead — each *extends* the base with `super.merge(...)` (e.g. Crazy Eights' `discard_pile`), and `==` extends with `super && ...`. Don't reference a per-game constant (e.g. `SMALL_GAME_CARDS`) from a method defined on the base: Ruby resolves constants *lexically*, not by the runtime subclass, so the base won't see the subclass's value — expose per-game values through an overridable method hook instead (see `starting_hand_size`).
 
 ## Generated files — don't hand-edit
 

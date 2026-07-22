@@ -11,20 +11,20 @@ RSpec.describe GoFish::Implementation, type: :model do
   let!(:player3) { GoFish::Player.new(user3.id) }
   let!(:player4) { GoFish::Player.new(user4.id) }
 
-  describe '#deal!' do
+  describe '#start!' do
     context 'with 2 or 3 players' do
       let(:players) { [player1, player2] }
       let(:game) { described_class.new(players) }
 
       it "deals #{GoFish::Implementation::SMALL_GAME_CARDS} cards to each player" do
-        game.deal!
+        game.start!
         expect(player1.cards.length).to eq GoFish::Implementation::SMALL_GAME_CARDS
         expect(player2.cards.length).to eq GoFish::Implementation::SMALL_GAME_CARDS
       end
 
       it 'cards are shuffled' do
         expect(game.deck).to receive(:shuffle)
-        game.deal!
+        game.start!
       end
     end
 
@@ -33,7 +33,7 @@ RSpec.describe GoFish::Implementation, type: :model do
       let(:game) { described_class.new(players) }
 
       before do
-        game.deal!
+        game.start!
       end
 
       it "deals #{GoFish::Implementation::BIG_GAME_CARDS} cards to each player" do
@@ -45,7 +45,7 @@ RSpec.describe GoFish::Implementation, type: :model do
 
       it 'cards are shuffled' do
         expect(game.deck).to receive(:shuffle)
-        game.deal!
+        game.start!
       end
     end
   end
@@ -575,6 +575,32 @@ RSpec.describe GoFish::Implementation, type: :model do
       it 'returns true' do
         expect(game).to be_game_over
       end
+    end
+  end
+
+  describe '#as_json, .from_json, and #==' do
+    let(:game) { described_class.new([player1, player2, player3], current_player_index: 1) }
+
+    before { game.start! }
+
+    it 'round-trips through dump and load' do
+      restored = described_class.load(described_class.dump(game).as_json)
+      expect(restored).to eq game
+    end
+
+    it 'is equal to a separately restored copy' do
+      json = described_class.dump(game).as_json
+      expect(described_class.load(json)).to eq described_class.load(json)
+    end
+
+    it 'is not equal when a field differs' do
+      restored = described_class.load(described_class.dump(game).as_json)
+      restored.switch_turn
+      expect(restored).to_not eq game
+    end
+
+    it 'is not equal to nil' do
+      expect(game).to_not eq(nil)
     end
   end
 
