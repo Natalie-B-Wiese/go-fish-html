@@ -198,6 +198,12 @@ Captured so they aren't lost; each is a good standalone future task.
   full yet anyway. No test currently covers a blank `player_count` on game creation.
 - **Coverage gaps:** `passwords_controller.rb` (55% line coverage) and `PasswordsMailer` (0%) are
   the lowest-covered files in the app. See `RAILS_AUDIT_REPORT.md` T1/T2.
+- **`Implementation#feed` grows unbounded:** confirmed while fixing the game-feed N+1
+  (`IMPROVEMENT_CARDS.md` Card 3) — nothing trims, paginates, or windows the feed array; it's
+  appended to every turn and persisted whole in the `game_state` jsonb column, and every render
+  re-processes the full history. The N+1 query fix doesn't address this — a long-running game
+  still means an ever-growing jsonb blob and linear per-render work. Candidate fix: cap/paginate
+  the rendered feed (e.g. last N turns) or archive older entries out of the hot jsonb column.
 
 ---
 

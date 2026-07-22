@@ -27,33 +27,34 @@ module GoFish
       out_of_cards_and_drew_from_deck? || ((!rank_received.nil? || book_made?) && rank_received == rank_requested)
     end
 
-    def request_message
+    def request_message(user_names_by_id)
       if player_out_of_cards?
-        "#{current_user_name} #{NO_CARDS}. "
+        "#{current_user_name(user_names_by_id)} #{NO_CARDS}. "
       else
-        "#{current_user_name} #{REQUEST} #{rank_requested} from #{opponent_user_name}. "
+        "#{current_user_name(user_names_by_id)} #{REQUEST} #{rank_requested} " \
+          "from #{opponent_user_name(user_names_by_id)}. "
       end
     end
 
-    def action_message
+    def action_message(user_names_by_id)
       return '' if player_out_of_cards?
 
-      if cards_received_opponent.empty?
-        "#{GO_FISH}: #{opponent_user_name} doesn't have any #{rank_requested}s"
-      else
-        card_word = cards_received_opponent.length == 1 ? 'card' : 'cards'
-        "#{opponent_user_name} gave #{cards_received_opponent.length} #{card_word} to #{current_user_name}. "
-      end
+      opponent_name = opponent_user_name(user_names_by_id)
+      return "#{GO_FISH}: #{opponent_name} doesn't have any #{rank_requested}s" if cards_received_opponent.empty?
+
+      card_word = cards_received_opponent.length == 1 ? 'card' : 'cards'
+      current_name = current_user_name(user_names_by_id)
+      "#{opponent_name} gave #{cards_received_opponent.length} #{card_word} to #{current_name}. "
     end
 
-    def result_message
-      result = deck_messages
+    def result_message(user_names_by_id)
+      result = deck_messages(user_names_by_id)
 
       result += "#{EMPTY_DECK}. " if deck_empty? && card_received_deck.nil?
-      result += "#{current_user_name} is #{DISQUALIFIED}. " if player_out_of_cards? && deck_empty?
+      result += "#{current_user_name(user_names_by_id)} is #{DISQUALIFIED}. " if player_out_of_cards? && deck_empty?
 
-      result += "#{current_user_name} #{GO_AGAIN}. " if go_again?
-      result += "#{current_user_name} #{BOOK} #{rank_received}s! " if book_made?
+      result += "#{current_user_name(user_names_by_id)} #{GO_AGAIN}. " if go_again?
+      result += "#{current_user_name(user_names_by_id)} #{BOOK} #{rank_received}s! " if book_made?
 
       result
     end
@@ -109,12 +110,12 @@ module GoFish
 
     private
 
-    def current_user_name
-      User.find(current_user_id).name
+    def current_user_name(user_names_by_id)
+      user_names_by_id.fetch(current_user_id)
     end
 
-    def opponent_user_name
-      User.find(opponent_user_id).name
+    def opponent_user_name(user_names_by_id)
+      user_names_by_id.fetch(opponent_user_id)
     end
 
     def out_of_cards_and_drew_from_deck?
@@ -137,11 +138,11 @@ module GoFish
       cards_received_opponent.empty?
     end
 
-    def deck_messages
+    def deck_messages(user_names_by_id)
       return '' unless card_received_deck
 
       card_str = rank_received == rank_requested ? rank_requested : 'card'
-      "#{current_user_name} #{TAKE_DECK} #{card_str} from the deck. "
+      "#{current_user_name(user_names_by_id)} #{TAKE_DECK} #{card_str} from the deck. "
     end
   end
 end

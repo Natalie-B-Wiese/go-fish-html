@@ -10,6 +10,10 @@ class GamePresenter
     game.users - [my_user]
   end
 
+  def user_names_by_id
+    game.users.to_h { |user| [user.id, user.name] }
+  end
+
   def implementation
     game.game_state
   end

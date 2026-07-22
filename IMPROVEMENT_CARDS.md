@@ -123,7 +123,26 @@ breakdown: `scratchpad/brave-breakdown-card-2.md`.
 
 ---
 
-## Card 3: Fix N+1 query building game-feed turn messages
+## Card 3: Fix N+1 query building game-feed turn messages  ✅ DONE
+
+> **Status: implemented** (2026-07-21). `current_user_name`/`opponent_user_name` on both `TurnResult`
+> classes no longer touch ActiveRecord at all — `request_message`/`action_message`/`result_message` (and
+> GoFish's private `deck_messages`) now take a `user_names_by_id` (`{user_id => name}`) argument, and the
+> private name helpers resolve via `user_names_by_id.fetch(id)` instead of `User.find(id).name`. A settable
+> attribute injected onto `TurnResult` post-construction was considered and rejected in favor of a plain
+> parameter, since `TurnResult` only ever gets a raw `user_id` from the engine (never a loaded `User`) and
+> passing the hash into the message methods keeps it a pure data object with zero AR coupling — a better
+> fit for this codebase's "avoid instance variables in plain Ruby objects" convention than adding mutable
+> state. `GamePresenter#user_names_by_id` builds the hash once from `game.users` (already the seam the
+> card called out); `_feed_content.html.slim`/`_feed_bubble.html.slim` thread it through to each call.
+> `GoFish::TurnResult#action_message` needed a small restructure (early-return guard instead of if/else,
+> plus a couple of local variables) to fit the parameter within both the 7-line method limit and the
+> 120-column line limit once the longer method calls were added. A dedicated query-count regression test
+> was considered and skipped — the model specs already prove the fix by construction, since `TurnResult`
+> now has no `User.find` call anywhere to regress. Both `turn_result_spec.rb` files were updated to pass a
+> plain hash literal instead of relying on real DB-backed `User` records for name resolution, and a new
+> `spec/presenters/game_presenter_spec.rb` (first presenter spec in the codebase) covers
+> `user_names_by_id`.
 
 **Title**: Stop querying `User.find` per turn result in the game feed
 
