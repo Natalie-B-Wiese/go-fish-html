@@ -123,3 +123,8 @@ The whole design exists to make this straightforward:
    `app/views/application/`. See [Views & rendering](#views--rendering-the-board-shell).
 
 Keep every method (and every spec `it` block) to **7 lines or fewer** — see [conventions.md](conventions.md).
+
+> **One assumption to know:** every game here treats a turn as a *single* submission → one
+> `play_turn?` call. A game with a multi-step turn (e.g. draw → meld → discard) breaks that —
+> it needs mid-turn/phase state on the engine and multiple round-trips per turn. See
+> [plans/rummy-view-design.md](plans/rummy-view-design.md).

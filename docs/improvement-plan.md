@@ -164,6 +164,9 @@ small region partials." Fixes to shared layout/markup happen once, for every gam
 
 Captured so they aren't lost; each is a good standalone future task.
 
+- **Rummy (third game) — view design drafted.** The board/turn-form design is captured in
+  `docs/plans/rummy-view-design.md`. Engine (multi-step turn/phase state, meld/run/set rules,
+  serialization) still to be designed.
 - **Concurrency race on `game_state`** (`app/controllers/games_controller.rb#play`, `Game#start!`
   / `#end!`): read-modify-write with no lock. A double-submit or the auto-timer
   (`autorun_turn_controller.js`) firing alongside a manual submit can clobber a turn; `start!`/
