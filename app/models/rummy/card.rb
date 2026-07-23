@@ -1,9 +1,9 @@
 module Rummy
   class Card < ::Card
     def value
-      return 1 if rank == 'A'
+      return 0 if rank == 'A'
 
-      super
+      super + 1
     end
   end
 end

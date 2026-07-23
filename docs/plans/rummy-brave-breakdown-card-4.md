@@ -99,16 +99,27 @@ is the UI card's concern.
 
 ## Implementation Plan
 
-- [ ] Spike: `meld_spec` for valid set + valid `A-2-3` run; implement `Rummy::Meld#valid?` with
+- [x] Spike: `meld_spec` for valid set + valid `A-2-3` run; implement `Rummy::Meld#valid?` with
       Ace-low rank order → green (proves the ordering decision).
-- [ ] Finish `Rummy::Meld` validation: `Q-K-A` invalid, wrong-suit run, size < 3, mixed — and
-      `as_json` / `from_json` round-trip.
+- [x] Finish `Rummy::Meld` validation: `Q-K-A` invalid, wrong-suit run, size < 3, mixed — and
+      `as_json` / `from_json` round-trip. Also added `#==` and sorts cards by value in
+      `initialize` (design change made mid-card; see note below).
 - [ ] `Rummy::Player`: `melds` + `add_meld`; extend `as_json` / `from_json` / `==`.
 - [ ] `Rummy::TurnResult`: add `meld` field; extend `as_json` / `from_json` / `==`.
 - [ ] `Rummy::Implementation#meld_turn`: guard `drawn?` + all-cards-in-hand + `Meld#valid?`;
       move cards hand→melds; build `TurnResult`; push feed; no `switch_turn`; `nil` on invalid.
 - [ ] `Rummy::Implementation#melds`: stable seat-then-lay-down-ordered array across all players.
 - [ ] Full `implementation_spec` coverage for the above; run `bundle exec rspec` + `bin/rubocop`.
+
+> **Note on the Ace-low approach (diverges from the Approach section above):** rather than a
+> rank-order constant living on `Meld` itself, the Ace-low fix lives on a new `Rummy::Card < Card`
+> (overrides `#value`: `A` → `0`, all other ranks → `super + 1`) and `Rummy::CardCollection <
+> CardCollection` (`self.card_class` → `Rummy::Card`), mirroring the existing `Rummy::DiscardPile
+> < Deck` pattern. This was caught before implementation: an earlier version of `#value` returned
+> `1` for Ace without shifting the other ranks, colliding with `'3'`'s value (also `1`) — it
+> happened to still pass the `A-2-3`/`Q-K-A` spike tests by coincidence, but would have silently
+> accepted an invalid run like `A-3-4`. `Meld#initialize` now sorts its cards by `#value` up
+> front, so `run?` no longer needs its own `.sort`.
 
 ---
 
