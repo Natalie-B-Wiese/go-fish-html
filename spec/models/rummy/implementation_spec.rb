@@ -17,6 +17,11 @@ RSpec.describe Rummy::Implementation, type: :model do
         expect(game.deck).to receive(:shuffle)
         game.start!
       end
+
+      it 'deals Rummy::Card instances' do
+        game.start!
+        expect(players.first.cards).to all(be_a(Rummy::Card))
+      end
     end
 
     context 'with 3 or 4 players' do
@@ -41,8 +46,8 @@ RSpec.describe Rummy::Implementation, type: :model do
   describe '#draw_deck_turn' do
     let(:user_ids) { [1, 2] }
     let!(:game) { described_class.new(players, current_player_index: 0) }
-    let(:top_card) { Card.new('5', 'Hearts') }
-    let(:next_card) { Card.new('2', 'Diamonds') }
+    let(:top_card) { Rummy::Card.new('5', 'Hearts') }
+    let(:next_card) { Rummy::Card.new('2', 'Diamonds') }
 
     before do
       game.start!
@@ -93,8 +98,8 @@ RSpec.describe Rummy::Implementation, type: :model do
     context 'seeding the discard pile' do
       let(:user_ids) { [1, 2] }
       let(:cards_dealt_to_players) { user_ids.length * Rummy::Implementation::SMALL_GAME_CARDS }
-      let(:top_of_deck) { Card.new('A', 'Spades') }
-      let(:deck) { Deck.new(Array.new(cards_dealt_to_players, Card.new('2', 'Spades')) + [top_of_deck]) }
+      let(:top_of_deck) { Rummy::Card.new('A', 'Spades') }
+      let(:deck) { Rummy::Deck.new(Array.new(cards_dealt_to_players, Rummy::Card.new('2', 'Spades')) + [top_of_deck]) }
       let(:game) { described_class.new(players, deck: deck) }
 
       before { allow(deck).to receive(:shuffle) }
@@ -114,7 +119,7 @@ RSpec.describe Rummy::Implementation, type: :model do
   describe '#draw_discard_turn' do
     let(:user_ids) { [1, 2] }
     let!(:game) { described_class.new(players, current_player_index: 0) }
-    let(:discard_top) { Card.new('5', 'Hearts') }
+    let(:discard_top) { Rummy::Card.new('5', 'Hearts') }
 
     before do
       game.start!
@@ -168,7 +173,7 @@ RSpec.describe Rummy::Implementation, type: :model do
   describe '#last_drawn_card' do
     let(:user_ids) { [1, 2] }
     let!(:game) { described_class.new(players, current_player_index: 0) }
-    let(:card) { Card.new('5', 'Hearts') }
+    let(:card) { Rummy::Card.new('5', 'Hearts') }
 
     before { game.start! }
 
@@ -213,12 +218,12 @@ RSpec.describe Rummy::Implementation, type: :model do
   end
 
   describe '#discardable_cards' do
-    let(:hand_card) { Card.new('2', 'Clubs') }
-    let(:drawn_card) { Card.new('5', 'Hearts') }
+    let(:hand_card) { Rummy::Card.new('2', 'Clubs') }
+    let(:drawn_card) { Rummy::Card.new('5', 'Hearts') }
     let(:player1) { Rummy::Player.new(1) }
     let(:player2) { Rummy::Player.new(2) }
     let(:players) { [player1, player2] }
-    let(:game) { described_class.new(players, deck: Deck.new([drawn_card]), current_player_index: 0) }
+    let(:game) { described_class.new(players, deck: Rummy::Deck.new([drawn_card]), current_player_index: 0) }
 
     before { game.draw_deck_turn }
 
@@ -248,12 +253,12 @@ RSpec.describe Rummy::Implementation, type: :model do
   end
 
   describe '#discard_turn' do
-    let(:hand_card) { Card.new('2', 'Clubs') }
-    let(:drawn_card) { Card.new('5', 'Hearts') }
-    let(:player1) { Rummy::Player.new(1, hand: CardCollection.new([hand_card])) }
+    let(:hand_card) { Rummy::Card.new('2', 'Clubs') }
+    let(:drawn_card) { Rummy::Card.new('5', 'Hearts') }
+    let(:player1) { Rummy::Player.new(1, hand: Rummy::CardCollection.new([hand_card])) }
     let(:player2) { Rummy::Player.new(2) }
     let(:players) { [player1, player2] }
-    let(:game) { described_class.new(players, deck: Deck.new([drawn_card]), current_player_index: 0) }
+    let(:game) { described_class.new(players, deck: Rummy::Deck.new([drawn_card]), current_player_index: 0) }
 
     context 'when the current player has drawn a card' do
       before { game.draw_deck_turn }
@@ -355,8 +360,8 @@ RSpec.describe Rummy::Implementation, type: :model do
     end
 
     it 'is not equal when only last_drawn_card differs' do
-      deck = Deck.new
-      drawn = described_class.new(players, deck: deck, last_drawn_card: Card.new('5', 'Hearts'))
+      deck = Rummy::Deck.new
+      drawn = described_class.new(players, deck: deck, last_drawn_card: Rummy::Card.new('5', 'Hearts'))
       not_drawn = described_class.new(players, deck: deck, last_drawn_card: nil)
       expect(drawn).to_not eq not_drawn
     end
@@ -366,9 +371,14 @@ RSpec.describe Rummy::Implementation, type: :model do
       expect(restored.discard_pile).to eq game.discard_pile
     end
 
+    it 'restores the deck with Rummy::Card instances' do
+      restored = described_class.load(described_class.dump(game).as_json)
+      expect(restored.deck.cards).to all(be_a(Rummy::Card))
+    end
+
     it 'is not equal when only the discard pile differs' do
-      deck = Deck.new
-      seeded = described_class.new(players, deck: deck, discard_pile: Rummy::DiscardPile.new([Card.new('2', 'Clubs')]))
+      deck = Rummy::Deck.new
+      seeded = described_class.new(players, deck: deck, discard_pile: Rummy::DiscardPile.new([Rummy::Card.new('2', 'Clubs')]))
       empty = described_class.new(players, deck: deck, discard_pile: Rummy::DiscardPile.new)
       expect(seeded).to_not eq empty
     end

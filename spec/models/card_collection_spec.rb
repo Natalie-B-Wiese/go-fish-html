@@ -315,6 +315,19 @@ RSpec.describe CardCollection, type: :model do
 
       expect(converted).to eq original
     end
+
+    it 'builds cards using .card_class' do
+      json = collection_with_2_cards.as_json.transform_keys(&:to_s)
+      converted = CardCollection.from_json(json)
+
+      expect(converted.cards).to all(be_a(CardCollection.card_class))
+    end
+  end
+
+  describe '.card_class' do
+    it 'defaults to Card' do
+      expect(described_class.card_class).to eq Card
+    end
   end
 
   describe '.cards_to_h' do

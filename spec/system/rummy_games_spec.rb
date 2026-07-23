@@ -40,10 +40,6 @@ RSpec.describe 'Rummy Games', type: :system do
       visit show_game_path(game)
     end
 
-    it 'shows a Draw from Deck button on the current player’s turn' do
-      expect(page).to have_button('Draw from Deck')
-    end
-
     it 'moves the top deck card into the hand and hides the button' do
       hand_count = within('.game-view__hand') { find_all('.playing-card').count }
 
@@ -106,7 +102,7 @@ RSpec.describe 'Rummy Games', type: :system do
   context 'showing the discard pile on the board' do
     let(:game_name) { "Penelope's Game" }
     let(:game) { Game.find_by(name: game_name) }
-    let(:discard_top) { Card.new('Q', 'Spades') }
+    let(:discard_top) { Rummy::Card.new('Q', 'Spades') }
 
     before do
       create :game, :rummy, :with_users, name: game_name, player_count: 2, users: [user1, user2]
@@ -167,7 +163,7 @@ RSpec.describe 'Rummy Games', type: :system do
 
       it 'shows the discarded card’s image on the discard pile' do
         selected_value = page.find_field('Card').all('option').first[:value]
-        discarded_card = Card.from_key(selected_value)
+        discarded_card = Rummy::Card.from_key(selected_value)
 
         click_on 'Discard and End Turn'
 

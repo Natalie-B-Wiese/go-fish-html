@@ -75,8 +75,12 @@ class CardCollection
   end
 
   def self.from_json(json)
-    json_cards = json['cards'].map { |card_json| Card.from_json(card_json) }
+    json_cards = json['cards'].map { |card_json| card_class.from_json(card_json) }
     new(json_cards)
+  end
+
+  def self.card_class
+    Card
   end
 
   def cards_to_h

@@ -29,6 +29,10 @@ class Implementation
     raise NotImplementedError, "#{self.class} must implement .turn_result_class"
   end
 
+  def self.deck_class
+    Deck
+  end
+
   def ==(other)
     return false if other.nil?
 
@@ -64,7 +68,7 @@ class Implementation
 
   def self.json_attributes(json)
     {
-      deck: Deck.from_json(json['deck']),
+      deck: deck_class.from_json(json['deck']),
       current_player_index: json['current_player_index'],
       feed: json['feed'].map { |turn_result_json| turn_result_class.from_json(turn_result_json) }
     }

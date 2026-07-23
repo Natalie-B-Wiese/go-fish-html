@@ -5,7 +5,7 @@ RSpec.describe Rummy::Player, type: :model do
 
   describe '#add_card' do
     it 'adds a card to the hand' do
-      card = Card.new('3', 'Diamonds')
+      card = Rummy::Card.new('3', 'Diamonds')
 
       player.add_card(card)
       expect(player.cards).to include(card)
@@ -13,8 +13,8 @@ RSpec.describe Rummy::Player, type: :model do
   end
 
   describe '#take_card' do
-    let(:card) { Card.new('3', 'Diamonds') }
-    let(:other_card) { Card.new('K', 'Hearts') }
+    let(:card) { Rummy::Card.new('3', 'Diamonds') }
+    let(:other_card) { Rummy::Card.new('K', 'Hearts') }
 
     before do
       player.add_card(card)
@@ -33,17 +33,17 @@ RSpec.describe Rummy::Player, type: :model do
   end
 
   describe '#==' do
-    let(:card) { Card.new('3', 'Diamonds') }
+    let(:card) { Rummy::Card.new('3', 'Diamonds') }
 
     before { player.add_card(card) }
 
     it 'is equal when user_id and hand match' do
-      other = described_class.new(1, hand: CardCollection.new([card]))
+      other = described_class.new(1, hand: Rummy::CardCollection.new([card]))
       expect(player).to eq other
     end
 
     it 'is not equal when user_id differs' do
-      other = described_class.new(2, hand: CardCollection.new([card]))
+      other = described_class.new(2, hand: Rummy::CardCollection.new([card]))
       expect(player).to_not eq other
     end
 
@@ -58,11 +58,16 @@ RSpec.describe Rummy::Player, type: :model do
   end
 
   describe '#as_json, .from_json' do
-    before { player.add_card(Card.new('K', 'Hearts')) }
+    before { player.add_card(Rummy::Card.new('K', 'Hearts')) }
 
     it 'round-trips through as_json and from_json' do
       restored = described_class.from_json(player.as_json.as_json)
       expect(restored).to eq player
+    end
+
+    it 'restores cards as Rummy::Card instances' do
+      restored = described_class.from_json(player.as_json.as_json)
+      expect(restored.cards).to all(be_a(Rummy::Card))
     end
   end
 end

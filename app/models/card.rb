@@ -33,7 +33,7 @@ class Card
     rank += key[1] if key.length > 2
 
     suit = SUIT_SYMBOLS[key[-1]]
-    Card.new(rank, suit)
+    new(rank, suit)
   end
 
   def initialize(rank, suit)

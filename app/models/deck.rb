@@ -22,7 +22,7 @@ class Deck < CardCollection
   def sorted_deck
     Card::SUITS.flat_map do |suit|
       Card::RANKS.map do |rank|
-        Card.new(rank, suit)
+        self.class.card_class.new(rank, suit)
       end
     end
   end

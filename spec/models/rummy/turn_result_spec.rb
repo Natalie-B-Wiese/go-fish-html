@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Rummy::TurnResult, type: :model do
   let!(:user) { create(:user1) }
-  let(:card) { Card.new('2', 'Diamonds') }
+  let(:card) { Rummy::Card.new('2', 'Diamonds') }
 
   describe 'serialization round trip' do
     let!(:turn_result) do
@@ -29,7 +29,7 @@ RSpec.describe Rummy::TurnResult, type: :model do
     end
 
     it 'is not equal when the received card differs' do
-      other = described_class.new(current_user_id: user.id, card_received_deck: Card.new('K', 'Spades'))
+      other = described_class.new(current_user_id: user.id, card_received_deck: Rummy::Card.new('K', 'Spades'))
       expect(turn_result).to_not eq other
     end
 
@@ -39,7 +39,7 @@ RSpec.describe Rummy::TurnResult, type: :model do
 
     it 'is not equal when the received discard card differs' do
       turn_result = described_class.new(current_user_id: user.id, card_received_discard: card)
-      other = described_class.new(current_user_id: user.id, card_received_discard: Card.new('K', 'Spades'))
+      other = described_class.new(current_user_id: user.id, card_received_discard: Rummy::Card.new('K', 'Spades'))
       expect(turn_result).to_not eq other
     end
   end
@@ -93,7 +93,7 @@ RSpec.describe Rummy::TurnResult, type: :model do
     let(:turn_result) { described_class.new(current_user_id: user.id, card_discarded: card) }
 
     it 'is not equal when the discarded card differs' do
-      other = described_class.new(current_user_id: user.id, card_discarded: Card.new('K', 'Spades'))
+      other = described_class.new(current_user_id: user.id, card_discarded: Rummy::Card.new('K', 'Spades'))
       expect(turn_result).to_not eq other
     end
   end

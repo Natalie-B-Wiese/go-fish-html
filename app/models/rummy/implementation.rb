@@ -16,6 +16,10 @@ module Rummy
       Rummy::TurnResult
     end
 
+    def self.deck_class
+      Deck
+    end
+
     def initialize(players, deck: Deck.new, discard_pile: DiscardPile.new, current_player_index: 0, feed: [],
                    last_drawn_card: nil)
       super(players, deck: deck, current_player_index: current_player_index, feed: feed)

@@ -22,7 +22,7 @@ Under `app/models/go_fish/`, `app/models/crazy_eights/`, and `app/models/rummy/`
 - **`TurnResult`** — a record of what happened on one turn; used to render the game feed (see below).
 - Game-specific pieces: `GoFish::Book`, `CrazyEights::DiscardPile`, `Rummy::DiscardPile`.
 
-Shared primitives used by all three engines: **`Card`**, **`CardCollection`**, **`Deck`** (all plain Ruby).
+Shared primitives used by all three engines: **`Card`**, **`CardCollection`**, **`Deck`** (all plain Ruby). A game can subclass any of these for its own card behavior — e.g. `Rummy::Card` overrides `#value` so an Ace counts as `1`. `CardCollection.card_class` (used by `.from_json`) and `Deck#sorted_deck` (used to build a fresh deck) both build via `self.class.card_class`, so a game only needs to override that one class method (see `Rummy::Deck`, `Rummy::CardCollection`).
 
 The engine knows nothing about the database.
 
@@ -41,7 +41,7 @@ end
 
 Every value object in the engine (`Player`, `Card`, `CardCollection`, `Deck`, `Book`, `TurnResult`, `Implementation`) implements a matching `as_json` / `self.from_json` pair.
 
-The shared `::Implementation` base implements the common half: `dump`/`load`, `as_json`, `from_json` (via an overridable `self.json_attributes` hook), and value `==`. A game with extra state *extends* rather than replaces these — Crazy Eights adds `discard_pile` by overriding `as_json` and `json_attributes` with `super.merge(discard_pile: …)` (hashes) and `==` with `super && discard_pile == other.discard_pile` (boolean). The per-game `self.player_class` / `self.turn_result_class` class methods tell the inherited `from_json` which objects to build.
+The shared `::Implementation` base implements the common half: `dump`/`load`, `as_json`, `from_json` (via an overridable `self.json_attributes` hook), and value `==`. A game with extra state *extends* rather than replaces these — Crazy Eights adds `discard_pile` by overriding `as_json` and `json_attributes` with `super.merge(discard_pile: …)` (hashes) and `==` with `super && discard_pile == other.discard_pile` (boolean). The per-game `self.player_class` / `self.turn_result_class` / `self.deck_class` class methods tell the inherited `from_json` which objects to build (`deck_class` defaults to `Deck` and only needs overriding if the game supplies its own `Deck` subclass, e.g. `Rummy::Implementation.deck_class` → `Rummy::Deck`).
 
 **The rule that bites people: if you add or change a field, update BOTH `as_json` and `from_json`.** A mismatch doesn't raise — the field silently fails to persist or round-trip. (In practice jsonb itself has caused no trouble as long as the two stay in sync.)
 
@@ -112,7 +112,7 @@ The index (`app/views/games/index.html.slim`) splits games into "Your Games" and
 The whole design exists to make this straightforward:
 
 1. Add a `NewGame < Game` STI subclass with `serialize :game_state, coder: NewGame::Implementation`, a `create_and_start_game`, and a `play_turn?`.
-2. Build the engine under `app/models/new_game/` (`Implementation`, `Player`, `TurnResult`, …). `NewGame::Implementation` **subclasses `::Implementation`** and implements the hooks it raises `NotImplementedError` for: `self.player_class`, `self.turn_result_class`, `start!`, `game_over?`, `winning_player`, and private `starting_hand_size`. It inherits `from_json`, `as_json`, `==`, `switch_turn`, and dealing — only override `as_json` + `self.json_attributes` + `==` (via `super`) if the game adds state beyond the shared `players`/`deck`/`feed`/`current_player_index`. Every value object still needs its own `as_json`/`from_json`.
+2. Build the engine under `app/models/new_game/` (`Implementation`, `Player`, `TurnResult`, …). `NewGame::Implementation` **subclasses `::Implementation`** and implements the hooks it raises `NotImplementedError` for: `self.player_class`, `self.turn_result_class`, `start!`, `game_over?`, `winning_player`, and private `starting_hand_size`. Optionally override `self.deck_class` (and give a `Card`/`CardCollection` subclass a `self.card_class` override) if the game needs its own card value logic. It inherits `from_json`, `as_json`, `==`, `switch_turn`, and dealing — only override `as_json` + `self.json_attributes` + `==` (via `super`) if the game adds state beyond the shared `players`/`deck`/`feed`/`current_player_index`. Every value object still needs its own `as_json`/`from_json`.
    **Validate turn input against actual game state before mutating** — mirror Go Fish's
    `valid_request_rank?`/`includes_card_with_rank?` guards before acting on a turn. Crazy Eights
    shipped without this and allowed playing a card not in the player's hand.
