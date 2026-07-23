@@ -168,8 +168,9 @@ Captured so they aren't lost; each is a good standalone future task.
   `docs/plans/rummy-view-design.md`. Built outside-in on branch `phase3-rummy`, one thin
   BRAVE-sized card at a time: draw-from-deck (`docs/plans/rummy-brave-breakdown-card-1.md`) and
   discard-pile + draw-from-discard (`docs/plans/rummy-brave-breakdown-card-2.md`), and
-  discard-&-end-turn (`docs/plans/rummy-brave-breakdown-card-3.md`) are done. Next: melds/lay-off,
-  then the win condition.
+  discard-&-end-turn (`docs/plans/rummy-brave-breakdown-card-3.md`) are done. Next: lay down melds
+  — engine only, lay-off deferred (`docs/plans/rummy-brave-breakdown-card-4.md`, planned). Then the
+  win condition, then the melds UI.
 - **Concurrency race on `game_state`** (`app/controllers/games_controller.rb#play`, `Game#start!`
   / `#end!`): read-modify-write with no lock. A double-submit or the auto-timer
   (`autorun_turn_controller.js`) firing alongside a manual submit can clobber a turn; `start!`/
