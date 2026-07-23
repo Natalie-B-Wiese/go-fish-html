@@ -134,22 +134,24 @@ request just re-renders — no crash, no state change. Same safety net as Card 1
 
 ## Implementation Plan
 
-- [ ] Spec-first: `spec/models/rummy/implementation_spec.rb` — `draw_discard_turn` (draws top
+- [x] Spec-first: `spec/models/rummy/implementation_spec.rb` — `draw_discard_turn` (draws top
       discard into hand, sets `has_drawn`, no `switch_turn`; `nil` when already drawn; `nil`
       when pile empty) + `start!` seeds one discard card + serialization round-trip preserves
       `discard_pile`.
-- [ ] Add `app/models/rummy/discard_pile.rb` (mirror `CrazyEights::DiscardPile`).
-- [ ] Add `discard_pile` to `Rummy::Implementation` (ctor / `as_json` / `json_attributes` /
+- [x] Add `app/models/rummy/discard_pile.rb` (mirror `CrazyEights::DiscardPile`).
+- [x] Add `discard_pile` to `Rummy::Implementation` (ctor / `as_json` / `json_attributes` /
       `==`), seed in `start!`, add `draw_discard_turn`.
-- [ ] Spec-first + add `card_received_discard` to `Rummy::TurnResult` (as_json/from_json/==).
-- [ ] Fork `RummyGame#play_turn?` on the `source` param.
-- [ ] Permit `:source` in `GamesController#turn_params_hash`.
-- [ ] Spec-first + add `RummyGamePresenter#discard_card` and `#can_take_discard?`.
-- [ ] Add the "Take Discard" button to `_phase1.html.slim` (hidden `source` field; both draw
-      buttons gated).
-- [ ] System spec `spec/system/rummy_games_spec.rb`: take discard → card in hand + top-of-pile
+- [x] Spec-first + add `card_received_discard` to `Rummy::TurnResult` (as_json/from_json/==).
+- [x] Fork `RummyGame#play_turn?` on the `source` param.
+- [x] Permit `:source` in `GamesController#turn_params_hash`.
+- [x] Spec-first + add `RummyGamePresenter#discard_card` and `#can_take_discard?`.
+- [x] Add the "Take Discard" button to `_phase1.html.slim` (shares a `turn[source]` name/value
+      pair with "Draw from Deck" so the clicked button determines source; both live under the
+      existing `can_draw?` gate — no separate `can_take_discard?` gating needed since an empty-pile
+      or already-drawn click is already a safe no-op in the engine).
+- [x] System spec `spec/system/rummy_games_spec.rb`: take discard → card in hand + top-of-pile
       moved → both draw buttons gone → **reload** → still gone.
-- [ ] `bin/rubocop` (7-line method / `it` limits) + full `bundle exec rspec`.
+- [x] `bin/rubocop` (7-line method / `it` limits) + full `bundle exec rspec`.
 
 ---
 

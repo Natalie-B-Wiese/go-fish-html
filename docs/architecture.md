@@ -15,14 +15,14 @@ The AR layer knows *almost* nothing about game rules. The one intentional except
 
 ### 2. Game engine layer (plain Ruby, no DB)
 
-Under `app/models/go_fish/` and `app/models/crazy_eights/`, each game has:
+Under `app/models/go_fish/`, `app/models/crazy_eights/`, and `app/models/rummy/`, each game has:
 
-- **`Implementation`** — the rules engine. `GoFish::Implementation` and `CrazyEights::Implementation` both subclass a shared **`::Implementation`** base (`app/models/implementation.rb`) that owns the common state (`players`, `deck`, `feed`, turn index) and shared behavior (serialization, `==`, `switch_turn`, dealing); subclasses add their own state (Crazy Eights' `discard_pile`) and fill in hooks. Exposes turn methods (`request_opponent_turn`, `draw_deck_turn`, `play_turn`), `game_over?`, `winning_player`, `current_user_id`.
-- **`Player`** (`GoFish::Player` / `CrazyEights::Player`) — an in-game player holding a hand. Linked to the AR `User`/`Player` **only by `user_id`**. There are deliberately two "Player" concepts; don't conflate them.
+- **`Implementation`** — the rules engine. `GoFish::Implementation`, `CrazyEights::Implementation`, and `Rummy::Implementation` all subclass a shared **`::Implementation`** base (`app/models/implementation.rb`) that owns the common state (`players`, `deck`, `feed`, turn index) and shared behavior (serialization, `==`, `switch_turn`, dealing); subclasses add their own state (Crazy Eights' `discard_pile`; Rummy's `discard_pile` plus a `has_drawn` intra-turn phase flag, since a Rummy turn spans multiple submissions instead of one) and fill in hooks. Exposes turn methods (`request_opponent_turn`, `draw_deck_turn`, `play_turn`), `game_over?`, `winning_player`, `current_user_id`.
+- **`Player`** (`GoFish::Player` / `CrazyEights::Player` / `Rummy::Player`) — an in-game player holding a hand. Linked to the AR `User`/`Player` **only by `user_id`**. There are deliberately two "Player" concepts; don't conflate them.
 - **`TurnResult`** — a record of what happened on one turn; used to render the game feed (see below).
-- Game-specific pieces: `GoFish::Book`, `CrazyEights::DiscardPile`.
+- Game-specific pieces: `GoFish::Book`, `CrazyEights::DiscardPile`, `Rummy::DiscardPile`.
 
-Shared primitives used by both engines: **`Card`**, **`CardCollection`**, **`Deck`** (all plain Ruby).
+Shared primitives used by all three engines: **`Card`**, **`CardCollection`**, **`Deck`** (all plain Ruby).
 
 The engine knows nothing about the database.
 

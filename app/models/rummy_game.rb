@@ -11,7 +11,7 @@ class RummyGame < Game
     new_game
   end
 
-  def play_turn?(**)
-    !!game_state.draw_deck_turn
+  def play_turn?(source: 'deck', **)
+    source == 'discard' ? !!game_state.draw_discard_turn : !!game_state.draw_deck_turn
   end
 end

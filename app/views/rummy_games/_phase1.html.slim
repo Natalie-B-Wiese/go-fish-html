@@ -2,18 +2,6 @@
 
 - if @presenter.can_draw?
 	= simple_form_for :turn, url: play_turn_path(@presenter.game), html: { class: "game-actions"} do |f|
-		= f.button :button do
-			| Draw from Deck
-	/ - unless my_ranks.empty?
-	/ 	.game-actions__options
-	/ 		= f.input :player,
-	/ 		as: :select, 
-	/ 		collection: opponents,
-	/ 		selected: opponents.first
-
-	/ 		= f.input :rank,
-	/ 		as: :select, 
-	/ 		collection: my_ranks,
-	/ 		selected: my_ranks.first
-
-	/ = render 'play_turn_button', f: f, is_my_turn: is_my_turn
+		div.flex.gap-sm.align-items-stretch
+			= f.button :button, "Draw from Deck", name: "turn[source]", value: "deck"
+			= f.button :button, "Take from Discard", name: "turn[source]", value: "discard"

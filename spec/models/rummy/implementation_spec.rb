@@ -89,6 +89,82 @@ RSpec.describe Rummy::Implementation, type: :model do
     end
   end
 
+  describe '#start!' do
+    context 'seeding the discard pile' do
+      let(:user_ids) { [1, 2] }
+      let(:cards_dealt_to_players) { user_ids.length * Rummy::Implementation::SMALL_GAME_CARDS }
+      let(:top_of_deck) { Card.new('A', 'Spades') }
+      let(:deck) { Deck.new(Array.new(cards_dealt_to_players, Card.new('2', 'Spades')) + [top_of_deck]) }
+      let(:game) { described_class.new(players, deck: deck) }
+
+      before { allow(deck).to receive(:shuffle) }
+
+      it 'moves the top remaining deck card face-up onto the discard pile' do
+        game.start!
+        expect(game.discard_pile.cards).to eq [top_of_deck]
+      end
+
+      it 'removes that card from the deck' do
+        expect { game.start! }.to change { deck.cards.length }.by(-(cards_dealt_to_players + 1))
+        expect(deck.cards).to_not include top_of_deck
+      end
+    end
+  end
+
+  describe '#draw_discard_turn' do
+    let(:user_ids) { [1, 2] }
+    let!(:game) { described_class.new(players, current_player_index: 0) }
+    let(:discard_top) { Card.new('5', 'Hearts') }
+
+    before do
+      game.start!
+      game.discard_pile.cards = [discard_top]
+    end
+
+    it 'moves the top discard card into the current player’s hand' do
+      game.draw_discard_turn
+      expect(players.first.cards).to include discard_top
+      expect(game.discard_pile.cards).to_not include discard_top
+    end
+
+    it 'sets has_drawn' do
+      game.draw_discard_turn
+      expect(game.has_drawn).to be true
+    end
+
+    it 'does not switch turns' do
+      game.draw_discard_turn
+      expect(game.current_player_index).to eq 0
+    end
+
+    it 'pushes one turn result to the feed' do
+      game.draw_discard_turn
+      expect(game.feed.length).to eq 1
+    end
+
+    it 'returns a turn result carrying the drawn card' do
+      result = game.draw_discard_turn
+      expect(result.current_user_id).to eq players.first.user_id
+      expect(result.card_received_discard).to eq discard_top
+    end
+
+    context 'when the player has already drawn this turn' do
+      before { game.draw_discard_turn }
+
+      it 'returns nil' do
+        expect(game.draw_discard_turn).to be_nil
+      end
+    end
+
+    context 'when the discard pile is empty' do
+      before { game.discard_pile.cards = [] }
+
+      it 'returns nil' do
+        expect(game.draw_discard_turn).to be_nil
+      end
+    end
+  end
+
   describe '#game_over?' do
     # TODO: implement a real test once the win condition (a player emptying their hand) is implemented
   end
@@ -128,6 +204,18 @@ RSpec.describe Rummy::Implementation, type: :model do
       drawn = described_class.new(players, deck: deck, has_drawn: true)
       not_drawn = described_class.new(players, deck: deck, has_drawn: false)
       expect(drawn).to_not eq not_drawn
+    end
+
+    it 'round-trips the discard pile' do
+      restored = described_class.load(described_class.dump(game).as_json)
+      expect(restored.discard_pile).to eq game.discard_pile
+    end
+
+    it 'is not equal when only the discard pile differs' do
+      deck = Deck.new
+      seeded = described_class.new(players, deck: deck, discard_pile: Rummy::DiscardPile.new([Card.new('2', 'Clubs')]))
+      empty = described_class.new(players, deck: deck, discard_pile: Rummy::DiscardPile.new)
+      expect(seeded).to_not eq empty
     end
   end
 end

@@ -1,4 +1,22 @@
 div.panel.panel--padded.game-view__game-board
 	= render 'game_header', game_name: @presenter.game.name
-	p 
-		| Nothing here yet!
+	div.flex.flex-no-wrap.justify-center.items-center.gap-xl
+          
+		div.meld
+			div.meld__label
+				span
+					| Deck
+				span.badge
+					| #{@presenter.implementation.deck.card_count} cards
+			div.meld__content
+				= image_tag "cards/playing-card-back.jpg", alt: "Back of card", class: "playing-card playing-card--lg"
+
+		div.meld
+			div.meld__label
+				span
+					| Discard
+				span.badge
+					| #{@presenter.implementation.discard_pile.card_count} cards
+			div.meld__content
+				- if @presenter.discard_card
+					= image_tag "cards/#{@presenter.discard_card.to_image_name}", alt: @presenter.discard_card.to_s, class: "playing-card playing-card--lg"

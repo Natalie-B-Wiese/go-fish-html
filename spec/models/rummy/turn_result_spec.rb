@@ -36,5 +36,22 @@ RSpec.describe Rummy::TurnResult, type: :model do
     it 'is not equal to nil' do
       expect(turn_result).to_not eq(nil)
     end
+
+    it 'is not equal when the received discard card differs' do
+      turn_result = described_class.new(current_user_id: user.id, card_received_discard: card)
+      other = described_class.new(current_user_id: user.id, card_received_discard: Card.new('K', 'Spades'))
+      expect(turn_result).to_not eq other
+    end
+  end
+
+  describe 'serialization round trip for a discard draw' do
+    let!(:turn_result) do
+      described_class.new(current_user_id: user.id, card_received_discard: card)
+    end
+
+    it 'can dump and restore data' do
+      restored = described_class.from_json(turn_result.as_json)
+      expect(restored).to eq turn_result
+    end
   end
 end

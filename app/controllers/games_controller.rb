@@ -52,7 +52,7 @@ class GamesController < ApplicationController
 
   # returns nil if user is user cannot play a card even though it's their turn
   def turn_params_hash
-    params.require(:turn).permit(:player, :rank, :card).to_h.symbolize_keys
+    params.require(:turn).permit(:player, :rank, :card, :source).to_h.symbolize_keys
   rescue ActionController::ParameterMissing
     {}
   end

@@ -48,11 +48,11 @@ bin/ci               # runs setup + rubocop + audits together
 
 ## Architecture (big picture)
 
-**Persistence vs. game logic are deliberately separated.** `Game` (STI: `GoFishGame`, `CrazyEightsGame`, `RummyGame`) is the Active Record model that lives in the lobby and tracks players, turns started/ended, and the winner. The *actual game rules* live in plain Ruby objects under `app/models/go_fish/` and `app/models/crazy_eights/` — each has an `Implementation` (the game engine, subclassing a shared `::Implementation` base in `app/models/implementation.rb`), `Player`, `TurnResult`, and game-specific pieces (`Book`, `DiscardPile`). None of these are Active Record.
+**Persistence vs. game logic are deliberately separated.** `Game` (STI: `GoFishGame`, `CrazyEightsGame`, `RummyGame`) is the Active Record model that lives in the lobby and tracks players, turns started/ended, and the winner. The *actual game rules* live in plain Ruby objects under `app/models/go_fish/`, `app/models/crazy_eights/`, and `app/models/rummy/` — each has an `Implementation` (the game engine, subclassing a shared `::Implementation` base in `app/models/implementation.rb`), `Player`, `TurnResult`, and game-specific pieces (`Book`, `DiscardPile`). None of these are Active Record.
 
 The engine is stored in the `games.game_state` jsonb column and (de)serialized through Rails' `serialize` with a **custom coder**: each `Implementation` implements `self.dump`/`self.load` and every value object implements `as_json`/`self.from_json`. When adding a field to any game object, you must update both `as_json` and `from_json` or it silently won't persist.
 
-`Card`, `CardCollection`, and `Deck` are shared plain-Ruby primitives used by both games.
+`Card`, `CardCollection`, and `Deck` are shared plain-Ruby primitives used by all three games.
 
 **Request flow:** `GamesController#show` lazily starts a game once it's full (`game.start!`) and ends it when over. `#play` validates it's the caller's turn (`game.valid_turn?`) then delegates to the STI subclass's `play_turn?`, which calls into the `Implementation`. **Presenters** (`app/presenters/`) wrap a game + the current user for view rendering (whose turn, my hand vs. opponents).
 
