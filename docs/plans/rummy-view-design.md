@@ -64,6 +64,13 @@ Named here only so the view has something to read — to be designed separately:
   melding/laying-off/discarding exist.
 - Still open: whether lay-off is allowed before a player's own first meld (see Turn structure
   above) — unchanged from before this session.
+- **Turn engine is being built as a card sequence, thinnest slice first:** (1) draw-from-deck
+  + `has_drawn` phase state (proving the flag persists through jsonb round-trip + drives the
+  Draw button), then (2) End Turn (`switch_turn` + reset `has_drawn` + draw-before-end
+  enforcement), then (3) discard pile, (4) melds/lay-off, (5) win condition. Discard-top draw
+  is deferred out of card 1 (needs the discard pile). Card 1 also adds the missing
+  `Rummy::TurnResult` + `self.turn_result_class` (absent today → `NotImplementedError` on
+  `feed` deserialization).
 
 ## Files to create / mirror
 
