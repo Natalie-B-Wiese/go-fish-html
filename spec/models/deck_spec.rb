@@ -26,5 +26,19 @@ RSpec.describe Deck, type: :model do
 
       expect(non_shuffled.cards).not_to eq shuffled.cards
     end
+
+    context 'with a single card' do
+      it 'does not hang' do
+        deck = Deck.new([Card.new('5', 'Hearts')])
+        expect { deck.shuffle }.to_not raise_error
+      end
+    end
+
+    context 'with no cards' do
+      it 'does not hang' do
+        deck = Deck.new([])
+        expect { deck.shuffle }.to_not raise_error
+      end
+    end
   end
 end

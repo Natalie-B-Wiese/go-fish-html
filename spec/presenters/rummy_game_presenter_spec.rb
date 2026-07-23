@@ -36,6 +36,19 @@ RSpec.describe RummyGamePresenter, type: :model do
     end
   end
 
+  describe '#discardable_cards_h' do
+    let(:presenter) { described_class.new(game, user1) }
+
+    before do
+      game.game_state.draw_deck_turn
+      game.save!
+    end
+
+    it 'returns the discardable cards as a hash for the select input' do
+      expect(presenter.discardable_cards_h).to eq CardCollection.cards_to_h(game.game_state.discardable_cards)
+    end
+  end
+
   describe '#discard_card' do
     let(:presenter) { described_class.new(game, user1) }
 

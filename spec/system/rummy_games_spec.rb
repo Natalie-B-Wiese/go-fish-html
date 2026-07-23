@@ -125,6 +125,59 @@ RSpec.describe 'Rummy Games', type: :system do
     end
   end
 
+  context 'discarding and ending the turn' do
+    let(:game_name) { "Penelope's Game" }
+    let(:game) { Game.find_by(name: game_name) }
+
+    before do
+      create :game, :rummy, :with_users, name: game_name, player_count: 2, users: [user1, user2]
+      game.reload
+      visit show_game_path(game)
+    end
+
+    context 'when the player has not drawn a card' do
+      it 'hides the Discard and End Turn button' do
+        expect(page).to_not have_button('Discard and End Turn')
+      end
+    end
+
+    context 'when the player has drawn a card' do
+      before do
+        click_on 'Draw from Deck'
+      end
+
+      it 'ends the turn when the current player discards a card' do
+        click_on 'Discard and End Turn'
+
+        expect(page).to have_content("#{user2.name}'s Turn")
+      end
+
+      it 'has correct card dropdown options and values' do
+        game.reload
+        card_options = game.game_state.discardable_cards
+
+        dropdown_options = page.find_field('Card').all('option')
+
+        dropdown_labels = dropdown_options.map(&:text)
+        dropdown_values = dropdown_options.map { |opt| opt[:value] }
+
+        expect(dropdown_labels).to match_array(CardCollection.cards_to_h(card_options).keys)
+        expect(dropdown_values).to match_array(CardCollection.cards_to_h(card_options).values)
+      end
+
+      it 'shows the discarded card’s image on the discard pile' do
+        selected_value = page.find_field('Card').all('option').first[:value]
+        discarded_card = Card.from_key(selected_value)
+
+        click_on 'Discard and End Turn'
+
+        within '.game-view__game-board' do
+          expect(page).to have_css("img[src*='#{File.basename(discarded_card.to_image_name, '.*')}']")
+        end
+      end
+    end
+  end
+
   context 'showing the deck on the board' do
     let(:game_name) { "Penelope's Game" }
     let(:game) { Game.find_by(name: game_name) }

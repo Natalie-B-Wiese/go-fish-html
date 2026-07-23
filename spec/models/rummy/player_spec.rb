@@ -12,6 +12,26 @@ RSpec.describe Rummy::Player, type: :model do
     end
   end
 
+  describe '#take_card' do
+    let(:card) { Card.new('3', 'Diamonds') }
+    let(:other_card) { Card.new('K', 'Hearts') }
+
+    before do
+      player.add_card(card)
+      player.add_card(other_card)
+    end
+
+    it 'removes only the card from the hand' do
+      player.take_card(card.rank, card.suit)
+      expect(player.cards).to_not include(card)
+      expect(player.cards).to include(other_card)
+    end
+
+    it 'returns the taken card' do
+      expect(player.take_card(card.rank, card.suit)).to eq card
+    end
+  end
+
   describe '#==' do
     let(:card) { Card.new('3', 'Diamonds') }
 

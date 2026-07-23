@@ -70,6 +70,11 @@ RSpec.describe Card, type: :model do
       expect(card1).not_to eq card2
       expect(card1).to eq card3
     end
+
+    it 'is not equal to nil' do
+      card = Card.new('A', 'Spades')
+      expect(card).to_not eq nil
+    end
   end
 
   describe '#value' do

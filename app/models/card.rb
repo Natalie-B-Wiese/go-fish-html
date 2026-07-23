@@ -45,6 +45,8 @@ class Card
   end
 
   def ==(other)
+    return false if other.nil?
+
     rank == other.rank && suit == other.suit
   end
 

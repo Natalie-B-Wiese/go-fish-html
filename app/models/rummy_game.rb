@@ -11,7 +11,16 @@ class RummyGame < Game
     new_game
   end
 
-  def play_turn?(source: 'deck', **)
+  def play_turn?(source: 'deck', card: nil, **)
+    return !!discard_turn(card) if card
+
     source == 'discard' ? !!game_state.draw_discard_turn : !!game_state.draw_deck_turn
+  end
+
+  private
+
+  def discard_turn(card_key)
+    card = Card.from_key(card_key)
+    game_state.discard_turn(rank: card.rank, suit: card.suit)
   end
 end

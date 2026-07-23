@@ -54,4 +54,47 @@ RSpec.describe Rummy::TurnResult, type: :model do
       expect(restored).to eq turn_result
     end
   end
+
+  describe 'serialization round trip for a discarded card' do
+    let!(:turn_result) do
+      described_class.new(current_user_id: user.id, card_discarded: card)
+    end
+
+    it 'can dump and restore data' do
+      restored = described_class.from_json(turn_result.as_json)
+      expect(restored).to eq turn_result
+    end
+  end
+
+  describe '#card_received' do
+    context 'when the card was received from the deck' do
+      it 'returns the card' do
+        turn_result = described_class.new(current_user_id: user.id, card_received_deck: card)
+        expect(turn_result.card_received).to eq card
+      end
+    end
+
+    context 'when the card was received from the discard pile' do
+      it 'returns the card' do
+        turn_result = described_class.new(current_user_id: user.id, card_received_discard: card)
+        expect(turn_result.card_received).to eq card
+      end
+    end
+
+    context 'when no card was received' do
+      it 'returns nil' do
+        turn_result = described_class.new(current_user_id: user.id)
+        expect(turn_result.card_received).to be_nil
+      end
+    end
+  end
+
+  describe '#== for a discarded card' do
+    let(:turn_result) { described_class.new(current_user_id: user.id, card_discarded: card) }
+
+    it 'is not equal when the discarded card differs' do
+      other = described_class.new(current_user_id: user.id, card_discarded: Card.new('K', 'Spades'))
+      expect(turn_result).to_not eq other
+    end
+  end
 end

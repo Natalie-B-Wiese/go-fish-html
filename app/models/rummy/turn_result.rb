@@ -1,19 +1,25 @@
 module Rummy
   class TurnResult
     attr_reader :current_user_id
-    attr_accessor :card_received_deck, :card_received_discard
+    attr_accessor :card_received_deck, :card_received_discard, :card_discarded
 
-    def initialize(current_user_id:, card_received_deck: nil, card_received_discard: nil)
+    def initialize(current_user_id:, card_received_deck: nil, card_received_discard: nil, card_discarded: nil)
       @current_user_id = current_user_id
       @card_received_deck = card_received_deck
       @card_received_discard = card_received_discard
+      @card_discarded = card_discarded
+    end
+
+    def card_received
+      card_received_deck || card_received_discard
     end
 
     def as_json
       {
         'current_user_id' => current_user_id,
         'card_received_deck' => card_received_deck.as_json,
-        'card_received_discard' => card_received_discard.as_json
+        'card_received_discard' => card_received_discard.as_json,
+        'card_discarded' => card_discarded.as_json
       }
     end
 
@@ -21,7 +27,8 @@ module Rummy
       new(
         current_user_id: json['current_user_id'],
         card_received_deck: card_from_json(json['card_received_deck']),
-        card_received_discard: card_from_json(json['card_received_discard'])
+        card_received_discard: card_from_json(json['card_received_discard']),
+        card_discarded: card_from_json(json['card_discarded'])
       )
     end
 
@@ -34,7 +41,8 @@ module Rummy
 
       current_user_id == other.current_user_id &&
         card_received_deck == other.card_received_deck &&
-        card_received_discard == other.card_received_discard
+        card_received_discard == other.card_received_discard &&
+        card_discarded == other.card_discarded
     end
   end
 end

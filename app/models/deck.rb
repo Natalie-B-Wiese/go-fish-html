@@ -12,7 +12,7 @@ class Deck < CardCollection
 
   def shuffle
     shuffled = cards.shuffle
-    shuffled = cards.shuffle while shuffled == cards
+    shuffled = cards.shuffle while shuffled == cards && cards.length > 1
 
     self.cards = shuffled
   end

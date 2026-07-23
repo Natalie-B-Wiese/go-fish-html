@@ -16,6 +16,12 @@ module Rummy
       hand.push_cards(card)
     end
 
+    def take_card(rank, suit)
+      card_taken = cards.find { |card| card.rank == rank && card.suit == suit }
+      hand.cards -= [card_taken]
+      card_taken
+    end
+
     def ==(other)
       return false if other.nil?
 

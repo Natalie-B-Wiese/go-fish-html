@@ -55,9 +55,9 @@ RSpec.describe Rummy::Implementation, type: :model do
       expect(game.deck.cards).to_not include top_card
     end
 
-    it 'sets has_drawn' do
+    it 'sets last_drawn_card to the drawn card' do
       game.draw_deck_turn
-      expect(game.has_drawn).to be true
+      expect(game.last_drawn_card).to eq top_card
     end
 
     it 'does not switch turns' do
@@ -127,9 +127,9 @@ RSpec.describe Rummy::Implementation, type: :model do
       expect(game.discard_pile.cards).to_not include discard_top
     end
 
-    it 'sets has_drawn' do
+    it 'sets last_drawn_card to the drawn card' do
       game.draw_discard_turn
-      expect(game.has_drawn).to be true
+      expect(game.last_drawn_card).to eq discard_top
     end
 
     it 'does not switch turns' do
@@ -165,6 +165,161 @@ RSpec.describe Rummy::Implementation, type: :model do
     end
   end
 
+  describe '#last_drawn_card' do
+    let(:user_ids) { [1, 2] }
+    let!(:game) { described_class.new(players, current_player_index: 0) }
+    let(:card) { Card.new('5', 'Hearts') }
+
+    before { game.start! }
+
+    context 'when the current player drew from the deck' do
+      before { game.deck.cards = [card] }
+
+      it 'returns the card drawn from the deck' do
+        game.draw_deck_turn
+        expect(game.last_drawn_card).to eq card
+      end
+    end
+
+    context 'when the current player drew from the discard pile' do
+      before { game.discard_pile.cards = [card] }
+
+      it 'returns the card drawn from the discard pile' do
+        game.draw_discard_turn
+        expect(game.last_drawn_card).to eq card
+      end
+    end
+  end
+
+  describe '#drawn?' do
+    let(:user_ids) { [1, 2] }
+    let!(:game) { described_class.new(players, current_player_index: 0) }
+
+    before { game.start! }
+
+    context 'when the current player has not drawn a card' do
+      it 'returns false' do
+        expect(game.drawn?).to be false
+      end
+    end
+
+    context 'when the current player has drawn a card' do
+      before { game.draw_deck_turn }
+
+      it 'returns true' do
+        expect(game.drawn?).to be true
+      end
+    end
+  end
+
+  describe '#discardable_cards' do
+    let(:hand_card) { Card.new('2', 'Clubs') }
+    let(:drawn_card) { Card.new('5', 'Hearts') }
+    let(:player1) { Rummy::Player.new(1) }
+    let(:player2) { Rummy::Player.new(2) }
+    let(:players) { [player1, player2] }
+    let(:game) { described_class.new(players, deck: Deck.new([drawn_card]), current_player_index: 0) }
+
+    before { game.draw_deck_turn }
+
+    context 'when player has cards other than the picked up card' do
+      before do
+        player1.hand.cards = [hand_card, drawn_card]
+      end
+
+      it 'includes the cards already in hand' do
+        expect(game.discardable_cards).to include hand_card
+      end
+
+      it 'excludes the just-drawn card' do
+        expect(game.discardable_cards).to_not include drawn_card
+      end
+    end
+
+    context 'when player only has the card picked up in hand' do
+      before do
+        player1.hand.cards = [drawn_card]
+      end
+
+      it 'includes the just-drawn card' do
+        expect(game.discardable_cards).to eq [drawn_card]
+      end
+    end
+  end
+
+  describe '#discard_turn' do
+    let(:hand_card) { Card.new('2', 'Clubs') }
+    let(:drawn_card) { Card.new('5', 'Hearts') }
+    let(:player1) { Rummy::Player.new(1, hand: CardCollection.new([hand_card])) }
+    let(:player2) { Rummy::Player.new(2) }
+    let(:players) { [player1, player2] }
+    let(:game) { described_class.new(players, deck: Deck.new([drawn_card]), current_player_index: 0) }
+
+    context 'when the current player has drawn a card' do
+      before { game.draw_deck_turn }
+
+      context 'when discarding a card in hand that was not just drawn' do
+        it 'moves the card onto the discard pile' do
+          game.discard_turn(rank: hand_card.rank, suit: hand_card.suit)
+          expect(game.discard_pile.cards).to include hand_card
+        end
+
+        it 'removes the card from the current player’s hand' do
+          game.discard_turn(rank: hand_card.rank, suit: hand_card.suit)
+          expect(player1.cards).to_not include hand_card
+        end
+
+        it 'switches to the next player’s turn' do
+          game.discard_turn(rank: hand_card.rank, suit: hand_card.suit)
+          expect(game.current_player_index).to eq 1
+        end
+
+        it 'resets last_drawn_card' do
+          game.discard_turn(rank: hand_card.rank, suit: hand_card.suit)
+          expect(game.last_drawn_card).to be_nil
+        end
+
+        it 'pushes a turn result carrying the discarded card' do
+          game.discard_turn(rank: hand_card.rank, suit: hand_card.suit)
+          expect(game.feed.last.card_discarded).to eq hand_card
+        end
+      end
+
+      context 'when discarding the card that was just drawn' do
+        it 'returns nil' do
+          expect(game.discard_turn(rank: drawn_card.rank, suit: drawn_card.suit)).to be_nil
+        end
+
+        it 'does not push to the feed or switch turns' do
+          expect { game.discard_turn(rank: drawn_card.rank, suit: drawn_card.suit) }
+            .to_not(change { [game.feed.length, game.current_player_index] })
+        end
+      end
+
+      context 'when discarding a card not in hand' do
+        it 'returns nil' do
+          expect(game.discard_turn(rank: 'K', suit: 'Clubs')).to be_nil
+        end
+
+        it 'does not push to the feed or switch turns' do
+          expect { game.discard_turn(rank: 'K', suit: 'Clubs') }
+            .to_not(change { [game.feed.length, game.current_player_index] })
+        end
+      end
+    end
+
+    context 'when the current player has not yet drawn' do
+      it 'returns nil' do
+        expect(game.discard_turn(rank: hand_card.rank, suit: hand_card.suit)).to be_nil
+      end
+
+      it 'does not push to the feed or switch turns' do
+        expect { game.discard_turn(rank: hand_card.rank, suit: hand_card.suit) }
+          .to_not(change { [game.feed.length, game.current_player_index] })
+      end
+    end
+  end
+
   describe '#game_over?' do
     # TODO: implement a real test once the win condition (a player emptying their hand) is implemented
   end
@@ -193,16 +348,16 @@ RSpec.describe Rummy::Implementation, type: :model do
       expect(game).to_not eq(nil)
     end
 
-    it 'round-trips the has_drawn flag' do
+    it 'round-trips the last_drawn_card' do
       game.draw_deck_turn
       restored = described_class.load(described_class.dump(game).as_json)
-      expect(restored.has_drawn).to be true
+      expect(restored.last_drawn_card).to eq game.last_drawn_card
     end
 
-    it 'is not equal when only has_drawn differs' do
+    it 'is not equal when only last_drawn_card differs' do
       deck = Deck.new
-      drawn = described_class.new(players, deck: deck, has_drawn: true)
-      not_drawn = described_class.new(players, deck: deck, has_drawn: false)
+      drawn = described_class.new(players, deck: deck, last_drawn_card: Card.new('5', 'Hearts'))
+      not_drawn = described_class.new(players, deck: deck, last_drawn_card: nil)
       expect(drawn).to_not eq not_drawn
     end
 

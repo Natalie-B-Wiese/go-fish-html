@@ -1,0 +1,9 @@
+- if @presenter.can_discard?
+	= simple_form_for :turn, url: play_turn_path(@presenter.game), html: { class: "game-actions"} do |f|
+		div.op-stack.gap-xs
+			= f.input :card,
+				as: :select,
+				collection: @presenter.discardable_cards_h,
+				selected: @presenter.discardable_cards_h.values.first
+
+			= f.button :button, "Discard and End Turn"

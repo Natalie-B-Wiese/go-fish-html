@@ -24,7 +24,8 @@ RoleModel house style and project-specific rules that you won't infer from readi
 
 - **Single-quoted strings.**
 - **No `# frozen_string_literal: true` magic comments** (`Style/FrozenStringLiteralComment: never`).
-- **`Metrics/ParameterLists` offenses on `Implementation` subclasses are accepted, not fixed.** Constructors grow past the default max (5) as engine state accumulates (e.g. Rummy's `deck:`/`discard_pile:`/`current_player_index:`/`feed:`/`has_drawn:`) — don't refactor to shrink the list and don't add an inline `# rubocop:disable` either; just leave the offense.
+- **`Array#-`/`Array#include?` compare via `hash`/`eql?` (identity by default), not `==`.** Value objects like `Card`/`TurnResult` only override `==`. `array - [some_value_equal_card]` or a membership check against a freshly-constructed object silently no-ops if the array holds a *different instance* with the same value — this surfaced as flaky specs when a hand-built `Card.new(...)` fixture happened to collide with a randomly dealt hand. To remove/filter by value, use `reject { |x| x == target }`, not `-`.
+- **`Metrics/ParameterLists` offenses on `Implementation` subclasses are accepted, not fixed.** Constructors grow past the default max (5) as engine state accumulates (e.g. Rummy's `deck:`/`discard_pile:`/`current_player_index:`/`feed:`/`last_drawn_card:`) — don't refactor to shrink the list and don't add an inline `# rubocop:disable` either; just leave the offense.
 
 ## Rails patterns
 
