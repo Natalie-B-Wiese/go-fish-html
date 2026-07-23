@@ -38,6 +38,57 @@ RSpec.describe Rummy::Implementation, type: :model do
     end
   end
 
+  describe '#draw_deck_turn' do
+    let(:user_ids) { [1, 2] }
+    let!(:game) { described_class.new(players, current_player_index: 0) }
+    let(:top_card) { Card.new('5', 'Hearts') }
+    let(:next_card) { Card.new('2', 'Diamonds') }
+
+    before do
+      game.start!
+      game.deck.cards = [top_card, next_card]
+    end
+
+    it 'moves the top deck card into the current player’s hand' do
+      game.draw_deck_turn
+      expect(players.first.cards).to include top_card
+      expect(game.deck.cards).to_not include top_card
+    end
+
+    it 'sets has_drawn' do
+      game.draw_deck_turn
+      expect(game.has_drawn).to be true
+    end
+
+    it 'does not switch turns' do
+      game.draw_deck_turn
+      expect(game.current_player_index).to eq 0
+    end
+
+    it 'pushes one turn result to the feed' do
+      game.draw_deck_turn
+      expect(game.feed.length).to eq 1
+    end
+
+    it 'returns a turn result carrying the drawn card' do
+      result = game.draw_deck_turn
+      expect(result.current_user_id).to eq players.first.user_id
+      expect(result.card_received_deck).to eq top_card
+    end
+
+    context 'when the player has already drawn this turn' do
+      before { game.draw_deck_turn }
+
+      it 'returns nil' do
+        expect(game.draw_deck_turn).to be_nil
+      end
+
+      it 'does not draw a second card' do
+        expect { game.draw_deck_turn }.to_not(change { players.first.cards.length })
+      end
+    end
+  end
+
   describe '#game_over?' do
     # TODO: implement a real test once the win condition (a player emptying their hand) is implemented
   end
@@ -64,6 +115,19 @@ RSpec.describe Rummy::Implementation, type: :model do
 
     it 'is not equal to nil' do
       expect(game).to_not eq(nil)
+    end
+
+    it 'round-trips the has_drawn flag' do
+      game.draw_deck_turn
+      restored = described_class.load(described_class.dump(game).as_json)
+      expect(restored.has_drawn).to be true
+    end
+
+    it 'is not equal when only has_drawn differs' do
+      deck = Deck.new
+      drawn = described_class.new(players, deck: deck, has_drawn: true)
+      not_drawn = described_class.new(players, deck: deck, has_drawn: false)
+      expect(drawn).to_not eq not_drawn
     end
   end
 end

@@ -1,3 +1,5 @@
 class RummyGamePresenter < GamePresenter
-  # add Rummy helper methods here
+  def can_draw?
+    my_turn? && !implementation.has_drawn
+  end
 end

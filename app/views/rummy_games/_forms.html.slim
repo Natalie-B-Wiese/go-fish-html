@@ -1,0 +1,9 @@
+/ Locals:
+
+.game-view__game-feed.panel.panel--padded.panel--primary
+	header.panel__header.op-split
+		h2 Turn Action
+		= render 'turn_badge', classes: ''
+
+	.panel__content.op-stack.flex-grow-1.gap-none
+		= render 'rummy_games/phase1'

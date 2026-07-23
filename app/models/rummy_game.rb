@@ -10,4 +10,8 @@ class RummyGame < Game
     new_game.start!
     new_game
   end
+
+  def play_turn?(**)
+    !!game_state.draw_deck_turn
+  end
 end
