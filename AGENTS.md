@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A web-based multiplayer card-game platform. Players sign up, create or join games in a lobby, and play turn-based card games (Go Fish, Crazy Eights) in real time. The UI updates live over WebSockets, and the app is installable as a PWA with offline support.
+A web-based multiplayer card-game platform. Players sign up, create or join games in a lobby, and play turn-based card games (Go Fish, Crazy Eights, and Rummy — in progress) in real time. The UI updates live over WebSockets, and the app is installable as a PWA with offline support.
 
 ## Tech stack
 

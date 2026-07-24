@@ -1,7 +1,11 @@
 - if @presenter.can_meld?
 	= simple_form_for :turn, url: play_turn_path(@presenter.game), html: { class: "game-actions"} do |f|
 		div.op-stack.gap-xs
-			= f.input :meld, as: :select, label: false, collection: ['New Meld'], selected: 'New Meld', include_blank: false
+			= f.input :meld,
+				as: :select,
+				collection: @presenter.meld_options_h,
+				selected: @presenter.meld_options_h.values.first,
+				include_blank: false
 
 			- @presenter.hand_cards_h.each do |label, value|
 				label

@@ -25,6 +25,15 @@ RoleModel house style and project-specific rules that you won't infer from readi
   objects directly, passes the implementation in as `game_state:`, then calls `play_turn?` must assert
   through `some_game.game_state.current_player` (etc.) afterward — not against the original objects,
   which are no longer the ones being mutated.
+- **Planting a hand in a Rummy system spec? Remove those cards from the deck too.**
+  `CardCollection.cards_to_h` keys by `card.to_s`, so two equal cards collapse into one entry — and
+  the hand checkboxes / discard select are built from it. Setting `hand.cards = [...]` without
+  `deck.cards -= [...]` leaves the planted cards in the deck, so a later draw can duplicate one and
+  silently drop a checkbox. It fails only on seeds that deal the duplicate, which reads as a flake.
+- **Known flake: `spec/system/users_spec.rb` "allows user to choose a state after choosing a
+  country".** The `:js` example waits with a fixed `sleep(1)` for JS to repopulate the State select;
+  it fails on roughly 2 of 3 whole-file runs on a clean checkout. If it's the only failure, it's not
+  your change.
 - **`CardCollection.new(array)` stores the array reference directly (no `dup`)** — if a spec reuses that
   same array elsewhere (e.g. a `let`), mutating the collection (`push_cards`, `add_card`, a turn that draws
   a card) mutates the shared array too. Pass `.dup` when handing an array to `CardCollection.new` in a spec

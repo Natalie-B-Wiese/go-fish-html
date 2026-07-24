@@ -66,6 +66,31 @@ RSpec.describe Rummy::TurnResult, type: :model do
     end
   end
 
+  describe 'serialization round trip for a lay-off' do
+    let(:meld) do
+      Rummy::Meld.new([
+                        Rummy::Card.new('7', 'Spades'),
+                        Rummy::Card.new('7', 'Hearts'),
+                        Rummy::Card.new('7', 'Clubs'),
+                        Rummy::Card.new('7', 'Diamonds')
+                      ])
+    end
+    let!(:turn_result) do
+      described_class.new(current_user_id: user.id, meld: meld,
+                          laid_off_cards: [Rummy::Card.new('7', 'Diamonds')])
+    end
+
+    it 'can dump and restore data' do
+      restored = described_class.from_json(turn_result.as_json)
+      expect(restored).to eq turn_result
+    end
+
+    it 'restores the laid-off cards as Rummy::Card instances' do
+      restored = described_class.from_json(turn_result.as_json)
+      expect(restored.laid_off_cards).to all(be_a(Rummy::Card))
+    end
+  end
+
   describe '#card_received' do
     context 'when the card was received from the deck' do
       it 'returns the card' do
@@ -130,6 +155,28 @@ RSpec.describe Rummy::TurnResult, type: :model do
                                      Rummy::Card.new('8', 'Clubs')
                                    ])
       other = described_class.new(current_user_id: user.id, meld: other_meld)
+
+      expect(turn_result).to_not eq other
+    end
+  end
+
+  describe '#== for a lay-off' do
+    let(:meld) do
+      Rummy::Meld.new([
+                        Rummy::Card.new('7', 'Spades'),
+                        Rummy::Card.new('7', 'Hearts'),
+                        Rummy::Card.new('7', 'Clubs'),
+                        Rummy::Card.new('7', 'Diamonds')
+                      ])
+    end
+    let(:laid_off_cards) { [Rummy::Card.new('7', 'Diamonds')] }
+    let(:turn_result) do
+      described_class.new(current_user_id: user.id, meld: meld, laid_off_cards: laid_off_cards)
+    end
+
+    it 'is not equal when the laid-off cards differ' do
+      other = described_class.new(current_user_id: user.id, meld: meld,
+                                  laid_off_cards: [Rummy::Card.new('8', 'Diamonds')])
 
       expect(turn_result).to_not eq other
     end

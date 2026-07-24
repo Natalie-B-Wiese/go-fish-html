@@ -175,6 +175,221 @@ RSpec.describe Rummy::Meld, type: :model do
     end
   end
 
+  describe '#try_add_cards' do
+    let(:three_spades) { Rummy::Card.new('3', 'Spades') }
+    let(:four_spades) { Rummy::Card.new('4', 'Spades') }
+    let(:five_spades) { Rummy::Card.new('5', 'Spades') }
+    let(:six_spades) { Rummy::Card.new('6', 'Spades') }
+    let(:seven_spades) { Rummy::Card.new('7', 'Spades') }
+    let(:eight_spades) { Rummy::Card.new('8', 'Spades') }
+    let(:nine_spades) { Rummy::Card.new('9', 'Spades') }
+    let(:eight_hearts) { Rummy::Card.new('8', 'Hearts') }
+    let(:run) { described_class.new([five_spades, six_spades, seven_spades]) }
+
+    context 'when adding a matching card to a set' do
+      let(:seven_hearts) { Rummy::Card.new('7', 'Hearts') }
+      let(:seven_clubs) { Rummy::Card.new('7', 'Clubs') }
+      let(:seven_diamonds) { Rummy::Card.new('7', 'Diamonds') }
+      let(:set) { described_class.new([seven_spades, seven_hearts, seven_clubs]) }
+
+      it 'returns non-nil' do
+        expect(set.try_add_cards([seven_diamonds])).to_not be_nil
+      end
+
+      it 'adds the card to the meld' do
+        set.try_add_cards([seven_diamonds])
+        expect(set.cards).to include(seven_diamonds)
+      end
+    end
+
+    context 'when adding a card to the high end of a run' do
+      it 'returns non-nil' do
+        expect(run.try_add_cards([eight_spades])).to_not be_nil
+      end
+
+      it 'adds the card in sorted order' do
+        run.try_add_cards([eight_spades])
+        expect(run.cards).to eq [five_spades, six_spades, seven_spades, eight_spades]
+      end
+    end
+
+    context 'when adding a card to the low end of a run' do
+      it 'returns non-nil' do
+        expect(run.try_add_cards([four_spades])).to_not be_nil
+      end
+
+      it 'adds the card in sorted order' do
+        run.try_add_cards([four_spades])
+        expect(run.cards).to eq [four_spades, five_spades, six_spades, seven_spades]
+      end
+    end
+
+    context 'when adding multiple out-of-order cards to a run' do
+      it 'returns non-nil' do
+        expect(run.try_add_cards([nine_spades, eight_spades])).to_not be_nil
+      end
+
+      it 'adds all the cards in sorted order' do
+        run.try_add_cards([nine_spades, eight_spades])
+        expect(run.cards).to eq [five_spades, six_spades, seven_spades, eight_spades, nine_spades]
+      end
+    end
+
+    context 'when adding cards to both ends of a run at once' do
+      it 'returns non-nil' do
+        expect(run.try_add_cards([eight_spades, four_spades])).to_not be_nil
+      end
+
+      it 'adds all the cards in sorted order' do
+        run.try_add_cards([eight_spades, four_spades])
+        expect(run.cards).to eq [four_spades, five_spades, six_spades, seven_spades, eight_spades]
+      end
+    end
+
+    context 'when adding a card of the wrong rank to a set' do
+      let(:seven_hearts) { Rummy::Card.new('7', 'Hearts') }
+      let(:seven_clubs) { Rummy::Card.new('7', 'Clubs') }
+      let(:eight_diamonds) { Rummy::Card.new('8', 'Diamonds') }
+      let(:set) { described_class.new([seven_spades, seven_hearts, seven_clubs]) }
+
+      it 'returns nil' do
+        expect(set.try_add_cards([eight_diamonds])).to be_nil
+      end
+
+      it 'does not change the meld' do
+        set.try_add_cards([eight_diamonds])
+        expect(set.cards).to eq [seven_spades, seven_hearts, seven_clubs]
+      end
+    end
+
+    context 'when adding a valid rank card and a wrong card to a set' do
+      let(:seven_hearts) { Rummy::Card.new('7', 'Hearts') }
+      let(:seven_clubs) { Rummy::Card.new('7', 'Clubs') }
+      let(:seven_diamonds) { Rummy::Card.new('7', 'Diamonds') }
+      let(:eight_diamonds) { Rummy::Card.new('8', 'Diamonds') }
+      let(:set) { described_class.new([seven_spades, seven_hearts, seven_clubs]) }
+
+      it 'returns nil' do
+        expect(set.try_add_cards([seven_diamonds, eight_diamonds])).to be_nil
+      end
+
+      it 'does not change the meld' do
+        set.try_add_cards([seven_diamonds, eight_diamonds])
+        expect(set.cards).to eq [seven_spades, seven_hearts, seven_clubs]
+      end
+    end
+
+    context 'when adding a card of the wrong suit to a run' do
+      it 'returns nil' do
+        expect(run.try_add_cards([eight_hearts])).to be_nil
+      end
+
+      it 'does not change the meld' do
+        run.try_add_cards([eight_hearts])
+        expect(run.cards).to eq [five_spades, six_spades, seven_spades]
+      end
+    end
+
+    context 'when adding a valid run card and a wrong card to a run' do
+      it 'returns nil' do
+        expect(run.try_add_cards([eight_spades, eight_hearts])).to be_nil
+      end
+
+      it 'does not change the meld' do
+        run.try_add_cards([eight_spades, eight_hearts])
+        expect(run.cards).to eq [five_spades, six_spades, seven_spades]
+      end
+    end
+
+    context 'when adding a non-sequential card to the high end of a run' do
+      it 'returns nil' do
+        expect(run.try_add_cards([nine_spades])).to be_nil
+      end
+
+      it 'does not change the meld' do
+        run.try_add_cards([nine_spades])
+        expect(run.cards).to eq [five_spades, six_spades, seven_spades]
+      end
+    end
+
+    context 'when adding a non-sequential card to the low end of a run' do
+      it 'returns nil' do
+        expect(run.try_add_cards([three_spades])).to be_nil
+      end
+
+      it 'does not change the meld' do
+        run.try_add_cards([three_spades])
+        expect(run.cards).to eq [five_spades, six_spades, seven_spades]
+      end
+    end
+  end
+
+  describe '#to_s' do
+    it 'labels a run with its first and last card joined by a dash' do
+      meld = described_class.new([
+                                   Rummy::Card.new('5', 'Spades'),
+                                   Rummy::Card.new('6', 'Spades'),
+                                   Rummy::Card.new('7', 'Spades')
+                                 ])
+
+      expect(meld.to_s).to eq '5♠-7♠'
+    end
+
+    it 'labels a longer run with a single dash between first and last' do
+      meld = described_class.new([
+                                   Rummy::Card.new('5', 'Spades'),
+                                   Rummy::Card.new('6', 'Spades'),
+                                   Rummy::Card.new('7', 'Spades'),
+                                   Rummy::Card.new('8', 'Spades')
+                                 ])
+
+      expect(meld.to_s).to eq '5♠-8♠'
+    end
+
+    it 'labels a set with the rank followed by s' do
+      meld = described_class.new([
+                                   Rummy::Card.new('7', 'Spades'),
+                                   Rummy::Card.new('7', 'Hearts'),
+                                   Rummy::Card.new('7', 'Clubs')
+                                 ])
+
+      expect(meld.to_s).to eq '7s'
+    end
+  end
+
+  describe '#to_s' do
+    it 'labels a run with its first and last card joined by a dash' do
+      meld = described_class.new([
+                                   Rummy::Card.new('5', 'Spades'),
+                                   Rummy::Card.new('6', 'Spades'),
+                                   Rummy::Card.new('7', 'Spades')
+                                 ])
+
+      expect(meld.to_s).to eq '5♠-7♠'
+    end
+
+    it 'labels a longer run with a single dash between first and last' do
+      meld = described_class.new([
+                                   Rummy::Card.new('5', 'Spades'),
+                                   Rummy::Card.new('6', 'Spades'),
+                                   Rummy::Card.new('7', 'Spades'),
+                                   Rummy::Card.new('8', 'Spades')
+                                 ])
+
+      expect(meld.to_s).to eq '5♠-8♠'
+    end
+
+    it 'labels a set with the rank followed by s' do
+      meld = described_class.new([
+                                   Rummy::Card.new('7', 'Spades'),
+                                   Rummy::Card.new('7', 'Hearts'),
+                                   Rummy::Card.new('7', 'Clubs')
+                                 ])
+
+      expect(meld.to_s).to eq '7s'
+    end
+  end
+
   describe '#==' do
     let(:cards) do
       [

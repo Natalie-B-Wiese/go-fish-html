@@ -131,23 +131,36 @@ User-facing feedback is a deferred card.
 
 ## Implementation Plan
 
-- [ ] Verify card 5's `Implementation#melds` accessor shape + the meld param/`play_turn?` branch it
-      established (dependency check before building on it).
-- [ ] Spike: `meld_spec` for `Meld#try_add_cards` — valid set extension + valid run extension →
+- [x] Verify card 5's `Implementation#melds` accessor shape + the meld param/`play_turn?` branch it
+      established (dependency check before building on it). — `melds` returns live refs
+      (`players.flat_map(&:melds)`); card 5's `_phase2` form already has a placeholder `:meld` select,
+      but `:meld` is **not yet permitted** in `turn_params_hash` and `play_turn?` ignores it.
+- [x] Spike: `meld_spec` for `Meld#try_add_cards` — valid set extension + valid run extension →
       green (proves extend-and-revalidate).
-- [ ] Finish `Meld#try_add_cards`: reject non-matching card (`nil`, no change), run extension at
-      both ends, multi-card lay-off. Add `Meld#to_s` (run: `5♠6♠7♠`; set: `7s`).
-- [ ] `Player#try_lay_off(meld, cards)`: eligibility gate (`melds.any?`), delegate to
-      `meld.try_add_cards`, remove cards from hand only on non-nil. Specs for ineligible / not-in-hand
-      / rejected.
-- [ ] `TurnResult`: add `laid_off_cards`, reuse `meld`; extend `as_json` / `from_json` / `==`.
-- [ ] `Implementation#lay_off_turn(meld_index:, cards:)`: guard `drawn?`; resolve meld by index;
+- [x] Finish `Meld#try_add_cards`: reject non-matching card (`nil`, no change), run extension at
+      both ends, multi-card lay-off, both-ends-at-once, mixed valid+invalid batches. Add `Meld#to_s`
+      (run: first–last range `5♠-7♠`; set: `7s`) built on a new base-`Card#to_short_s` (+ `SUIT_GLYPHS`).
+- [x] `Player#try_lay_off(meld, cards)`: eligibility gate via new public `Player#melded?` (reused by
+      the form later), delegate to `meld.try_add_cards`, remove cards from hand only on non-nil.
+      Specs for ineligible / not-in-hand / rejected.
+- [x] `TurnResult`: add `laid_off_cards` (defaults `[]`, `|| []` fallback for old rows), reuse `meld`;
+      extend `as_json` / `from_json` / `==`.
+- [x] `Implementation#lay_off_turn(meld_index:, cards:)`: guard `drawn?` + `meld_index < melds.length`;
       delegate; feed entry; no `switch_turn`; `nil` on invalid. Full `implementation_spec` coverage.
-- [ ] Wire `RummyGame#play_turn?` lay-off branch + permit `:meld` (index) in `turn_params_hash`
-      (following card 5's meld-param convention).
-- [ ] Meld-selection dropdown: options valued by raw index, labeled `1 + index` + `Meld#to_s`;
-      reuse card 5's card-selection UI. System spec.
-- [ ] Run `bundle exec rspec` + `bin/rubocop`.
+- [x] Wire `RummyGame#play_turn?` lay-off branch + permit `:meld` (index) in `turn_params_hash`
+      (following card 5's meld-param convention). A card selection now dispatches through a private
+      `cards_turn` — blank `:meld` (the "New Meld" option) → `meld_turn`, an index → `lay_off_turn`,
+      which rejects non-numeric params via `Integer(..., exception: false)`. Also tightened
+      `Implementation#lay_off_turn`'s bounds check to `(0...melds.length).include?` — a negative index
+      previously wrapped to the last meld.
+- [x] Meld-selection dropdown: `RummyGamePresenter#meld_options_h` (options valued by raw index,
+      labeled `1 + index` + `Meld#to_s`, `NEW_MELD_LABEL` first), gated by new `#can_lay_off?`
+      (`can_meld?` + `melded?`) so an un-melded player only sees "New Meld". Presenter spec covers the
+      label→index mapping and the gate; system spec covers the end-to-end lay-off.
+- [x] Run `bundle exec rspec` + `bin/rubocop`. Suite green except a **pre-existing** flake in
+      `spec/system/users_spec.rb:107` (`:js` country→state select with a `sleep(1)`; fails on a clean
+      checkout too). Rubocop adds no new offenses (`bin/rubocop` runs default config, not the
+      commented-out omakase inherit, so the repo baseline is noisy).
 
 ---
 

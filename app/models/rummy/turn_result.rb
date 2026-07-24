@@ -1,15 +1,16 @@
 module Rummy
   class TurnResult
     attr_reader :current_user_id
-    attr_accessor :card_received_deck, :card_received_discard, :card_discarded, :meld
+    attr_accessor :card_received_deck, :card_received_discard, :card_discarded, :meld, :laid_off_cards
 
     def initialize(current_user_id:, card_received_deck: nil, card_received_discard: nil, card_discarded: nil,
-                   meld: nil)
+                   meld: nil, laid_off_cards: [])
       @current_user_id = current_user_id
       @card_received_deck = card_received_deck
       @card_received_discard = card_received_discard
       @card_discarded = card_discarded
       @meld = meld
+      @laid_off_cards = laid_off_cards
     end
 
     def card_received
@@ -22,7 +23,8 @@ module Rummy
         'card_received_deck' => card_received_deck.as_json,
         'card_received_discard' => card_received_discard.as_json,
         'card_discarded' => card_discarded.as_json,
-        'meld' => meld&.as_json
+        'meld' => meld&.as_json,
+        'laid_off_cards' => laid_off_cards.map(&:as_json)
       }
     end
 
@@ -32,7 +34,8 @@ module Rummy
         card_received_deck: card_from_json(json['card_received_deck']),
         card_received_discard: card_from_json(json['card_received_discard']),
         card_discarded: card_from_json(json['card_discarded']),
-        meld: meld_from_json(json['meld'])
+        meld: meld_from_json(json['meld']),
+        laid_off_cards: (json['laid_off_cards'] || []).map { |card_json| Card.from_json(card_json) }
       )
     end
 
@@ -51,7 +54,8 @@ module Rummy
         card_received_deck == other.card_received_deck &&
         card_received_discard == other.card_received_discard &&
         card_discarded == other.card_discarded &&
-        meld == other.meld
+        meld == other.meld &&
+        laid_off_cards == other.laid_off_cards
     end
   end
 end

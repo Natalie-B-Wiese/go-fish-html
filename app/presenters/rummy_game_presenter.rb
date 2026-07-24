@@ -1,4 +1,7 @@
 class RummyGamePresenter < GamePresenter
+  NEW_MELD_LABEL = 'New Meld'.freeze
+  NEW_MELD_OPTION = { NEW_MELD_LABEL => '' }.freeze
+
   def can_draw?
     my_turn? && !implementation.drawn?
   end
@@ -21,6 +24,16 @@ class RummyGamePresenter < GamePresenter
 
   def melds
     implementation.melds
+  end
+
+  def meld_options_h
+    return NEW_MELD_OPTION unless can_lay_off?
+
+    NEW_MELD_OPTION.merge(melds.each_with_index.to_h { |meld, index| ["#{index + 1}: #{meld}", index] })
+  end
+
+  def can_lay_off?
+    can_meld? && my_implementation_player.melded?
   end
 
   def hand_cards_h

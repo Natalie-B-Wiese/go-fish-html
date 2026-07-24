@@ -191,6 +191,7 @@ RSpec.describe 'Rummy Games', type: :system do
 
       game.reload
       game.game_state.current_player.hand.cards = meld_cards.dup
+      game.game_state.deck.cards -= meld_cards
       game.save!
       visit show_game_path(game)
       click_on 'Draw from Deck'
@@ -252,6 +253,51 @@ RSpec.describe 'Rummy Games', type: :system do
       within('.game-view__game-board') do
         expect(page).to have_content('Meld 1')
       end
+    end
+  end
+
+  context 'laying off onto a meld on the table' do
+    let(:game_name) { "Penelope's Game" }
+    let(:game) { Game.find_by(name: game_name) }
+    let(:meld) do
+      Rummy::Meld.new([
+                        Rummy::Card.new('7', 'Spades'),
+                        Rummy::Card.new('7', 'Hearts'),
+                        Rummy::Card.new('7', 'Clubs')
+                      ])
+    end
+    let(:lay_off_card) { Rummy::Card.new('7', 'Diamonds') }
+
+    before do
+      create :game, :rummy, :with_users, name: game_name, player_count: 2, users: [user1, user2]
+      visit show_game_path(game)
+
+      game.reload
+      game.game_state.current_player.hand.cards = [lay_off_card]
+      game.game_state.deck.cards -= [lay_off_card] + meld.cards
+      game.game_state.current_player.add_meld(meld)
+      game.save!
+      visit show_game_path(game)
+      click_on 'Draw from Deck'
+    end
+
+    it 'extends the meld: the card leaves the hand and joins the meld on the board' do
+      select "1: #{meld}", from: 'Meld'
+      check lay_off_card.to_s
+      click_on 'Meld/Lay-off Selected'
+
+      within('.game-view__hand') do
+        expect(page).to_not have_css("img[src*='#{File.basename(lay_off_card.to_image_name, '.*')}']")
+      end
+      within('.game-view__game-board') { expect(page).to have_content('4 cards') }
+    end
+
+    it 'does not end the turn' do
+      select "1: #{meld}", from: 'Meld'
+      check lay_off_card.to_s
+      click_on 'Meld/Lay-off Selected'
+
+      expect(page).to have_content('Your Turn')
     end
   end
 

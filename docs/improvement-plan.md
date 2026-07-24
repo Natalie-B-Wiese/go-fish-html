@@ -173,12 +173,23 @@ Captured so they aren't lost; each is a good standalone future task.
   cross-player ordered accessor) was scoped into card 4 but pushed later, since it's only needed
   once a UI has to address a meld by array index. The melds UI — lay a new meld + render everyone's
   melds on the board, incl. `Implementation#melds` (`docs/plans/rummy-brave-breakdown-card-5.md`,
-  4 pts) — is also done. Breakdowns written but not yet built: lay-offs + lay-off UI
-  (`docs/plans/rummy-brave-breakdown-card-6.md`, 4 pts, engine + UI); the win condition — engine only
+  4 pts) — is also done, as are lay-offs + the meld-selection dropdown
+  (`docs/plans/rummy-brave-breakdown-card-6.md`, 4 pts, engine + UI). Breakdowns written but not yet
+  built: the win condition — engine only
   (`docs/plans/rummy-brave-breakdown-card-7.md`, 1 pt); and stock-runs-out refill-from-discard —
   engine only (`docs/plans/rummy-brave-breakdown-card-8.md`, 2 pts). Deferred to its own future
   card: when both stock and discard are empty, let the player skip drawing and still
   meld/lay-off/discard (relaxes the `drawn?` gate).
+- **Rummy: no feedback on a rejected meld / lay-off / discard.** Every turn action returns `nil` with
+  no state change and no message (deliberate through card 6), so an invalid submission looks like a
+  dead button. Needs a user-facing surface — flash, inline form error, or a feed entry.
+- **`docs/rummy-rules.md` doesn't exist** while Go Fish and Crazy Eights each have a rules-as-
+  implemented doc (and AGENTS.md's Key context links them). Worth writing once cards 7-8 land, so it
+  can state the win condition and stock-refill behavior.
+- **Restore the omakase inherit in `.rubocop.yml`.** The `inherit_gem` line is commented out, so
+  `bin/rubocop` runs default RuboCop instead of the house style the project claims — hence the ~686
+  offense baseline that makes the tool nearly useless as a gate. Uncommenting it is a small change
+  with a large diff of newly-clean/newly-flagged files, so it deserves its own card.
 - **Concurrency race on `game_state`** (`app/controllers/games_controller.rb#play`, `Game#start!`
   / `#end!`): read-modify-write with no lock. A double-submit or the auto-timer
   (`autorun_turn_controller.js`) firing alongside a manual submit can clobber a turn; `start!`/
@@ -231,5 +242,8 @@ Captured so they aren't lost; each is a good standalone future task.
 - **Item 2:** `bundle exec rspec spec/system/go_fish_games_spec.rb spec/system/crazy_eights_games_spec.rb`
   stay green through the refactor. Manually run `bin/dev` and open a game in two browsers to eyeball
   the board.
-- **Whole pass:** `bundle exec rspec` (or `bin/turbo_tests`) clean, `bin/rubocop` clean (mind the
-  7-line method / 7-line `it`-block limits), `bin/ci` before merge.
+- **Whole pass:** `bundle exec rspec` (or `bin/turbo_tests`) clean, `bin/rubocop` showing **no new
+  offenses in the files you touched** (mind the 7-line method / 7-line `it`-block limits), `bin/ci`
+  before merge. `bin/rubocop` is *not* clean repo-wide: `.rubocop.yml`'s `inherit_gem` omakase line is
+  commented out, so plain default RuboCop runs and reports ~686 baseline offenses
+  (`Style/Documentation`, `Metrics/*`). Compare against the baseline rather than chasing a zero.

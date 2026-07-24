@@ -385,6 +385,116 @@ RSpec.describe Rummy::Implementation, type: :model do
     end
   end
 
+  describe '#lay_off_turn' do
+    let(:lay_off_card) { Rummy::Card.new('7', 'Diamonds') }
+    let(:drawn_card) { Rummy::Card.new('5', 'Hearts') }
+    let(:own_meld_cards) do
+      [Rummy::Card.new('9', 'Spades'), Rummy::Card.new('9', 'Hearts'), Rummy::Card.new('9', 'Clubs')]
+    end
+    let(:target_cards) do
+      [Rummy::Card.new('7', 'Spades'), Rummy::Card.new('7', 'Hearts'), Rummy::Card.new('7', 'Clubs')]
+    end
+    let(:player1) do
+      Rummy::Player.new(1, hand: Rummy::CardCollection.new([lay_off_card] + own_meld_cards))
+    end
+    let(:player2) { Rummy::Player.new(2, hand: Rummy::CardCollection.new(target_cards)) }
+    let(:players) { [player1, player2] }
+    let(:game) { described_class.new(players, deck: Rummy::Deck.new([drawn_card]), current_player_index: 0) }
+
+    before do
+      player1.try_create_meld(own_meld_cards)
+      player2.try_create_meld(target_cards)
+    end
+
+    context 'when the player has drawn, is eligible, and the cards extend the target meld' do
+      before { game.draw_deck_turn }
+
+      it 'adds the cards to the target meld' do
+        game.lay_off_turn(meld_index: 1, cards: [lay_off_card])
+        expect(game.melds[1].cards).to include(lay_off_card)
+      end
+
+      it 'removes the cards from the current player’s hand' do
+        game.lay_off_turn(meld_index: 1, cards: [lay_off_card])
+        expect(player1.cards).to_not include(lay_off_card)
+      end
+
+      it 'does not switch turns' do
+        game.lay_off_turn(meld_index: 1, cards: [lay_off_card])
+        expect(game.current_player_index).to eq 0
+      end
+
+      it 'pushes a turn result carrying the laid-off cards and target meld' do
+        game.lay_off_turn(meld_index: 1, cards: [lay_off_card])
+        expect(game.feed.last.laid_off_cards).to eq [lay_off_card]
+        expect(game.feed.last.meld).to eq game.melds[1]
+      end
+    end
+
+    context 'when the current player has not drawn' do
+      it 'returns nil' do
+        expect(game.lay_off_turn(meld_index: 1, cards: [lay_off_card])).to be_nil
+      end
+
+      it 'does not change the target meld' do
+        game.lay_off_turn(meld_index: 1, cards: [lay_off_card])
+        expect(game.melds[1].cards).to_not include(lay_off_card)
+      end
+
+      it 'does not push to the feed' do
+        expect { game.lay_off_turn(meld_index: 1, cards: [lay_off_card]) }
+          .to_not(change { game.feed.length })
+      end
+    end
+
+    context 'when the current player could not lay off' do
+      let(:player1) { Rummy::Player.new(1, hand: Rummy::CardCollection.new([lay_off_card])) }
+
+      before { game.draw_deck_turn }
+
+      it 'returns nil' do
+        expect(game.lay_off_turn(meld_index: 0, cards: [lay_off_card])).to be_nil
+      end
+
+      it 'does not push to the feed' do
+        expect { game.lay_off_turn(meld_index: 0, cards: [lay_off_card]) }
+          .to_not(change { game.feed.length })
+      end
+    end
+
+    context 'when the meld index is out of range' do
+      before { game.draw_deck_turn }
+
+      it 'returns nil' do
+        expect(game.lay_off_turn(meld_index: 99, cards: [lay_off_card])).to be_nil
+      end
+
+      it 'does not remove the cards from the hand' do
+        game.lay_off_turn(meld_index: 99, cards: [lay_off_card])
+        expect(player1.cards).to include(lay_off_card)
+      end
+
+      it 'does not push to the feed' do
+        expect { game.lay_off_turn(meld_index: 99, cards: [lay_off_card]) }
+          .to_not(change { game.feed.length })
+      end
+    end
+
+    context 'when the meld index is negative' do
+      before { game.draw_deck_turn }
+
+      it 'returns nil rather than wrapping to the last meld' do
+        expect(game.lay_off_turn(meld_index: -1, cards: [lay_off_card])).to be_nil
+      end
+
+      it 'does not change any meld' do
+        game.lay_off_turn(meld_index: -1, cards: [lay_off_card])
+
+        expect(game.melds.last.cards).to_not include(lay_off_card)
+      end
+    end
+  end
+
   describe '#melds' do
     let(:player1_meld_cards) do
       [

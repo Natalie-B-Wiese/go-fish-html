@@ -21,6 +21,26 @@ RSpec.describe Card, type: :model do
     end
   end
 
+  describe '#to_short_s' do
+    it 'combines the rank with the suit symbol' do
+      expect(Card.new('5', 'Spades').to_short_s).to eq '5♠'
+    end
+
+    it 'works for every suit' do
+      expect(Card.new('7', 'Hearts').to_short_s).to eq '7♥'
+      expect(Card.new('7', 'Clubs').to_short_s).to eq '7♣'
+      expect(Card.new('7', 'Diamonds').to_short_s).to eq '7♦'
+    end
+
+    it 'works with face-card and ten ranks' do
+      expect(Card.new('10', 'Spades').to_short_s).to eq '10♠'
+      expect(Card.new('J', 'Hearts').to_short_s).to eq 'J♥'
+      expect(Card.new('Q', 'Clubs').to_short_s).to eq 'Q♣'
+      expect(Card.new('K', 'Diamonds').to_short_s).to eq 'K♦'
+      expect(Card.new('A', 'Spades').to_short_s).to eq 'A♠'
+    end
+  end
+
   describe '#key' do
     let(:card1) { Card.new('5', 'Spades') }
     let(:card2) { Card.new('J', 'Clubs') }

@@ -27,6 +27,19 @@ module Rummy
       melds.push(meld)
     end
 
+    def melded?
+      melds.any?
+    end
+
+    def try_lay_off(meld, lay_off_cards)
+      return nil unless melded?
+      return nil unless lay_off_cards.all? { |card| cards.include?(card) }
+      return nil unless meld.try_add_cards(lay_off_cards)
+
+      hand.cards -= lay_off_cards
+      meld
+    end
+
     def try_create_meld(meld_cards)
       return nil unless meld_cards.all? { |card| cards.include?(card) }
 

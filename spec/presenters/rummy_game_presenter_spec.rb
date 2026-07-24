@@ -83,6 +83,86 @@ RSpec.describe RummyGamePresenter, type: :model do
     end
   end
 
+  describe '#can_lay_off?' do
+    let(:presenter) { described_class.new(game, user1) }
+    let(:my_meld) do
+      Rummy::Meld.new([Rummy::Card.new('7', 'Spades'), Rummy::Card.new('7', 'Hearts'),
+                       Rummy::Card.new('7', 'Clubs')])
+    end
+
+    context 'after drawing, when I have laid a meld of my own' do
+      before do
+        game.game_state.draw_deck_turn
+        game.game_state.current_player.add_meld(my_meld)
+        game.save!
+      end
+
+      it 'returns true' do
+        expect(presenter.can_lay_off?).to be true
+      end
+    end
+
+    context 'after drawing, when I have not laid a meld of my own' do
+      before do
+        game.game_state.draw_deck_turn
+        game.save!
+      end
+
+      it 'returns false' do
+        expect(presenter.can_lay_off?).to be false
+      end
+    end
+
+    context 'when I have a meld but have not drawn yet' do
+      before do
+        game.game_state.current_player.add_meld(my_meld)
+        game.save!
+      end
+
+      it 'returns false' do
+        expect(presenter.can_lay_off?).to be false
+      end
+    end
+  end
+
+  describe '#meld_options_h' do
+    let(:presenter) { described_class.new(game, user1) }
+    let(:my_meld) do
+      Rummy::Meld.new([Rummy::Card.new('7', 'Spades'), Rummy::Card.new('7', 'Hearts'),
+                       Rummy::Card.new('7', 'Clubs')])
+    end
+    let(:opponent_meld) do
+      Rummy::Meld.new([Rummy::Card.new('5', 'Spades'), Rummy::Card.new('6', 'Spades'),
+                       Rummy::Card.new('7', 'Spades')])
+    end
+
+    context 'after drawing, when the current player has melded' do
+      before do
+        game.game_state.draw_deck_turn
+        game.game_state.current_player.add_meld(my_meld)
+        game.game_state.players.last.add_meld(opponent_meld)
+        game.save!
+      end
+
+      it 'labels each meld 1-based and values it by its index in the melds list' do
+        expect(presenter.meld_options_h)
+          .to eq(described_class::NEW_MELD_LABEL => '', "1: #{my_meld}" => 0, "2: #{opponent_meld}" => 1)
+      end
+    end
+
+    context 'after drawing, when the current player has not melded' do
+      before do
+        game.game_state.draw_deck_turn
+        game.game_state.players.last.add_meld(opponent_meld)
+        game.save!
+      end
+
+      it 'offers only the New Meld option' do
+        expect(presenter.meld_options_h).to eq(described_class::NEW_MELD_LABEL => '')
+      end
+    end
+  end
+
   describe '#discardable_cards_h' do
     let(:presenter) { described_class.new(game, user1) }
 

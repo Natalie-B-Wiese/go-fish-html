@@ -86,6 +86,118 @@ RSpec.describe Rummy::Player, type: :model do
     end
   end
 
+  describe '#melded?' do
+    let(:meld) do
+      Rummy::Meld.new([
+                        Rummy::Card.new('7', 'Spades'),
+                        Rummy::Card.new('7', 'Hearts'),
+                        Rummy::Card.new('7', 'Clubs')
+                      ])
+    end
+
+    it 'is false when the player has no melds' do
+      expect(player.melded?).to be false
+    end
+
+    it 'is true when the player has at least one meld' do
+      player.add_meld(meld)
+      expect(player.melded?).to be true
+    end
+  end
+
+  describe '#try_lay_off' do
+    let(:lay_off_card) { Rummy::Card.new('7', 'Diamonds') }
+    let(:other_hand_card) { Rummy::Card.new('2', 'Clubs') }
+    let(:own_meld) do
+      Rummy::Meld.new([
+                        Rummy::Card.new('9', 'Spades'),
+                        Rummy::Card.new('9', 'Hearts'),
+                        Rummy::Card.new('9', 'Clubs')
+                      ])
+    end
+    let(:target_meld) do
+      Rummy::Meld.new([
+                        Rummy::Card.new('7', 'Spades'),
+                        Rummy::Card.new('7', 'Hearts'),
+                        Rummy::Card.new('7', 'Clubs')
+                      ])
+    end
+
+    before do
+      player.add_card(lay_off_card)
+      player.add_card(other_hand_card)
+    end
+
+    context 'when the player has melded and the cards extend the target meld' do
+      before { player.add_meld(own_meld) }
+
+      it 'returns non-nil' do
+        expect(player.try_lay_off(target_meld, [lay_off_card])).to_not be_nil
+      end
+
+      it 'adds the cards to the target meld' do
+        player.try_lay_off(target_meld, [lay_off_card])
+        expect(target_meld.cards).to include(lay_off_card)
+      end
+
+      it 'removes the laid-off cards from the hand' do
+        player.try_lay_off(target_meld, [lay_off_card])
+        expect(player.cards).to_not include(lay_off_card)
+      end
+    end
+
+    context 'when the player has not melded yet' do
+      it 'returns nil' do
+        expect(player.try_lay_off(target_meld, [lay_off_card])).to be_nil
+      end
+
+      it 'does not change the target meld' do
+        player.try_lay_off(target_meld, [lay_off_card])
+        expect(target_meld.cards).to_not include(lay_off_card)
+      end
+
+      it 'does not remove the cards from the hand' do
+        player.try_lay_off(target_meld, [lay_off_card])
+        expect(player.cards).to include(lay_off_card)
+      end
+    end
+
+    context 'when a card is not in the player’s hand' do
+      let(:run_target) do
+        Rummy::Meld.new([
+                          Rummy::Card.new('4', 'Diamonds'),
+                          Rummy::Card.new('5', 'Diamonds'),
+                          Rummy::Card.new('6', 'Diamonds')
+                        ])
+      end
+      let(:card_not_in_hand) { Rummy::Card.new('3', 'Diamonds') }
+
+      before { player.add_meld(own_meld) }
+
+      it 'returns nil' do
+        expect(player.try_lay_off(run_target, [card_not_in_hand])).to be_nil
+      end
+
+      it 'does not change the target meld' do
+        player.try_lay_off(run_target, [card_not_in_hand])
+        expect(run_target.cards).to_not include(card_not_in_hand)
+      end
+    end
+
+    context 'when the cards do not extend the target meld' do
+      before { player.add_meld(own_meld) }
+
+      it 'returns nil' do
+        expect(player.try_lay_off(target_meld, [other_hand_card])).to be_nil
+      end
+
+      it 'does not remove the cards from the hand' do
+        player.try_lay_off(target_meld, [other_hand_card])
+        expect(player.cards).to include(other_hand_card)
+      end
+    end
+  end
+
   describe '#take_card' do
     let(:card) { Rummy::Card.new('3', 'Diamonds') }
     let(:other_card) { Rummy::Card.new('K', 'Hearts') }

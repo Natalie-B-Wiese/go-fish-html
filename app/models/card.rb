@@ -22,6 +22,13 @@ class Card
     'D' => 'Diamonds'
   }.freeze
 
+  SUIT_GLYPHS = {
+    'Spades' => '♠',
+    'Hearts' => '♥',
+    'Clubs' => '♣',
+    'Diamonds' => '♦'
+  }.freeze
+
   def key
     "#{rank}#{SUIT_SYMBOLS.invert[suit]}"
   end
@@ -65,6 +72,10 @@ class Card
 
   def to_s
     "#{rank} of #{suit}"
+  end
+
+  def to_short_s
+    "#{rank}#{SUIT_GLYPHS[suit]}"
   end
 
   def self.rank_to_s(rank)
