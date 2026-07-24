@@ -182,10 +182,9 @@ Captured so they aren't lost; each is a good standalone future task.
 - **Rummy: no feedback on a rejected meld / lay-off / discard.** Every turn action returns `nil` with
   no state change and no message (deliberate through card 6), so an invalid submission looks like a
   dead button. Needs a user-facing surface — flash, inline form error, or a feed entry.
-- **`docs/rummy-rules.md` doesn't exist** while Go Fish and Crazy Eights each have a rules-as-
-  implemented doc (and AGENTS.md's Key context links them). With card 7 complete, this is now
-  ready to write: should document the win condition + the stock-refill behavior from card 8.
-  Once written, add the link to AGENTS.md's "Key context" section alongside the other game rules.
+- **`docs/rummy-rules.md` — ✅ DONE** Created after card 7 completion alongside Go Fish and Crazy
+  Eights rules-as-implemented docs (linked in AGENTS.md's Key context). Documents the win
+  condition + the stock-refill behavior from card 8.
 - **Restore the omakase inherit in `.rubocop.yml`.** The `inherit_gem` line is commented out, so
   `bin/rubocop` runs default RuboCop instead of the house style the project claims — hence the ~686
   offense baseline that makes the tool nearly useless as a gate. Uncommenting it is a small change

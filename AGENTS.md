@@ -79,3 +79,4 @@ See [docs/conventions.md](docs/conventions.md) for the full list. The ones you'l
 - [docs/conventions.md](docs/conventions.md) — house style and project rules (7-line limit, TDD, RESTful routes, serialization symmetry).
 - [docs/go-fish-rules.md](docs/go-fish-rules.md) — Go Fish rules as implemented.
 - [docs/crazy-eights-rules.md](docs/crazy-eights-rules.md) — Crazy Eights rules as implemented.
+- [docs/rummy-rules.md](docs/rummy-rules.md) — Rummy rules as implemented.
