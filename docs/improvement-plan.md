@@ -173,8 +173,8 @@ Captured so they aren't lost; each is a good standalone future task.
   cross-player ordered accessor) was scoped into card 4 but pushed later, since it's only needed
   once a UI has to address a meld by array index. Next up (planned, not yet built): the melds UI —
   lay a new meld + render everyone's melds on the board, incl. `Implementation#melds`
-  (`docs/plans/rummy-brave-breakdown-card-5.md`, 4 pts) — then lay-offs + lay-off UI, then the win
-  condition.
+  (`docs/plans/rummy-brave-breakdown-card-5.md`, 4 pts) — then lay-offs + lay-off UI
+  (`docs/plans/rummy-brave-breakdown-card-6.md`, 4 pts, engine + UI) — then the win condition.
 - **Concurrency race on `game_state`** (`app/controllers/games_controller.rb#play`, `Game#start!`
   / `#end!`): read-modify-write with no lock. A double-submit or the auto-timer
   (`autorun_turn_controller.js`) firing alongside a manual submit can clobber a turn; `start!`/

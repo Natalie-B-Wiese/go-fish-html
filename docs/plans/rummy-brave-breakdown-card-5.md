@@ -44,7 +44,8 @@ A cohesive vertical slice that follows patterns already in the codebase (mirrors
   `Card.from_key` and call the already-built `game_state.meld_turn(cards:)`. Extract a private helper to keep the
   method ≤ 7 lines, mirroring the existing `discard_turn` helper.
 - `app/models/rummy/implementation.rb` — add `melds`: `players.flat_map(&:melds)` so the board can render
-  everyone's melds.
+  everyone's melds. **Must return live references to the stored `Meld` objects (not copies)** — the lay-off
+  card mutates a meld in place through this array.
 
 **Presenter** (`app/presenters/rummy_game_presenter.rb`)
 - `can_meld?` — `my_turn? && implementation.drawn?` (same window as `can_discard?`).
