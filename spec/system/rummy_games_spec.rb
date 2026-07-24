@@ -174,6 +174,87 @@ RSpec.describe 'Rummy Games', type: :system do
     end
   end
 
+  context 'laying a meld' do
+    let(:game_name) { "Penelope's Game" }
+    let(:game) { Game.find_by(name: game_name) }
+    let(:meld_cards) do
+      [
+        Rummy::Card.new('7', 'Spades'),
+        Rummy::Card.new('7', 'Hearts'),
+        Rummy::Card.new('7', 'Clubs')
+      ]
+    end
+
+    before do
+      create :game, :rummy, :with_users, name: game_name, player_count: 2, users: [user1, user2]
+      visit show_game_path(game)
+
+      game.reload
+      game.game_state.current_player.hand.cards = meld_cards.dup
+      game.save!
+      visit show_game_path(game)
+      click_on 'Draw from Deck'
+    end
+
+    it 'shows a New Meld option and a checkbox for each card in hand' do
+      game.reload
+      hand_size = game.game_state.current_player.cards.length
+
+      within('.game-view__game-feed') do
+        expect(page).to have_select(options: ['New Meld'])
+        expect(page.all('input[type="checkbox"]').count).to eq hand_size
+      end
+    end
+
+    it 'lays a valid meld: cards leave the hand and the meld appears on the melds-board' do
+      meld_cards.each { |card| check card.to_s }
+      click_on 'Meld/Lay-off Selected'
+
+      within('.game-view__hand') do
+        meld_cards.each do |card|
+          expect(page).to_not have_css("img[src*='#{File.basename(card.to_image_name, '.*')}']")
+        end
+      end
+
+      within('.game-view__game-board') do
+        expect(page).to have_content('Meld 1')
+      end
+    end
+
+    it 'does not end the turn' do
+      meld_cards.each { |card| check card.to_s }
+      click_on 'Meld/Lay-off Selected'
+
+      expect(page).to have_content('Your Turn')
+    end
+
+    it 'silently no-ops on an invalid selection' do
+      check meld_cards.first.to_s
+      click_on 'Meld/Lay-off Selected'
+
+      within('.game-view__hand') do
+        expect(page).to have_css("img[src*='#{File.basename(meld_cards.first.to_image_name, '.*')}']")
+      end
+
+      within('.game-view__game-board') do
+        expect(page).to_not have_content('Meld 1')
+      end
+    end
+
+    it 'shows the laid meld to the opponent' do
+      meld_cards.each { |card| check card.to_s }
+      click_on 'Meld/Lay-off Selected'
+
+      sign_out
+      sign_in_as(user2)
+      visit show_game_path(game)
+
+      within('.game-view__game-board') do
+        expect(page).to have_content('Meld 1')
+      end
+    end
+  end
+
   context 'showing the deck on the board' do
     let(:game_name) { "Penelope's Game" }
     let(:game) { Game.find_by(name: game_name) }

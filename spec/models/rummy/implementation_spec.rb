@@ -385,6 +385,60 @@ RSpec.describe Rummy::Implementation, type: :model do
     end
   end
 
+  describe '#melds' do
+    let(:player1_meld_cards) do
+      [
+        Rummy::Card.new('7', 'Spades'),
+        Rummy::Card.new('7', 'Hearts'),
+        Rummy::Card.new('7', 'Clubs')
+      ]
+    end
+    let(:player1_second_meld_cards) do
+      [
+        Rummy::Card.new('9', 'Spades'),
+        Rummy::Card.new('9', 'Hearts'),
+        Rummy::Card.new('9', 'Clubs')
+      ]
+    end
+    let(:player2_meld_cards) do
+      [
+        Rummy::Card.new('4', 'Diamonds'),
+        Rummy::Card.new('4', 'Spades'),
+        Rummy::Card.new('4', 'Clubs')
+      ]
+    end
+    let(:player1) do
+      Rummy::Player.new(1, hand: Rummy::CardCollection.new(player1_meld_cards + player1_second_meld_cards))
+    end
+    let(:player2) { Rummy::Player.new(2, hand: Rummy::CardCollection.new(player2_meld_cards)) }
+    let(:players) { [player1, player2] }
+    let(:game) { described_class.new(players, current_player_index: 0) }
+
+    context 'when players have laid melds' do
+      before do
+        player1.try_create_meld(player1_meld_cards)
+        player1.try_create_meld(player1_second_meld_cards)
+        player2.try_create_meld(player2_meld_cards)
+      end
+
+      it 'returns melds laid by all players combined, in player order' do
+        expect(game.melds).to eq(player1.melds + player2.melds)
+      end
+
+      it 'returns live references to the stored Meld objects, not copies' do
+        game.melds.first.cards << Rummy::Card.new('7', 'Diamonds')
+
+        expect(player1.melds.first.cards).to include(Rummy::Card.new('7', 'Diamonds'))
+      end
+    end
+
+    context 'when no players have laid a meld' do
+      it 'returns an empty array' do
+        expect(game.melds).to be_empty
+      end
+    end
+  end
+
   describe '#game_over?' do
     # TODO: implement a real test once the win condition (a player emptying their hand) is implemented
   end

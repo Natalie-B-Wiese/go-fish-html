@@ -49,6 +49,11 @@ class Card
 
     rank == other.rank && suit == other.suit
   end
+  alias eql? ==
+
+  def hash
+    [rank, suit].hash
+  end
 
   def self.rank_to_value(rank)
     RANKS.index(rank)

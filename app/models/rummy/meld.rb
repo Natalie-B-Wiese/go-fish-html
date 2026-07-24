@@ -24,8 +24,6 @@ module Rummy
       new(json['cards'].map { |card_json| Card.from_json(card_json) })
     end
 
-    private
-
     def set?
       cards.map(&:rank).uniq.size == 1
     end

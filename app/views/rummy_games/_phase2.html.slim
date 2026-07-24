@@ -1,0 +1,11 @@
+- if @presenter.can_meld?
+	= simple_form_for :turn, url: play_turn_path(@presenter.game), html: { class: "game-actions"} do |f|
+		div.op-stack.gap-xs
+			= f.input :meld, as: :select, label: false, collection: ['New Meld'], selected: 'New Meld', include_blank: false
+
+			- @presenter.hand_cards_h.each do |label, value|
+				label
+					input type="checkbox" name="turn[cards][]" value=value
+					= label
+
+			= f.button :button, "Meld/Lay-off Selected"

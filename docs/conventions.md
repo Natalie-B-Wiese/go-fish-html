@@ -19,12 +19,22 @@ RoleModel house style and project-specific rules that you won't infer from readi
 - **GoodJob broadcasts fire fine in `:js` specs as-is** — `broadcast_refresh_later_to` reaches an
   already-open page via GoodJob's default async execution; no test-env queue-adapter change or
   `perform_enqueued_jobs` is needed.
+- **Assigning `game_state:` on an unsaved `Game` round-trips through the `serialize` coder's dump/load
+  immediately** — `SomeGame.new(game_state: engine)` does *not* keep the object graph you passed in;
+  `some_game.game_state` is a freshly deserialized copy. A model spec that builds `Player`/`Implementation`
+  objects directly, passes the implementation in as `game_state:`, then calls `play_turn?` must assert
+  through `some_game.game_state.current_player` (etc.) afterward — not against the original objects,
+  which are no longer the ones being mutated.
+- **`CardCollection.new(array)` stores the array reference directly (no `dup`)** — if a spec reuses that
+  same array elsewhere (e.g. a `let`), mutating the collection (`push_cards`, `add_card`, a turn that draws
+  a card) mutates the shared array too. Pass `.dup` when handing an array to `CardCollection.new` in a spec
+  if the original array needs to stay unchanged.
 
 ## Ruby style (rubocop-rails-omakase + overrides in `.rubocop.yml`)
 
 - **Single-quoted strings.**
 - **No `# frozen_string_literal: true` magic comments** (`Style/FrozenStringLiteralComment: never`).
-- **`Array#-`/`Array#include?` compare via `hash`/`eql?` (identity by default), not `==`.** Value objects like `Card`/`TurnResult` only override `==`. `array - [some_value_equal_card]` or a membership check against a freshly-constructed object silently no-ops if the array holds a *different instance* with the same value — this surfaced as flaky specs when a hand-built `Card.new(...)` fixture happened to collide with a randomly dealt hand. To remove/filter by value, use `reject { |x| x == target }`, not `-`.
+- **`Array#-`/`Array#include?` compare via `hash`/`eql?` (identity by default), not `==`.** `Card` now defines `eql?`/`hash` matching `==` (fixed while wiring Rummy melds — `Player#make_meld`'s `hand.cards -= meld_cards` was silently failing to remove cards, since the melded cards were different instances than the ones already in hand), so `Array#-`/`include?` work by value for `Card` now. Other value objects (`TurnResult`, `Player`, `Meld`, …) still only override `==` — for those, a membership/removal check against a freshly-constructed equal-but-different-instance object still silently no-ops. To remove/filter by value on a class without `eql?`/`hash`, use `reject { |x| x == target }`, not `-`.
 - **`Metrics/ParameterLists` offenses on `Implementation` subclasses are accepted, not fixed.** Constructors grow past the default max (5) as engine state accumulates (e.g. Rummy's `deck:`/`discard_pile:`/`current_player_index:`/`feed:`/`last_drawn_card:`) — don't refactor to shrink the list and don't add an inline `# rubocop:disable` either; just leave the offense.
 
 ## Rails patterns
@@ -33,6 +43,9 @@ RoleModel house style and project-specific rules that you won't infer from readi
 - **Avoid instance variables in plain Ruby objects** (the game engine, presenters, service-style classes) — lean on locals and passed-in arguments instead. Instance variables are **fine in controllers** (e.g. `@game`, `@presenter` in `ApplicationController` subclasses), which is the normal Rails way to hand data to views.
 - **Presenters** (`app/presenters/`) hold view-facing helper methods for reading engine data so views don't dig into `game.game_state` directly. There's no hard rule forbidding direct access — presenters just keep views clean.
 - **Same `name`, different `value` on submit buttons picks an action without JS or a hidden field.** When one form offers a choice between turn actions (e.g. Rummy's "Draw from Deck" vs. "Take from Discard"), give each `f.button` the same nested `name:` (e.g. `name: "turn[source]"`) and a distinct `value:` — only the clicked button's pair is submitted, so the controller reads the chosen action straight off the permitted param. See `app/views/rummy_games/_phase1.html.slim`.
+- **`simple_form`'s `f.input as: :select` auto-adds a blank option when the field is required**, even with
+  a single-item `collection:`. Pass `include_blank: false` to avoid it (and `selected:` to pre-pick a
+  default) — see `rummy_games/_phase2.html.slim`'s "New Meld" dropdown.
 
 ## Serialization symmetry
 

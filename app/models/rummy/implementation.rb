@@ -70,6 +70,10 @@ module Rummy
       turn_result
     end
 
+    def melds
+      players.flat_map(&:melds)
+    end
+
     def meld_turn(cards:)
       return nil unless drawn?
 

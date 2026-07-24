@@ -99,18 +99,23 @@ meld and see it in `implementation.melds`; then the board should show it after a
 
 ## Implementation Plan
 
-- [ ] Model spec + `Rummy::Implementation#melds` (aggregate `players.flat_map(&:melds)`).
-- [ ] Model/request spec + `RummyGame#play_turn?` meld branch (keys → `Card.from_key` → `meld_turn(cards:)`),
+- [x] Model spec + `Rummy::Implementation#melds` (aggregate `players.flat_map(&:melds)`).
+- [x] Model/request spec + `RummyGame#play_turn?` meld branch (keys → `Card.from_key` → `meld_turn(cards:)`),
       valid lays / invalid returns false; private helper to stay ≤ 7 lines.
-- [ ] `GamesController#turn_params` — permit `cards: []`.
-- [ ] Presenter specs + `can_meld?`, `melds`, and a Set/Run + count label helper.
-- [ ] `rummy_games/_phase2.html.slim` — "New Meld" select (single option) + checkbox grid + "Lay Down Meld".
-- [ ] Wire `_phase2` into `_forms.html.slim` (replace the `TODO`).
-- [ ] `_game_board.html.slim` — render `.melds-board` above the piles.
-- [ ] `components/rummy.css` — port meld styles (BEM); full render, defer collapse.
-- [ ] System spec in `spec/system/rummy_games_spec.rb`: draw → check 3 valid cards → lay → meld shows on board;
-      opponent's meld visible.
-- [ ] Manual play-through via `bin/dev`; run `bundle exec rspec` + `bin/rubocop`.
+- [x] `GamesController#turn_params` — permit `cards: []`.
+- [x] Presenter specs + `can_meld?`, `melds` — Set/Run + count label ended up built directly in the
+      `_meld` partial via `Meld#set?`/`#run?` (made public) rather than a separate presenter helper.
+- [x] `rummy_games/_phase2.html.slim` — "New Meld" select (single option) + checkbox grid + "Lay Down Meld".
+- [x] Wire `_phase2` into `_forms.html.slim` (replace the `TODO`).
+- [x] `_game_board.html.slim` — render melds above the piles (via a new `rummy_games/_meld.html.slim`
+      partial per meld; class naming ended up `.card-container` rather than `.melds-board`/`.meld`, to
+      avoid colliding with "meld" as Rummy domain terminology).
+- [x] CSS — ported as `components/card-container.css` (not `components/rummy.css`); full render, collapse deferred.
+- [x] System spec in `spec/system/rummy_games_spec.rb`: draw → check 3 valid cards → lay → meld shows on board;
+      opponent's meld visible; also added "does not end the turn" and "silently no-ops on an invalid
+      selection" coverage.
+- [ ] Manual play-through via `bin/dev` — not done this session (verified via the automated system specs
+      instead). `bundle exec rspec` + `bin/rubocop` both run clean.
 
 ## Verification
 

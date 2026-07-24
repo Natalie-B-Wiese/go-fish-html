@@ -36,6 +36,53 @@ RSpec.describe RummyGamePresenter, type: :model do
     end
   end
 
+  describe '#can_meld?' do
+    context 'on the current player’s turn, before drawing' do
+      let(:presenter) { described_class.new(game, user1) }
+
+      it 'returns false' do
+        expect(presenter.can_meld?).to be false
+      end
+    end
+
+    context 'when it is not my turn' do
+      let(:presenter) { described_class.new(game, user2) }
+
+      it 'returns false' do
+        expect(presenter.can_meld?).to be false
+      end
+    end
+
+    context 'after the current player has drawn' do
+      let(:presenter) { described_class.new(game, user1) }
+
+      before do
+        game.game_state.draw_deck_turn
+        game.save!
+      end
+
+      it 'returns true' do
+        expect(presenter.can_meld?).to be true
+      end
+    end
+  end
+
+  describe '#hand_cards_h' do
+    let(:presenter) { described_class.new(game, user1) }
+
+    it 'returns the current player’s hand as a hash for the checkbox grid' do
+      expect(presenter.hand_cards_h).to eq CardCollection.cards_to_h(game.game_state.current_player.cards)
+    end
+  end
+
+  describe '#melds' do
+    let(:presenter) { described_class.new(game, user1) }
+
+    it 'returns the melds laid by all players' do
+      expect(presenter.melds).to eq game.game_state.melds
+    end
+  end
+
   describe '#discardable_cards_h' do
     let(:presenter) { described_class.new(game, user1) }
 

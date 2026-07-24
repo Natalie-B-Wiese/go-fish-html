@@ -15,6 +15,18 @@ class RummyGamePresenter < GamePresenter
     my_turn? && implementation.drawn?
   end
 
+  def can_meld?
+    my_turn? && implementation.drawn?
+  end
+
+  def melds
+    implementation.melds
+  end
+
+  def hand_cards_h
+    CardCollection.cards_to_h(my_implementation_player.cards)
+  end
+
   def discardable_cards_h
     CardCollection.cards_to_h(implementation.discardable_cards)
   end

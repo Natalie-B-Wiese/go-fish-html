@@ -25,105 +25,153 @@ RSpec.describe Rummy::Meld, type: :model do
       expect(meld.valid?).to be false
     end
 
-    context 'with a set (same rank)' do
-      it 'is valid for three cards of the same rank' do
-        cards = [
-          Rummy::Card.new('7', 'Spades'),
-          Rummy::Card.new('7', 'Hearts'),
-          Rummy::Card.new('7', 'Clubs')
-        ]
+    it 'is valid when the cards form a set' do
+      cards = [
+        Rummy::Card.new('7', 'Spades'),
+        Rummy::Card.new('7', 'Hearts'),
+        Rummy::Card.new('7', 'Clubs')
+      ]
 
-        meld = described_class.new(cards)
+      meld = described_class.new(cards)
 
-        expect(meld.valid?).to be true
-      end
-
-      it 'is invalid for four of a kind with a mismatched rank mixed in' do
-        cards = [
-          Rummy::Card.new('7', 'Spades'),
-          Rummy::Card.new('7', 'Hearts'),
-          Rummy::Card.new('7', 'Clubs'),
-          Rummy::Card.new('8', 'Diamonds')
-        ]
-
-        meld = described_class.new(cards)
-
-        expect(meld.valid?).to be false
-      end
-
-      it 'is invalid for cards with mixed ranks and mixed suits' do
-        cards = [
-          Rummy::Card.new('3', 'Diamonds'),
-          Rummy::Card.new('7', 'Hearts'),
-          Rummy::Card.new('9', 'Clubs')
-        ]
-
-        meld = described_class.new(cards)
-
-        expect(meld.valid?).to be false
-      end
+      expect(meld.valid?).to be true
     end
 
-    context 'with a run (same suit, consecutive)' do
-      it 'is valid for an Ace-low run of the same suit' do
-        cards = [
-          Rummy::Card.new('A', 'Diamonds'),
-          Rummy::Card.new('2', 'Diamonds'),
-          Rummy::Card.new('3', 'Diamonds')
-        ]
+    it 'is valid when the cards form a run' do
+      cards = [
+        Rummy::Card.new('3', 'Diamonds'),
+        Rummy::Card.new('4', 'Diamonds'),
+        Rummy::Card.new('5', 'Diamonds')
+      ]
 
-        meld = described_class.new(cards)
+      meld = described_class.new(cards)
 
-        expect(meld.valid?).to be true
-      end
+      expect(meld.valid?).to be true
+    end
 
-      it 'is valid for a same-suit run given out of order' do
-        cards = [
-          Rummy::Card.new('3', 'Diamonds'),
-          Rummy::Card.new('5', 'Diamonds'),
-          Rummy::Card.new('4', 'Diamonds')
-        ]
+    it 'is invalid when the cards form neither a set nor a run' do
+      cards = [
+        Rummy::Card.new('3', 'Diamonds'),
+        Rummy::Card.new('7', 'Hearts'),
+        Rummy::Card.new('9', 'Clubs')
+      ]
 
-        meld = described_class.new(cards)
+      meld = described_class.new(cards)
 
-        expect(meld.valid?).to be true
-      end
+      expect(meld.valid?).to be false
+    end
+  end
 
-      it 'is invalid for consecutive ranks with a mismatched suit' do
-        cards = [
-          Rummy::Card.new('4', 'Diamonds'),
-          Rummy::Card.new('5', 'Diamonds'),
-          Rummy::Card.new('6', 'Hearts')
-        ]
+  describe '#set?' do
+    it 'is true for three cards of the same rank' do
+      cards = [
+        Rummy::Card.new('7', 'Spades'),
+        Rummy::Card.new('7', 'Hearts'),
+        Rummy::Card.new('7', 'Clubs')
+      ]
 
-        meld = described_class.new(cards)
+      meld = described_class.new(cards)
 
-        expect(meld.valid?).to be false
-      end
+      expect(meld.set?).to be true
+    end
 
-      it 'is invalid for a same-suit run that is not consecutive' do
-        cards = [
-          Rummy::Card.new('4', 'Diamonds'),
-          Rummy::Card.new('6', 'Diamonds'),
-          Rummy::Card.new('8', 'Diamonds')
-        ]
+    it 'is false for four of a kind with a mismatched rank mixed in' do
+      cards = [
+        Rummy::Card.new('7', 'Spades'),
+        Rummy::Card.new('7', 'Hearts'),
+        Rummy::Card.new('7', 'Clubs'),
+        Rummy::Card.new('8', 'Diamonds')
+      ]
 
-        meld = described_class.new(cards)
+      meld = described_class.new(cards)
 
-        expect(meld.valid?).to be false
-      end
+      expect(meld.set?).to be false
+    end
 
-      it 'is invalid for Q-K-A since Aces are low only' do
-        cards = [
-          Rummy::Card.new('Q', 'Diamonds'),
-          Rummy::Card.new('K', 'Diamonds'),
-          Rummy::Card.new('A', 'Diamonds')
-        ]
+    it 'is false for a run' do
+      cards = [
+        Rummy::Card.new('3', 'Diamonds'),
+        Rummy::Card.new('4', 'Diamonds'),
+        Rummy::Card.new('5', 'Diamonds')
+      ]
 
-        meld = described_class.new(cards)
+      meld = described_class.new(cards)
 
-        expect(meld.valid?).to be false
-      end
+      expect(meld.set?).to be false
+    end
+  end
+
+  describe '#run?' do
+    it 'is true for an Ace-low run of the same suit' do
+      cards = [
+        Rummy::Card.new('A', 'Diamonds'),
+        Rummy::Card.new('2', 'Diamonds'),
+        Rummy::Card.new('3', 'Diamonds')
+      ]
+
+      meld = described_class.new(cards)
+
+      expect(meld.run?).to be true
+    end
+
+    it 'is true for a same-suit run given out of order' do
+      cards = [
+        Rummy::Card.new('3', 'Diamonds'),
+        Rummy::Card.new('5', 'Diamonds'),
+        Rummy::Card.new('4', 'Diamonds')
+      ]
+
+      meld = described_class.new(cards)
+
+      expect(meld.run?).to be true
+    end
+
+    it 'is false for consecutive ranks with a mismatched suit' do
+      cards = [
+        Rummy::Card.new('4', 'Diamonds'),
+        Rummy::Card.new('5', 'Diamonds'),
+        Rummy::Card.new('6', 'Hearts')
+      ]
+
+      meld = described_class.new(cards)
+
+      expect(meld.run?).to be false
+    end
+
+    it 'is false for a same-suit run that is not consecutive' do
+      cards = [
+        Rummy::Card.new('4', 'Diamonds'),
+        Rummy::Card.new('6', 'Diamonds'),
+        Rummy::Card.new('8', 'Diamonds')
+      ]
+
+      meld = described_class.new(cards)
+
+      expect(meld.run?).to be false
+    end
+
+    it 'is false for Q-K-A since Aces are low only' do
+      cards = [
+        Rummy::Card.new('Q', 'Diamonds'),
+        Rummy::Card.new('K', 'Diamonds'),
+        Rummy::Card.new('A', 'Diamonds')
+      ]
+
+      meld = described_class.new(cards)
+
+      expect(meld.run?).to be false
+    end
+
+    it 'is false for a set' do
+      cards = [
+        Rummy::Card.new('7', 'Spades'),
+        Rummy::Card.new('7', 'Hearts'),
+        Rummy::Card.new('7', 'Clubs')
+      ]
+
+      meld = described_class.new(cards)
+
+      expect(meld.run?).to be false
     end
   end
 
