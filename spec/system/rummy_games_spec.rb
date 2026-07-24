@@ -40,6 +40,13 @@ RSpec.describe 'Rummy Games', type: :system do
       visit show_game_path(game)
     end
 
+    it 'shows the turn action form to the current player inside the game feed panel' do
+      within('.game-view__game-feed') do
+        expect(page).to have_content('Turn Action')
+        expect(page).to have_button('Draw from Deck')
+      end
+    end
+
     it 'moves the top deck card into the hand and hides the button' do
       hand_count = within('.game-view__hand') { find_all('.playing-card').count }
 
@@ -55,6 +62,44 @@ RSpec.describe 'Rummy Games', type: :system do
       visit show_game_path(game)
 
       expect(page).to_not have_button('Draw from Deck')
+    end
+
+    it 'does not show any feed message to the current player' do
+      click_on 'Draw from Deck'
+
+      within('.game-view__game-feed') do
+        expect(page).to_not have_css('.feed-bubble')
+      end
+    end
+
+    it 'shows a feed message to the other player' do
+      click_on 'Draw from Deck'
+
+      sign_out
+      sign_in_as(user2)
+      visit show_game_path(game)
+
+      within('.game-view__game-feed') do
+        expect(page).to have_css('.feed-bubble')
+      end
+    end
+
+    it 'does not name the drawn card in the other player’s feed message' do
+      game.reload
+      top_card = Rummy::Card.new('9', 'Clubs')
+      game.game_state.deck.cards = [top_card] + (game.game_state.deck.cards - [top_card])
+      game.save!
+      visit show_game_path(game)
+
+      click_on 'Draw from Deck'
+
+      sign_out
+      sign_in_as(user2)
+      visit show_game_path(game)
+
+      within('.game-view__game-feed') do
+        expect(page).to_not have_content(top_card.to_s)
+      end
     end
   end
 

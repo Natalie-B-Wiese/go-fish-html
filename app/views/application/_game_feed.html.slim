@@ -8,4 +8,4 @@
 
 	.panel__content.op-stack.flex-grow-1.gap-none
 		= render 'feed_content'
-		= render turn_form_partial
+		= render turn_form_partial if local_assigns[:turn_form_partial]

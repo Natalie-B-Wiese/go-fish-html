@@ -1,5 +1,11 @@
 module Rummy
   class TurnResult
+    TAKE_DECK = 'drew a'.freeze
+    TAKE_DISCARD = 'took the'.freeze
+    MELD = 'melded'.freeze
+    LAY_OFF = 'laid off'.freeze
+    DISCARD = 'discarded'.freeze
+
     attr_reader :current_user_id
     attr_accessor :card_received_deck, :card_received_discard, :card_discarded, :meld, :laid_off_cards
 
@@ -15,6 +21,23 @@ module Rummy
 
     def card_received
       card_received_deck || card_received_discard
+    end
+
+    def request_message(user_names_by_id)
+      return deck_draw_message(user_names_by_id) if card_received_deck
+      return discard_draw_message(user_names_by_id) if card_received_discard
+      return lay_off_message(user_names_by_id) if meld && !laid_off_cards.empty?
+      return meld_message(user_names_by_id) if meld
+
+      discard_message(user_names_by_id) if card_discarded
+    end
+
+    def action_message(_user_names_by_id)
+      ''
+    end
+
+    def result_message(_user_names_by_id)
+      ''
     end
 
     def as_json
@@ -56,6 +79,32 @@ module Rummy
         card_discarded == other.card_discarded &&
         meld == other.meld &&
         laid_off_cards == other.laid_off_cards
+    end
+
+    private
+
+    def current_user_name(user_names_by_id)
+      user_names_by_id.fetch(current_user_id)
+    end
+
+    def deck_draw_message(user_names_by_id)
+      "#{current_user_name(user_names_by_id)} #{TAKE_DECK} card from the deck."
+    end
+
+    def discard_draw_message(user_names_by_id)
+      "#{current_user_name(user_names_by_id)} #{TAKE_DISCARD} #{card_received_discard} from the discard pile."
+    end
+
+    def meld_message(user_names_by_id)
+      "#{current_user_name(user_names_by_id)} #{MELD} #{meld.cards.join(', ')}."
+    end
+
+    def lay_off_message(user_names_by_id)
+      "#{current_user_name(user_names_by_id)} #{LAY_OFF} #{laid_off_cards.join(', ')}."
+    end
+
+    def discard_message(user_names_by_id)
+      "#{current_user_name(user_names_by_id)} #{DISCARD} #{card_discarded}."
     end
   end
 end

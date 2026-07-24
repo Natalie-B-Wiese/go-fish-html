@@ -1,4 +1,7 @@
 = render 'rummy_games/game_board'
-= render 'rummy_games/forms'
+- if @presenter.my_turn?
+	= render 'rummy_games/turn_form'
+- else
+	= render 'game_feed'
 = render 'hand'
 = render 'rummy_games/extra'

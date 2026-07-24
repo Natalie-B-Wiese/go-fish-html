@@ -3,6 +3,90 @@ require 'rails_helper'
 RSpec.describe Rummy::TurnResult, type: :model do
   let!(:user) { create(:user1) }
   let(:card) { Rummy::Card.new('2', 'Diamonds') }
+  let(:user_names_by_id) { { user.id => user.name } }
+
+  describe '#request_message' do
+    context 'when card_received_deck is present' do
+      let(:turn_result) { described_class.new(current_user_id: user.id, card_received_deck: card) }
+      let(:result) { turn_result.request_message(user_names_by_id) }
+
+      it 'returns a draw from deck message without saying the card' do
+        expect(result).to match(/#{Rummy::TurnResult::TAKE_DECK}/)
+        expect(result).to match(/#{user.name}/)
+        expect(result).to_not match(/#{card}/)
+      end
+    end
+
+    context 'when card_received_discard is present' do
+      let(:turn_result) { described_class.new(current_user_id: user.id, card_received_discard: card) }
+      let(:result) { turn_result.request_message(user_names_by_id) }
+
+      it 'returns a draw from discard message naming the card' do
+        expect(result).to match(/#{Rummy::TurnResult::TAKE_DISCARD}/)
+        expect(result).to match(/#{user.name}/)
+        expect(result).to match(/#{card}/)
+      end
+    end
+
+    context 'when meld is present without laid_off_cards' do
+      let(:meld) do
+        Rummy::Meld.new([
+                          Rummy::Card.new('7', 'Spades'),
+                          Rummy::Card.new('7', 'Hearts'),
+                          Rummy::Card.new('7', 'Clubs')
+                        ])
+      end
+      let(:turn_result) { described_class.new(current_user_id: user.id, meld: meld) }
+      let(:result) { turn_result.request_message(user_names_by_id) }
+
+      it 'returns a meld message naming the melded cards' do
+        expect(result).to match(/#{Rummy::TurnResult::MELD}/)
+        expect(result).to match(/#{user.name}/)
+        meld.cards.each { |meld_card| expect(result).to match(/#{meld_card}/) }
+      end
+
+      it 'does not return a lay-off message' do
+        expect(result).to_not match(/#{Rummy::TurnResult::LAY_OFF}/)
+      end
+    end
+
+    context 'when meld and laid_off_cards are both present' do
+      let(:meld) do
+        Rummy::Meld.new([
+                          Rummy::Card.new('7', 'Spades'),
+                          Rummy::Card.new('7', 'Hearts'),
+                          Rummy::Card.new('7', 'Clubs'),
+                          Rummy::Card.new('7', 'Diamonds')
+                        ])
+      end
+      let(:laid_off_card) { Rummy::Card.new('7', 'Diamonds') }
+      let(:turn_result) do
+        described_class.new(current_user_id: user.id, meld: meld, laid_off_cards: [laid_off_card])
+      end
+      let(:result) { turn_result.request_message(user_names_by_id) }
+
+      it 'returns a lay-off message naming the laid-off card' do
+        expect(result).to match(/#{Rummy::TurnResult::LAY_OFF}/)
+        expect(result).to match(/#{user.name}/)
+        expect(result).to match(/#{laid_off_card}/)
+      end
+
+      it 'does not return a meld message' do
+        expect(result).to_not match(/#{Rummy::TurnResult::MELD}/)
+      end
+    end
+
+    context 'when card_discarded is present' do
+      let(:turn_result) { described_class.new(current_user_id: user.id, card_discarded: card) }
+      let(:result) { turn_result.request_message(user_names_by_id) }
+
+      it 'returns a discard message naming the card' do
+        expect(result).to match(/#{Rummy::TurnResult::DISCARD}/)
+        expect(result).to match(/#{user.name}/)
+        expect(result).to match(/#{card}/)
+      end
+    end
+  end
 
   describe 'serialization round trip' do
     let!(:turn_result) do

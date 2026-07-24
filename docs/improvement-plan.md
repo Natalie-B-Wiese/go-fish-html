@@ -179,6 +179,14 @@ Captured so they aren't lost; each is a good standalone future task.
   (win condition — engine only) ✅ DONE. Implemented `game_over?` and `winning_player` by porting
   from Crazy Eights. Deferred to a future card: when both stock and discard are empty, let the
   player skip drawing and still meld/lay-off/discard (relaxes the `drawn?` gate).
+- **Rummy: game feed for non-current players — ✅ DONE.** BRAVE breakdown +
+  TDD'd (`docs/plans/completed/rummy-game-feed-brave-breakdown.md`,
+  `docs/plans/completed/rummy-game-feed-spec-plan.md`). Non-current players now see the
+  shared `application/_game_feed`; the current player still only sees their turn-action
+  forms (mutually exclusive by `my_turn?` — never both in the same grid slot). Deck-draw
+  messages stay generic (hidden card); discard-draw/meld/lay-off/discard name the actual
+  card(s), since those are already public. `_game_feed` now tolerates being rendered
+  without a `turn_form_partial` local (`if local_assigns[:turn_form_partial]`).
 - **Rummy: no feedback on a rejected meld / lay-off / discard.** Every turn action returns `nil` with
   no state change and no message (deliberate through card 6), so an invalid submission looks like a
   dead button. Needs a user-facing surface — flash, inline form error, or a feed entry.

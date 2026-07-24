@@ -57,6 +57,12 @@ The shared `::Implementation` base implements the common half: `dump`/`load`, `a
 
 - **Crazy Eights:** one `TurnResult` → **one** feed bubble.
 - **Go Fish:** one `TurnResult` → **up to three** bubbles (`request_message`, `action_message`, `result_message`), fewer when a player has run out of cards.
+- **Rummy:** one `TurnResult` → **one** feed bubble (same shape as Crazy Eights —
+  `action_message`/`result_message` are always empty). Each turn action
+  (`draw_deck_turn`, `draw_discard_turn`, `meld_turn`, `lay_off_turn`, `discard_turn`)
+  pushes its own `TurnResult`. Deck-draw messages never name the card (hidden info);
+  every other message does, since those cards are already public (discard pile top,
+  or melds/lay-offs on the table).
 
 ## Live updates (Turbo Streams)
 
@@ -84,6 +90,13 @@ The game screen is a **4-panel CSS grid**, and its shared skeleton is factored i
   form generically.
 - **Thin entry partial** — `_<game>_game.html.slim` is just the four renders in order:
   `game_board`, `game_feed` (with `turn_form_partial:`), `hand`, `extra`.
+
+**Rummy is an exception to this convention.** Instead of always rendering `game_feed`
+with a `turn_form_partial:` local, `_rummy_game.html.slim` branches on
+`@presenter.my_turn?`: the current player renders `rummy_games/turn_form` directly (no
+feed — their own move history isn't useful mid-turn), everyone else renders `game_feed`
+with no local at all. This is why `_game_feed`'s final line guards on
+`local_assigns[:turn_form_partial]` rather than assuming the local is always passed.
 
 **The fork between lobby and board is in `games/show.html.slim`**, keyed on
 `@presenter.implementation?` (nil until the game starts): started → `render @presenter.game`
