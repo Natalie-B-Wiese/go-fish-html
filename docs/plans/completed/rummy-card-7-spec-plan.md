@@ -11,12 +11,12 @@ This card ports the win-condition methods from the Crazy Eights engine, which us
 ### `spec/models/rummy/implementation_spec.rb` (modify existing)
 
 #### `#game_over?`
-- [ ] returns `false` when all players have cards in their hand
-- [ ] returns `true` when a player has emptied their hand
+- [x] returns `false` when all players have cards in their hand
+- [x] returns `true` when a player has emptied their hand
 
 #### `#winning_player`
-- [ ] returns `nil` when all players have cards in their hand
-- [ ] returns the player whose hand is empty when the game is over
+- [x] returns `nil` when all players have cards in their hand
+- [x] returns the player whose hand is empty when the game is over
 
 ## Implementation Checklist
 
@@ -29,8 +29,8 @@ This card ports the win-condition methods from the Crazy Eights engine, which us
 
 ## Related Specs (Regression Check)
 
-- `spec/models/rummy/*_spec.rb` — all Rummy engine specs (ensure no regressions when hand state is checked)
-- `spec/system/rummy_games_spec.rb` — Rummy system specs (game ending flow already tested at system level via shared code)
+- [x] `spec/models/rummy/*_spec.rb` — all Rummy engine specs (ensure no regressions when hand state is checked)
+- [x] `spec/system/rummy_games_spec.rb` — Rummy system specs (game ending flow already tested at system level via shared code)
 
 ## Notes
 

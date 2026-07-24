@@ -125,20 +125,20 @@ current player's turn
 
 ## Implementation Plan
 
-- [ ] Spec-first: `spec/models/rummy/turn_result_spec.rb` — `as_json`/`from_json` round-trip.
-- [ ] Add `app/models/rummy/turn_result.rb` (`current_user_id`, `card_received_deck`).
-- [ ] Spec-first: `spec/models/rummy/implementation_spec.rb` — `draw_deck_turn` adds a card,
+- [x] Spec-first: `spec/models/rummy/turn_result_spec.rb` — `as_json`/`from_json` round-trip.
+- [x] Add `app/models/rummy/turn_result.rb` (`current_user_id`, `card_received_deck`).
+- [x] Spec-first: `spec/models/rummy/implementation_spec.rb` — `draw_deck_turn` adds a card,
       sets `has_drawn`, does not switch turn; a second draw returns `nil`; `Implementation`
       serialization round-trip preserves `has_drawn`.
-- [ ] Add `has_drawn` state to `Rummy::Implementation` (constructor, `as_json`,
+- [x] Add `has_drawn` state to `Rummy::Implementation` (constructor, `as_json`,
       `self.json_attributes`, `==`) + `self.turn_result_class` + `draw_deck_turn`.
-- [ ] Add `RummyGame#play_turn?` delegating to `game_state.draw_deck_turn`.
-- [ ] Add `RummyGamePresenter#can_draw?`.
-- [ ] Permit the new turn param in `GamesController#play`.
-- [ ] Add `app/views/rummy_games/_turn_form.html.slim` (Draw button gated on `can_draw?`).
-- [ ] Wire `_rummy_game.html.slim:2` `game_feed` render to the new turn form.
-- [ ] System spec `spec/system/rummy_games_spec.rb`: draw → button gone → **reload** → still gone.
-- [ ] `bin/rubocop` (mind the 7-line method / 7-line `it` limits) + full `bundle exec rspec`.
+- [x] Add `RummyGame#play_turn?` delegating to `game_state.draw_deck_turn`.
+- [x] Add `RummyGamePresenter#can_draw?`.
+- [x] Permit the new turn param in `GamesController#play`.
+- [x] Add `app/views/rummy_games/_turn_form.html.slim` (Draw button gated on `can_draw?`).
+- [x] Wire `_rummy_game.html.slim:2` `game_feed` render to the new turn form.
+- [x] System spec `spec/system/rummy_games_spec.rb`: draw → button gone → **reload** → still gone.
+- [x] `bin/rubocop` (mind the 7-line method / 7-line `it` limits) + full `bundle exec rspec`.
 
 ---
 

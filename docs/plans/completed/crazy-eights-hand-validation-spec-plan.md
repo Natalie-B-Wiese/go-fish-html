@@ -19,18 +19,18 @@ no further changes needed there.
 ### `spec/models/crazy_eights/implementation_spec.rb` (modify existing `#play_turn` describe block)
 
 #### context: when the card is not among the player's playable cards
-- [ ] when the card is not in the player's hand at all: does not change the player's hand
-- [ ] when the card is not in the player's hand at all: does not change the discard pile
-- [ ] when the card is not in the player's hand at all: does not switch turns
-- [ ] when the card is not in the player's hand at all: does not add a turn result to the feed
-- [ ] when the card is not in the player's hand at all: returns nil
-- [ ] when the card is in hand but doesn't match the discard pile (and isn't an 8): returns nil and makes no changes
+- [x] when the card is not in the player's hand at all: does not change the player's hand
+- [x] when the card is not in the player's hand at all: does not change the discard pile
+- [x] when the card is not in the player's hand at all: does not switch turns
+- [x] when the card is not in the player's hand at all: does not add a turn result to the feed
+- [x] when the card is not in the player's hand at all: returns nil
+- [x] when the card is in hand but doesn't match the discard pile (and isn't an 8): returns nil and makes no changes
 
 No new spec file needed — `#playable_cards` is already covered by
 `spec/models/crazy_eights/player_spec.rb`; this feature only adds a call site.
 
 ## Related specs (regression check)
 
-- `spec/models/crazy_eights/player_spec.rb` — confirm `#playable_cards` behavior unchanged
-- `spec/models/crazy_eights_game_spec.rb` — serialization round-trip; unaffected but worth a sanity run
-- `spec/system/crazy_eights_games_spec.rb` — end-to-end play flow, to confirm valid plays still work
+- [x] `spec/models/crazy_eights/player_spec.rb` — confirm `#playable_cards` behavior unchanged
+- [x] `spec/models/crazy_eights_game_spec.rb` — serialization round-trip; unaffected but worth a sanity run
+- [x] `spec/system/crazy_eights_games_spec.rb` — end-to-end play flow, to confirm valid plays still work

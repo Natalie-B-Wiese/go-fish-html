@@ -14,28 +14,28 @@ no melds — those are later cards. Mirrors the Crazy Eights turn path.
 ### `spec/models/rummy/turn_result_spec.rb` (new file)
 
 #### serialization round trip
-- [ ] dumps and restores a `card_received_deck` turn result (`from_json(as_json) == original`)
+- [x] dumps and restores a `card_received_deck` turn result (`from_json(as_json) == original`)
 
 ### `spec/models/rummy/implementation_spec.rb` (modify existing)
 
 #### `#draw_deck_turn`
-- [ ] moves the top deck card into the current player's hand
-- [ ] sets `has_drawn` to true
-- [ ] does not switch turns
-- [ ] pushes one turn result to the feed
-- [ ] returns a turn result carrying the drawn card
-- [ ] returns `nil` and does not draw again when `has_drawn` is already true
+- [x] moves the top deck card into the current player's hand
+- [x] sets `has_drawn` to true
+- [x] does not switch turns
+- [x] pushes one turn result to the feed
+- [x] returns a turn result carrying the drawn card
+- [x] returns `nil` and does not draw again when `has_drawn` is already true
 
 #### `#as_json, .from_json, and #==` (extend existing)
-- [ ] round-trip preserves `has_drawn` (drawn game restores as drawn)
-- [ ] is not equal when only `has_drawn` differs
+- [x] round-trip preserves `has_drawn` (drawn game restores as drawn)
+- [x] is not equal when only `has_drawn` differs
 
 ### `spec/system/rummy_games_spec.rb` (modify existing) — the outer driver
 
 #### drawing from the deck
-- [ ] current player sees a **Draw from Deck** button
-- [ ] clicking it adds one card to their hand and the button disappears
-- [ ] button stays gone after a page reload (state persisted)
+- [x] current player sees a **Draw from Deck** button
+- [x] clicking it adds one card to their hand and the button disappears
+- [x] button stays gone after a page reload (state persisted)
 
 ## Implementation touched (from BRAVE card `rummy-brave-breakdown-card-1.md`)
 
@@ -49,6 +49,6 @@ no melds — those are later cards. Mirrors the Crazy Eights turn path.
 
 ## Related specs (regression check)
 
-- `spec/models/crazy_eights/implementation_spec.rb` — shared base `Implementation` (`as_json`/`==`) changes
-- `spec/presenters/game_presenter_spec.rb` — base presenter untouched, but confirm
-- Full `bundle exec rspec` + `bin/rubocop` before done
+- [x] `spec/models/crazy_eights/implementation_spec.rb` — shared base `Implementation` (`as_json`/`==`) changes
+- [x] `spec/presenters/game_presenter_spec.rb` — base presenter untouched, but confirm
+- [x] Full `bundle exec rspec` + `bin/rubocop` before done

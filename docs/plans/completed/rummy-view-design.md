@@ -58,29 +58,28 @@ Named here only so the view has something to read — to be designed separately:
 
 - **Starting hand size:** 2 players → 10 cards, 3–4 players → 7 cards, 5–6 players → 6 cards
   (`Rummy::Implementation::SMALL_GAME_CARDS`/`MEDIUM_GAME_CARDS`/`BIG_GAME_CARDS`).
-- **Win condition:** a round ends when a player empties their hand (standard Rummy). **Not yet
-  implemented** — `game_over?`/`winning_player` are temporary stubs (`false`/`nil`, flagged
-  `# TODO` in the code) so the show page doesn't crash once a game starts; real logic lands once
-  melding/laying-off/discarding exist.
+- **Win condition:** a round ends when a player empties their hand (standard Rummy). ✅
+  **Implemented** — `game_over?`/`winning_player` logic is complete (commit `53cd71a`).
 - Still open: whether lay-off is allowed before a player's own first meld (see Turn structure
   above) — unchanged from before this session.
 - **Turn engine is being built as a card sequence, thinnest slice first** (re-sequenced during
-  the Card-2 breakdown): (1) draw-from-deck + `has_drawn` phase state — **shipped, commit
-  `caf73be`**; then (2) **DiscardPile + draw-from-discard** (see
-  `rummy-brave-breakdown-card-2.md`); then (3) **`switch_turn`** (advance player + reset
-  `has_drawn` + draw-before-end enforcement, which also carries discard-*to*-pile since
-  discarding ends the turn); then (4) melds/lay-off, (5) win condition. Card 1 also added
-  `Rummy::TurnResult` + `self.turn_result_class`.
+  the Card-2 breakdown): 
+  - (1) draw-from-deck + `has_drawn` phase state — ✅ **shipped, commit `caf73be`**
+  - (2) **DiscardPile + draw-from-discard** — ✅ **shipped, commit `0ba82b7`**
+  - (3) **`switch_turn`** + discard-to-pile — ✅ **shipped, commit `1c9b03d`**
+  - (4) melds/lay-off — ✅ **shipped, commits `9cfe86b`, `8e20620`**
+  - (5) win condition — ✅ **shipped, commit `53cd71a`**
+  - Bonus: stock refill — ✅ **shipped, commit `5fa0c84`**
 
 ## Files to create / mirror
 
 - ✅ `app/views/rummy_games/_rummy_game.html.slim` — scaffolded; `game_feed` render still commented out pending the turn form.
 - ✅ `app/views/rummy_games/_game_board.html.slim` — placeholder only ("Nothing here yet!"); still needs the real piles + melds layout.
-- ⬜ `app/views/rummy_games/_turn_form.html.slim` — phase-aware form. Not started.
+- ✅ `app/views/rummy_games/_turn_form.html.slim` — phase-aware form. Implemented with phase 1 and phase 2 forms.
 - ✅ `app/views/rummy_games/_extra.html.slim`, `_player_accordion.slim` — mirror Crazy Eights; working (renders opponent hand counts).
-- ⬜ Hand: extend `app/views/application/_hand.html.slim` (or a Rummy-specific variant) for checkbox selection. Not started — hand currently renders cards read-only.
+- ✅ Hand: extend `app/views/application/_hand.html.slim` (or a Rummy-specific variant) for checkbox selection. Implemented with multi-select checkboxes for melding.
 - ✅ `app/presenters/rummy_game_presenter.rb` — created as an empty `GamePresenter` subclass (same pattern as Go Fish); no Rummy-specific helpers needed yet since the base presenter already covers dealing/hand display.
-- ⬜ CSS: extend `app/assets/stylesheets/components/game-view.css` scope for the meld layout. Not started.
+- ✅ CSS: extend `app/assets/stylesheets/components/game-view.css` scope for the meld layout. Implemented.
 
 ## Verification (once built)
 
