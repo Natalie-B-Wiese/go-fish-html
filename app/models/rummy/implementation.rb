@@ -70,6 +70,17 @@ module Rummy
       turn_result
     end
 
+    def meld_turn(cards:)
+      return nil unless drawn?
+
+      meld = current_player.try_create_meld(cards)
+      return nil unless meld
+
+      turn_result = TurnResult.new(current_user_id: current_user_id, meld: meld)
+      feed.push(turn_result)
+      turn_result
+    end
+
     def as_json
       super.merge(last_drawn_card: last_drawn_card.as_json, discard_pile: discard_pile.as_json)
     end

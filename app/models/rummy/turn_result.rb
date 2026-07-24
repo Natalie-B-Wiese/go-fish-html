@@ -1,13 +1,15 @@
 module Rummy
   class TurnResult
     attr_reader :current_user_id
-    attr_accessor :card_received_deck, :card_received_discard, :card_discarded
+    attr_accessor :card_received_deck, :card_received_discard, :card_discarded, :meld
 
-    def initialize(current_user_id:, card_received_deck: nil, card_received_discard: nil, card_discarded: nil)
+    def initialize(current_user_id:, card_received_deck: nil, card_received_discard: nil, card_discarded: nil,
+                   meld: nil)
       @current_user_id = current_user_id
       @card_received_deck = card_received_deck
       @card_received_discard = card_received_discard
       @card_discarded = card_discarded
+      @meld = meld
     end
 
     def card_received
@@ -19,7 +21,8 @@ module Rummy
         'current_user_id' => current_user_id,
         'card_received_deck' => card_received_deck.as_json,
         'card_received_discard' => card_received_discard.as_json,
-        'card_discarded' => card_discarded.as_json
+        'card_discarded' => card_discarded.as_json,
+        'meld' => meld&.as_json
       }
     end
 
@@ -28,12 +31,17 @@ module Rummy
         current_user_id: json['current_user_id'],
         card_received_deck: card_from_json(json['card_received_deck']),
         card_received_discard: card_from_json(json['card_received_discard']),
-        card_discarded: card_from_json(json['card_discarded'])
+        card_discarded: card_from_json(json['card_discarded']),
+        meld: meld_from_json(json['meld'])
       )
     end
 
     def self.card_from_json(card_json)
       card_json.nil? ? nil : Card.from_json(card_json)
+    end
+
+    def self.meld_from_json(meld_json)
+      meld_json.nil? ? nil : Meld.from_json(meld_json)
     end
 
     def ==(other)
@@ -42,7 +50,8 @@ module Rummy
       current_user_id == other.current_user_id &&
         card_received_deck == other.card_received_deck &&
         card_received_discard == other.card_received_discard &&
-        card_discarded == other.card_discarded
+        card_discarded == other.card_discarded &&
+        meld == other.meld
     end
   end
 end

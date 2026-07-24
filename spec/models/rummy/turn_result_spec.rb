@@ -89,6 +89,52 @@ RSpec.describe Rummy::TurnResult, type: :model do
     end
   end
 
+  describe 'serialization round trip for a meld' do
+    let(:meld) do
+      Rummy::Meld.new([
+                        Rummy::Card.new('7', 'Spades'),
+                        Rummy::Card.new('7', 'Hearts'),
+                        Rummy::Card.new('7', 'Clubs')
+                      ])
+    end
+    let!(:turn_result) do
+      described_class.new(current_user_id: user.id, meld: meld)
+    end
+
+    it 'can dump and restore data' do
+      restored = described_class.from_json(turn_result.as_json)
+      expect(restored).to eq turn_result
+    end
+  end
+
+  describe '#== for a meld' do
+    let(:meld) do
+      Rummy::Meld.new([
+                        Rummy::Card.new('7', 'Spades'),
+                        Rummy::Card.new('7', 'Hearts'),
+                        Rummy::Card.new('7', 'Clubs')
+                      ])
+    end
+    let(:turn_result) { described_class.new(current_user_id: user.id, meld: meld) }
+
+    it 'is equal when the meld is the same' do
+      other = described_class.new(current_user_id: user.id, meld: meld)
+
+      expect(turn_result).to eq other
+    end
+
+    it 'is not equal when the meld differs' do
+      other_meld = Rummy::Meld.new([
+                                     Rummy::Card.new('8', 'Spades'),
+                                     Rummy::Card.new('8', 'Hearts'),
+                                     Rummy::Card.new('8', 'Clubs')
+                                   ])
+      other = described_class.new(current_user_id: user.id, meld: other_meld)
+
+      expect(turn_result).to_not eq other
+    end
+  end
+
   describe '#== for a discarded card' do
     let(:turn_result) { described_class.new(current_user_id: user.id, card_discarded: card) }
 

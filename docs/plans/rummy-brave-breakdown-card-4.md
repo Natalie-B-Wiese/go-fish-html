@@ -104,12 +104,16 @@ is the UI card's concern.
 - [x] Finish `Rummy::Meld` validation: `Q-K-A` invalid, wrong-suit run, size < 3, mixed — and
       `as_json` / `from_json` round-trip. Also added `#==` and sorts cards by value in
       `initialize` (design change made mid-card; see note below).
-- [ ] `Rummy::Player`: `melds` + `add_meld`; extend `as_json` / `from_json` / `==`.
-- [ ] `Rummy::TurnResult`: add `meld` field; extend `as_json` / `from_json` / `==`.
-- [ ] `Rummy::Implementation#meld_turn`: guard `drawn?` + all-cards-in-hand + `Meld#valid?`;
+- [x] `Rummy::Player`: `melds` + `add_meld`; extend `as_json` / `from_json` / `==`.
+- [x] `Rummy::TurnResult`: add `meld` field; extend `as_json` / `from_json` / `==`.
+- [x] `Rummy::Implementation#meld_turn`: guard `drawn?` + all-cards-in-hand + `Meld#valid?`;
       move cards hand→melds; build `TurnResult`; push feed; no `switch_turn`; `nil` on invalid.
-- [ ] `Rummy::Implementation#melds`: stable seat-then-lay-down-ordered array across all players.
-- [ ] Full `implementation_spec` coverage for the above; run `bundle exec rspec` + `bin/rubocop`.
+      (Design change: the hand-membership + validity check and the hand→melds move live in a new
+      `Rummy::Player#try_create_meld`, mirroring Go Fish's `Player#try_make_book` — `meld_turn`
+      just guards `drawn?` and delegates.)
+- [ ] ~~`Rummy::Implementation#melds`~~ — deferred to the lay-off card; it's only needed there to
+      address a meld by array index, not to lay one down.
+- [x] Full `implementation_spec` coverage for the above; run `bundle exec rspec` + `bin/rubocop`.
 
 > **Note on the Ace-low approach (diverges from the Approach section above):** rather than a
 > rank-order constant living on `Meld` itself, the Ace-low fix lives on a new `Rummy::Card < Card`

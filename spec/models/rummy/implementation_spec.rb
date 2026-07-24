@@ -325,6 +325,66 @@ RSpec.describe Rummy::Implementation, type: :model do
     end
   end
 
+  describe '#meld_turn' do
+    let(:meld_cards) do
+      [
+        Rummy::Card.new('7', 'Spades'),
+        Rummy::Card.new('7', 'Hearts'),
+        Rummy::Card.new('7', 'Clubs')
+      ]
+    end
+    let(:other_hand_card) { Rummy::Card.new('2', 'Clubs') }
+    let(:drawn_card) { Rummy::Card.new('5', 'Hearts') }
+    let(:player1) { Rummy::Player.new(1, hand: Rummy::CardCollection.new(meld_cards + [other_hand_card])) }
+    let(:player2) { Rummy::Player.new(2) }
+    let(:players) { [player1, player2] }
+    let(:game) { described_class.new(players, deck: Rummy::Deck.new([drawn_card]), current_player_index: 0) }
+
+    context 'when the current player has drawn and the cards form a valid meld' do
+      before { game.draw_deck_turn }
+
+      it 'moves the cards from hand into a meld on the player' do
+        game.meld_turn(cards: meld_cards)
+
+        expect(player1.melds.first.cards).to match_array meld_cards
+      end
+
+      it 'removes the melded cards from the hand' do
+        game.meld_turn(cards: meld_cards)
+
+        expect(player1.cards).to_not include(*meld_cards)
+      end
+    end
+
+    context 'when the current player has not drawn' do
+      it 'returns nil' do
+        expect(game.meld_turn(cards: meld_cards)).to be_nil
+      end
+
+      it 'does not add a meld to the player' do
+        game.meld_turn(cards: meld_cards)
+
+        expect(player1.melds).to be_empty
+      end
+    end
+
+    context 'when the current player does not have a valid meld' do
+      before { game.draw_deck_turn }
+
+      let(:invalid_cards) { [Rummy::Card.new('7', 'Spades'), other_hand_card] }
+
+      it 'returns nil' do
+        expect(game.meld_turn(cards: invalid_cards)).to be_nil
+      end
+
+      it 'does not remove the cards from the hand' do
+        game.meld_turn(cards: invalid_cards)
+
+        expect(player1.cards).to include(Rummy::Card.new('7', 'Spades'), other_hand_card)
+      end
+    end
+  end
+
   describe '#game_over?' do
     # TODO: implement a real test once the win condition (a player emptying their hand) is implemented
   end
