@@ -171,10 +171,14 @@ Captured so they aren't lost; each is a good standalone future task.
   discard-&-end-turn (`docs/plans/rummy-brave-breakdown-card-3.md`), and lay down melds — engine
   only (`docs/plans/rummy-brave-breakdown-card-4.md`) — are done. `Implementation#melds` (a stable
   cross-player ordered accessor) was scoped into card 4 but pushed later, since it's only needed
-  once a UI has to address a meld by array index. Next up (planned, not yet built): the melds UI —
-  lay a new meld + render everyone's melds on the board, incl. `Implementation#melds`
-  (`docs/plans/rummy-brave-breakdown-card-5.md`, 4 pts) — then lay-offs + lay-off UI
-  (`docs/plans/rummy-brave-breakdown-card-6.md`, 4 pts, engine + UI) — then the win condition.
+  once a UI has to address a meld by array index. The melds UI — lay a new meld + render everyone's
+  melds on the board, incl. `Implementation#melds` (`docs/plans/rummy-brave-breakdown-card-5.md`,
+  4 pts) — is also done. Breakdowns written but not yet built: lay-offs + lay-off UI
+  (`docs/plans/rummy-brave-breakdown-card-6.md`, 4 pts, engine + UI); the win condition — engine only
+  (`docs/plans/rummy-brave-breakdown-card-7.md`, 1 pt); and stock-runs-out refill-from-discard —
+  engine only (`docs/plans/rummy-brave-breakdown-card-8.md`, 2 pts). Deferred to its own future
+  card: when both stock and discard are empty, let the player skip drawing and still
+  meld/lay-off/discard (relaxes the `drawn?` gate).
 - **Concurrency race on `game_state`** (`app/controllers/games_controller.rb#play`, `Game#start!`
   / `#end!`): read-modify-write with no lock. A double-submit or the auto-timer
   (`autorun_turn_controller.js`) firing alongside a manual submit can clobber a turn; `start!`/
