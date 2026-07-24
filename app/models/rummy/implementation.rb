@@ -114,14 +114,12 @@ module Rummy
       super && last_drawn_card == other.last_drawn_card && discard_pile == other.discard_pile
     end
 
-    # TODO: a player wins by emptying their hand; not yet implemented
     def game_over?
-      false
+      players.any? { |player| player.cards.empty? }
     end
 
-    # TODO: a player wins by emptying their hand; not yet implemented
     def winning_player
-      nil
+      players.find { |player| player.cards.empty? }
     end
 
     private

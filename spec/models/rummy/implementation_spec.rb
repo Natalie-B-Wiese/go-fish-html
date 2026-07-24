@@ -568,11 +568,62 @@ RSpec.describe Rummy::Implementation, type: :model do
   end
 
   describe '#game_over?' do
-    # TODO: implement a real test once the win condition (a player emptying their hand) is implemented
+    let(:user_ids) { [1, 2] }
+    let!(:game) { described_class.new(players, current_player_index: 0) }
+
+    before { game.start! }
+
+    context 'when all players have cards' do
+      before do
+        players[0].hand.cards = [Rummy::Card.new('5', 'Spades')]
+        players[1].hand.cards = [Rummy::Card.new('3', 'Spades')]
+      end
+
+      it 'returns false' do
+        expect(game.game_over?).to be false
+      end
+    end
+
+    context 'when one player is out of cards' do
+      before do
+        players[0].hand.cards = [Rummy::Card.new('5', 'Spades')]
+        players[1].hand.cards = []
+      end
+
+      it 'returns true' do
+        expect(game.game_over?).to be true
+      end
+    end
   end
 
   describe '#winning_player' do
-    # TODO: implement a real test once the win condition (a player emptying their hand) is implemented
+    let(:user_ids) { [1, 2] }
+    let!(:game) { described_class.new(players, current_player_index: 0) }
+
+    before { game.start! }
+
+    context 'when all players have cards' do
+      before do
+        players[0].hand.cards = [Rummy::Card.new('5', 'Spades')]
+        players[1].hand.cards = [Rummy::Card.new('3', 'Spades')]
+      end
+
+      it 'returns nil' do
+        expect(game.winning_player).to be_nil
+      end
+    end
+
+    context 'when one player is out of cards' do
+      it 'returns the player whose hand is empty' do
+        players[0].hand.cards = []
+        players[1].hand.cards = [Rummy::Card.new('5', 'Spades')]
+        expect(game.winning_player).to eq players[0]
+
+        players[0].hand.cards = [Rummy::Card.new('5', 'Spades')]
+        players[1].hand.cards = []
+        expect(game.winning_player).to eq players[1]
+      end
+    end
   end
 
   describe '#as_json, .from_json, and #==' do

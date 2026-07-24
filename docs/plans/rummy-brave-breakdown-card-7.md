@@ -101,13 +101,13 @@ raise); a hand is either empty or not. Nothing for the user to "get wrong" here.
 
 ## Implementation Plan
 
-- [ ] Add `describe '#game_over?'` to `spec/models/rummy/implementation_spec.rb`
+- [x] Add `describe '#game_over?'` to `spec/models/rummy/implementation_spec.rb`
       (not-over + out-of-cards contexts), adapted to Rummy scaffolding — run red.
-- [ ] Replace the `#game_over?` TODO stub with the `players.any? { |p| p.cards.empty? }`
+- [x] Replace the `#game_over?` TODO stub with the `players.any? { |p| p.cards.empty? }`
       implementation — run green.
-- [ ] Add `describe '#winning_player'` (returns `nil` when all have cards; returns the
+- [x] Add `describe '#winning_player'` (returns `nil` when all have cards; returns the
       empty-handed player otherwise) — run red.
-- [ ] Replace the `#winning_player` TODO stub with the
+- [x] Replace the `#winning_player` TODO stub with the
       `players.find { |p| p.cards.empty? }` implementation — run green.
-- [ ] Remove both `# TODO:` comments; run the full engine spec + `bin/rubocop` to confirm
+- [x] Remove both `# TODO:` comments; run the full engine spec + `bin/rubocop` to confirm
       the suite is green and style-clean.
