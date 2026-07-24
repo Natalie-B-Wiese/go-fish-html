@@ -174,18 +174,18 @@ Captured so they aren't lost; each is a good standalone future task.
   once a UI has to address a meld by array index. The melds UI — lay a new meld + render everyone's
   melds on the board, incl. `Implementation#melds` (`docs/plans/rummy-brave-breakdown-card-5.md`,
   4 pts) — is also done, as are lay-offs + the meld-selection dropdown
-  (`docs/plans/rummy-brave-breakdown-card-6.md`, 4 pts, engine + UI). Breakdowns written but not yet
-  built: the win condition — engine only
-  (`docs/plans/rummy-brave-breakdown-card-7.md`, 1 pt); and stock-runs-out refill-from-discard —
-  engine only (`docs/plans/rummy-brave-breakdown-card-8.md`, 2 pts). Deferred to its own future
+  (`docs/plans/rummy-brave-breakdown-card-6.md`, 4 pts, engine + UI), as is the stock-runs-out
+  refill-from-discard (`docs/plans/rummy-brave-breakdown-card-8.md`, 2 pts, engine only). Breakdown
+  written but not yet built: the win condition — engine only
+  (`docs/plans/rummy-brave-breakdown-card-7.md`, 1 pt). Deferred to its own future
   card: when both stock and discard are empty, let the player skip drawing and still
   meld/lay-off/discard (relaxes the `drawn?` gate).
 - **Rummy: no feedback on a rejected meld / lay-off / discard.** Every turn action returns `nil` with
   no state change and no message (deliberate through card 6), so an invalid submission looks like a
   dead button. Needs a user-facing surface — flash, inline form error, or a feed entry.
 - **`docs/rummy-rules.md` doesn't exist** while Go Fish and Crazy Eights each have a rules-as-
-  implemented doc (and AGENTS.md's Key context links them). Worth writing once cards 7-8 land, so it
-  can state the win condition and stock-refill behavior.
+  implemented doc (and AGENTS.md's Key context links them). Worth writing once card 7 lands, so it
+  can state the win condition alongside the stock-refill behavior card 8 added.
 - **Restore the omakase inherit in `.rubocop.yml`.** The `inherit_gem` line is commented out, so
   `bin/rubocop` runs default RuboCop instead of the house style the project claims — hence the ~686
   offense baseline that makes the tool nearly useless as a gate. Uncommenting it is a small change

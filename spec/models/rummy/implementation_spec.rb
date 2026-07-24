@@ -81,6 +81,24 @@ RSpec.describe Rummy::Implementation, type: :model do
       expect(result.card_received_deck).to eq top_card
     end
 
+    context 'when the deck is empty' do
+      let(:oldest_discard) { Rummy::Card.new('K', 'Clubs') }
+      let(:middle_discard) { Rummy::Card.new('7', 'Hearts') }
+      let(:newest_discard) { Rummy::Card.new('3', 'Spades') }
+
+      before do
+        game.deck.cards = []
+        game.discard_pile.cards = [newest_discard, middle_discard, oldest_discard]
+      end
+
+      it 'flips the discard pile to form the new deck' do
+        result = game.draw_deck_turn
+        expect(result.card_received_deck).to eq oldest_discard
+        expect(game.deck.cards).to eq [middle_discard, newest_discard]
+        expect(game.discard_pile.cards).to be_empty
+      end
+    end
+
     context 'when the player has already drawn this turn' do
       before { game.draw_deck_turn }
 

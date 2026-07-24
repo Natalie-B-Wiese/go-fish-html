@@ -39,6 +39,7 @@ module Rummy
     def draw_deck_turn
       return nil if drawn?
 
+      refill_deck_from_discard if deck.empty?
       card = deck.shift_card
       turn_result = TurnResult.new(current_user_id: current_user_id, card_received_deck: card)
       draw_turn(card, turn_result)
@@ -124,6 +125,11 @@ module Rummy
     end
 
     private
+
+    def refill_deck_from_discard
+      deck.push_cards(discard_pile.cards.reverse)
+      discard_pile.cards = []
+    end
 
     def draw_turn(card, turn_result)
       current_player.add_card(card)

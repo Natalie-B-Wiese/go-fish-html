@@ -111,15 +111,20 @@ explicitly deferred.
 
 ## Implementation Plan
 
-- [ ] Add a `context 'when the deck is empty'` under `describe '#draw_deck_turn'` in
+- [x] Add a `context 'when the deck is empty'` under `describe '#draw_deck_turn'` in
       `spec/models/rummy/implementation_spec.rb`: set up an empty deck + a known discard
       pile, draw from deck, assert the drawn card is the *bottom* of the old discard pile
       (flip order) — run red.
-- [ ] Add `refill_deck_from_discard` (private) and the `refill_deck_from_discard if
+- [x] Add `refill_deck_from_discard` (private) and the `refill_deck_from_discard if
       deck.empty?` call in `draw_deck_turn` — run green.
-- [ ] Add a spec asserting the discard pile is **empty** after the refill draw (no
+- [x] Add a spec asserting the discard pile is **empty** after the refill draw (no
       duplicated cards) — confirm green.
-- [ ] Add a spec asserting the new stock holds the remaining flipped cards in reversed
+- [x] Add a spec asserting the new stock holds the remaining flipped cards in reversed
       order (draw again, or inspect) so the full reversal is pinned — confirm green.
-- [ ] Confirm the existing `#draw_deck_turn` specs (non-empty deck) and `#draw_discard_turn`
+- [x] Confirm the existing `#draw_deck_turn` specs (non-empty deck) and `#draw_discard_turn`
       still pass; run `bin/rubocop` for the 7-line limit and house style.
+
+**As built:** the last three spec bullets landed as a single example,
+`flips the discard pile to form the new deck`, asserting the drawn card (oldest discard),
+the reversed remaining stock, and the emptied discard pile together — one refill behavior,
+one test.
