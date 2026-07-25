@@ -2,6 +2,6 @@
 - if @presenter.my_turn?
 	= render 'rummy_games/turn_form'
 - else
-	= render 'game_feed'
+	= render 'game_feed', spacer: false
 = render 'hand'
 = render 'rummy_games/extra'

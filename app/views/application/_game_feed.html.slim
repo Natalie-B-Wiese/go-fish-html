@@ -1,5 +1,4 @@
-/ Locals:
-/ turn_form_partial: the name of the partial for the turn form
+/ # locals: (spacer:true, turn_form_partial:'')
 
 .game-view__game-feed.panel.panel--padded.panel--primary
 	header.panel__header.op-split
@@ -8,4 +7,6 @@
 
 	.panel__content.op-stack.flex-grow-1.gap-none
 		= render 'feed_content'
+		- if spacer==true
+			.game-actions-spacer
 		= render turn_form_partial if local_assigns[:turn_form_partial]
