@@ -6,10 +6,10 @@
 				collection: @presenter.meld_options_h,
 				selected: @presenter.meld_options_h.values.first,
 				include_blank: false
-
-			- @presenter.hand_cards_h.each do |label, value|
-				label
-					input type="checkbox" name="turn[cards][]" value=value
-					= label
+			div.grid-col-2
+				- @presenter.hand_cards_h.each do |label, value|
+					label
+						input type="checkbox" name="turn[cards][]" value=value
+						= label
 
 			= f.button :button, "Meld/Lay-off Selected"
