@@ -186,7 +186,8 @@ Captured so they aren't lost; each is a good standalone future task.
   forms (mutually exclusive by `my_turn?` — never both in the same grid slot). Deck-draw
   messages stay generic (hidden card); discard-draw/meld/lay-off/discard name the actual
   card(s), since those are already public. `_game_feed` now tolerates being rendered
-  without a `turn_form_partial` local (`if local_assigns[:turn_form_partial]`).
+  without a `turn_form_partial` local (`if turn_form_partial.present?`, since strict
+  locals require a default — `''` — rather than an absent key).
 - **Rummy: no feedback on a rejected meld / lay-off / discard.** Every turn action returns `nil` with
   no state change and no message (deliberate through card 6), so an invalid submission looks like a
   dead button. Needs a user-facing surface — flash, inline form error, or a feed entry.
@@ -237,6 +238,10 @@ Captured so they aren't lost; each is a good standalone future task.
   re-processes the full history. The N+1 query fix doesn't address this — a long-running game
   still means an ever-growing jsonb blob and linear per-render work. Candidate fix: cap/paginate
   the rendered feed (e.g. last N turns) or archive older entries out of the hot jsonb column.
+- **Convert `users/_form.html.slim` to strict locals.** The game-view strict-locals pass (this
+  session) covered `app/views/application/`, `app/views/<game>_games/`, and `games/show.html.slim`.
+  `users/_form.html.slim` still reads `@user` directly — unrelated to the game views, left out of
+  scope, worth a small standalone pass.
 
 ---
 

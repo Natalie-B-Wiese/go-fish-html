@@ -1,12 +1,12 @@
-/ # locals: (spacer:true, turn_form_partial:'')
+/ # locals: (spacer: true, turn_form_partial: '', presenter:)
 
 .game-view__game-feed.panel.panel--padded.panel--primary
 	header.panel__header.op-split
 		h2 Game Feed
-		= render 'turn_badge', classes: ''
+		= render 'turn_badge', classes: '', my_turn: presenter.my_turn?, current_user_name: presenter.implementation_current_user.name
 
 	.panel__content.op-stack.flex-grow-1.gap-none
-		= render 'feed_content'
+		= render 'feed_content', feed: presenter.implementation.feed, user_names_by_id: presenter.user_names_by_id
 		- if spacer==true
 			.game-actions-spacer
-		= render turn_form_partial if local_assigns[:turn_form_partial]
+		= render turn_form_partial, presenter: presenter if turn_form_partial.present?

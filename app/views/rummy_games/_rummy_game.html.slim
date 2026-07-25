@@ -1,7 +1,7 @@
-= render 'rummy_games/game_board'
+= render 'rummy_games/game_board', game_name: @presenter.game.name, melds: @presenter.melds, deck_count: @presenter.implementation.deck.card_count, discard_pile: @presenter.implementation.discard_pile
 - if @presenter.my_turn?
-	= render 'rummy_games/turn_form'
+	= render 'rummy_games/turn_form', presenter: @presenter
 - else
-	= render 'game_feed', spacer: false
-= render 'hand'
-= render 'rummy_games/extra'
+	= render 'game_feed', spacer: false, presenter: @presenter
+= render 'hand', cards: @presenter.my_implementation_player.cards
+= render 'rummy_games/extra', opponent_users: @presenter.opponent_users, players_hash: @presenter.implementation_players_hash

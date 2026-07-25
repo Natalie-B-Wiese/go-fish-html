@@ -34,6 +34,9 @@ RoleModel house style and project-specific rules that you won't infer from readi
   country".** The `:js` example waits with a fixed `sleep(1)` for JS to repopulate the State select;
   it fails on roughly 2 of 3 whole-file runs on a clean checkout. If it's the only failure, it's not
   your change.
+- **Known flake: `spec/system/games_spec.rb` "time on countdown does not reset on refresh".** Off-by-
+  one-second timing race (expects the same remaining time before/after a refresh; occasionally ticks
+  down by 1 in between). Passes in isolation. If it's the only failure, it's not your change.
 - **`CardCollection.new(array)` stores the array reference directly (no `dup`)** — if a spec reuses that
   same array elsewhere (e.g. a `let`), mutating the collection (`push_cards`, `add_card`, a turn that draws
   a card) mutates the shared array too. Pass `.dup` when handing an array to `CardCollection.new` in a spec
@@ -55,6 +58,14 @@ RoleModel house style and project-specific rules that you won't infer from readi
 - **`simple_form`'s `f.input as: :select` auto-adds a blank option when the field is required**, even with
   a single-item `collection:`. Pass `include_blank: false` to avoid it (and `selected:` to pre-pick a
   default) — see `rummy_games/_phase2.html.slim`'s "New Meld" dropdown.
+- **A model-level `broadcast_*_to` (e.g. `self.broadcast_append_later_to`) always merges an implicit
+  `<model_name.element>: self` local into the render** — the same injection `render(record, locals)`
+  does via `ActionView::ObjectRenderer`. A strict-locals partial that doesn't declare that key raises
+  `ArgumentError: unknown local`. This bit `_game_card.html.slim` (declared `game:, is_in_game: false`)
+  when `Player` broadcast into it (`player:` collision) and when an STI `Game` subclass broadcast into
+  it (`rummy_game:`/`go_fish_game:` collision). Fix: call the class-level `Turbo::StreamsChannel.broadcast_*_to`
+  instead of the instance convenience method — it doesn't know about `self`, so it skips the injection.
+  See `Game#add_game_to_index`, `Player#move_game_to_my_games`/`#update_user_game_card`.
 
 ## Serialization symmetry
 

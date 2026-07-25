@@ -1,13 +1,15 @@
-- if @presenter.can_meld?
-	= simple_form_for :turn, url: play_turn_path(@presenter.game), html: { class: "game-actions"} do |f|
+/ # locals: (can_meld:, game:, meld_options:, hand_cards:)
+
+- if can_meld
+	= simple_form_for :turn, url: play_turn_path(game), html: { class: "game-actions"} do |f|
 		div.op-stack.gap-xs
 			= f.input :meld,
 				as: :select,
-				collection: @presenter.meld_options_h,
-				selected: @presenter.meld_options_h.values.first,
+				collection: meld_options,
+				selected: meld_options.values.first,
 				include_blank: false
 			div.grid-col-2
-				- @presenter.hand_cards_h.each do |label, value|
+				- hand_cards.each do |label, value|
 					label
 						input type="checkbox" name="turn[cards][]" value=value
 						= label

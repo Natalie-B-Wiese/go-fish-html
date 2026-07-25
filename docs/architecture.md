@@ -85,18 +85,31 @@ The game screen is a **4-panel CSS grid**, and its shared skeleton is factored i
   `_play_turn_button`.
 - **Per-game region partials** in `app/views/<game>_games/` — `_game_board`, `_extra`,
   `_turn_form`, `_player_accordion`. These genuinely differ per game (e.g. Go Fish's `_extra` shows
-  your Books; Crazy Eights' shows the opponent list). Region partials **read `@presenter`
-  directly** rather than taking locals, which is what lets the shared feed render any game's turn
-  form generically.
+  your Books; Crazy Eights' shows the opponent list). Region partials take **strict locals**
+  (Rails' `# locals: (...)` magic comment), kept as narrow as possible — e.g. `_game_board` takes
+  `game_name:`/`melds:`/`deck_count:`/`discard_pile:`, not the whole presenter.
+- **Two deliberate exceptions stay non-strict / whole-presenter:**
+  - **Entry partials** (`_<game>_game.html.slim`) still read `@presenter` directly (no strict
+    locals at all). They're invoked via `render @presenter.game` — Rails' bare-object shorthand —
+    which always merges in an implicit local named after the object's `to_partial_path` basename
+    (e.g. `rummy_game:`) alongside any explicit locals. A strict-locals partial has a fixed keyword
+    signature and raises `ArgumentError: unknown local` on that extra key, so entry partials opt out
+    of strict locals entirely rather than fight the injection.
+  - **`_game_feed.html.slim`** and each game's **`_turn_form.html.slim`** take a whole `presenter:`
+    local (not narrowed). `_game_feed` dispatches to a per-game turn-form partial chosen dynamically
+    (`turn_form_partial:`), and each game's turn form pulls different, unrelated presenter methods —
+    there's no single narrow set of locals that would work for all three games, so the whole
+    presenter is handed through instead.
 - **Thin entry partial** — `_<game>_game.html.slim` is just the four renders in order:
-  `game_board`, `game_feed` (with `turn_form_partial:`), `hand`, `extra`.
+  `game_board`, `game_feed` (with `turn_form_partial:` and `presenter:`), `hand`, `extra`.
 
 **Rummy is an exception to this convention.** Instead of always rendering `game_feed`
 with a `turn_form_partial:` local, `_rummy_game.html.slim` branches on
 `@presenter.my_turn?`: the current player renders `rummy_games/turn_form` directly (no
 feed — their own move history isn't useful mid-turn), everyone else renders `game_feed`
-with no local at all. This is why `_game_feed`'s final line guards on
-`local_assigns[:turn_form_partial]` rather than assuming the local is always passed.
+with no `turn_form_partial` local at all. This is why `_game_feed`'s final line guards on
+`turn_form_partial.present?` (the strict local defaults to `''`) rather than assuming the
+local is always passed.
 
 **The fork between lobby and board is in `games/show.html.slim`**, keyed on
 `@presenter.implementation?` (nil until the game starts): started → `render @presenter.game`

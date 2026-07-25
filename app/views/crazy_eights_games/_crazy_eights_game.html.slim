@@ -1,4 +1,4 @@
-= render 'crazy_eights_games/game_board'
-= render 'game_feed', turn_form_partial: 'crazy_eights_games/turn_form'
-= render 'hand'
-= render 'crazy_eights_games/extra'
+= render 'crazy_eights_games/game_board', game_name: @presenter.game.name, discard_pile: @presenter.implementation.discard_pile, deck_count: @presenter.implementation.deck.card_count
+= render 'game_feed', turn_form_partial: 'crazy_eights_games/turn_form', presenter: @presenter
+= render 'hand', cards: @presenter.my_implementation_player.cards
+= render 'crazy_eights_games/extra', opponent_users: @presenter.opponent_users, players_hash: @presenter.implementation_players_hash

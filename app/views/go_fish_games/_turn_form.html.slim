@@ -1,18 +1,20 @@
-- is_my_turn=@presenter.my_turn?
-- my_ranks=@presenter.my_implementation_player.card_ranks
-- opponents= @presenter.opponent_users
+/ # locals: (presenter:)
 
-= simple_form_for :turn, url: play_turn_path(@presenter.game), html: { class: "game-actions game-actions--mobile-fixed", data: {controller: 'autorun-turn', action: 'game-timer:timer-over@window->autorun-turn#submit'}} do |f|
+- is_my_turn = presenter.my_turn?
+- my_ranks = presenter.my_implementation_player.card_ranks
+- opponents = presenter.opponent_users
+
+= simple_form_for :turn, url: play_turn_path(presenter.game), html: { class: "game-actions game-actions--mobile-fixed", data: {controller: 'autorun-turn', action: 'game-timer:timer-over@window->autorun-turn#submit'}} do |f|
 	- unless my_ranks.empty?
 		.game-actions__options
 			= f.input :player,
-			as: :select, 
+			as: :select,
 			collection: opponents,
 			selected: opponents.first
 
 			= f.input :rank,
-			as: :select, 
+			as: :select,
 			collection: my_ranks,
 			selected: my_ranks.first
 
-	= render 'play_turn_button', f: f, is_my_turn: is_my_turn
+	= render 'play_turn_button', f: f, is_my_turn: is_my_turn, updated_at: presenter.game.updated_at
