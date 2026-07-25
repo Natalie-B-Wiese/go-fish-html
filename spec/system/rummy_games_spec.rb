@@ -327,7 +327,7 @@ RSpec.describe 'Rummy Games', type: :system do
     end
 
     it 'extends the meld: the card leaves the hand and joins the meld on the board' do
-      select "1: #{meld}", from: 'Meld'
+      select "Meld 1: #{meld}", from: 'Meld'
       check lay_off_card.to_s
       click_on 'Meld/Lay-off Selected'
 
@@ -338,7 +338,7 @@ RSpec.describe 'Rummy Games', type: :system do
     end
 
     it 'does not end the turn' do
-      select "1: #{meld}", from: 'Meld'
+      select "Meld 1: #{meld}", from: 'Meld'
       check lay_off_card.to_s
       click_on 'Meld/Lay-off Selected'
 

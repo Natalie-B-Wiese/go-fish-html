@@ -146,7 +146,8 @@ RSpec.describe RummyGamePresenter, type: :model do
 
       it 'labels each meld 1-based and values it by its index in the melds list' do
         expect(presenter.meld_options_h)
-          .to eq(described_class::NEW_MELD_LABEL => '', "1: #{my_meld}" => 0, "2: #{opponent_meld}" => 1)
+          .to eq(described_class::NEW_MELD_LABEL => '', "Meld 1: #{my_meld}" => 0,
+                 "Meld 2: #{opponent_meld}" => 1)
       end
     end
 

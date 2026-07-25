@@ -29,7 +29,7 @@ class RummyGamePresenter < GamePresenter
   def meld_options_h
     return NEW_MELD_OPTION unless can_lay_off?
 
-    NEW_MELD_OPTION.merge(melds.each_with_index.to_h { |meld, index| ["#{index + 1}: #{meld}", index] })
+    NEW_MELD_OPTION.merge(melds.each_with_index.to_h { |meld, index| ["Meld #{index + 1}: #{meld}", index] })
   end
 
   def can_lay_off?
