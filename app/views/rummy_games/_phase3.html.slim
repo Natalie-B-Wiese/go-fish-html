@@ -6,4 +6,5 @@
 				collection: @presenter.discardable_cards_h,
 				selected: @presenter.discardable_cards_h.values.first
 
-			= f.button :button, "Discard and End Turn"
+			/ a button that does not apply 'btn--primary'
+			= button_tag "Discard and End Turn", name: "turn[source]", value: "discard", class: "btn btn--destructive"
