@@ -83,6 +83,10 @@ The game screen is a **4-panel CSS grid**, and its shared skeleton is factored i
   (one game-neutral waiting room showing the game name + player names). Plus the smaller shared
   bits already used across the app: `_game_header`, `_feed_content`, `_turn_badge`,
   `_play_turn_button`.
+  `_hand` also takes optional, defaulted locals (`show_sort: false`, `game: nil`) so a single game
+  can opt into extra chrome — e.g. Rummy passes `show_sort: true, game: @presenter.game` to get
+  sort-by-rank/sort-by-suit buttons in the panel header — without changing the other games that
+  don't pass them.
 - **Per-game region partials** in `app/views/<game>_games/` — `_game_board`, `_extra`,
   `_turn_form`, `_player_accordion`. These genuinely differ per game (e.g. Go Fish's `_extra` shows
   your Books; Crazy Eights' shows the opponent list). Region partials take **strict locals**

@@ -51,8 +51,6 @@
     align-items: center;
     min-height: calc(var(--op-size-unit)*10); /* 40 px */
 
-    padding-top: var(--op-space-small);
-    padding-bottom: var(--op-space-x-small);
     padding-right: var(--op-space-medium);
     padding-left: var(--op-space-medium);
   }  

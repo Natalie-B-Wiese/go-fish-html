@@ -86,6 +86,58 @@ RSpec.describe Rummy::Player, type: :model do
     end
   end
 
+  describe '#cards' do
+    let(:three_of_clubs) { Rummy::Card.new('3', 'Clubs') }
+    let(:three_of_diamonds) { Rummy::Card.new('3', 'Diamonds') }
+    let(:three_of_spades) { Rummy::Card.new('3', 'Spades') }
+    let(:three_of_hearts) { Rummy::Card.new('3', 'Hearts') }
+    let(:seven_of_clubs) { Rummy::Card.new('7', 'Clubs') }
+    let(:ace_of_diamonds) { Rummy::Card.new('A', 'Diamonds') }
+    let(:king_of_diamonds) { Rummy::Card.new('K', 'Diamonds') }
+    let(:ace_of_spades) { Rummy::Card.new('A', 'Spades') }
+    let(:five_of_spades) { Rummy::Card.new('5', 'Spades') }
+    let(:two_of_hearts) { Rummy::Card.new('2', 'Hearts') }
+    let(:dealt_order) do
+      [
+        king_of_diamonds, three_of_hearts, ace_of_spades, seven_of_clubs, three_of_diamonds,
+        two_of_hearts, five_of_spades, three_of_clubs, ace_of_diamonds, three_of_spades
+      ]
+    end
+
+    before { dealt_order.each { |card| player.add_card(card) } }
+
+    context 'when no sort preference is set' do
+      it 'returns the cards in dealt order' do
+        expect(player.cards).to eq dealt_order
+      end
+    end
+
+    context "when the sort preference is 'rank'" do
+      it 'groups cards by rank, breaking ties by suit order (Clubs, Diamonds, Spades, Hearts)' do
+        player.sort_preference = 'rank'
+
+        expect(player.cards).to eq [
+          ace_of_diamonds, ace_of_spades, two_of_hearts,
+          three_of_clubs, three_of_diamonds, three_of_spades, three_of_hearts,
+          five_of_spades, seven_of_clubs, king_of_diamonds
+        ]
+      end
+    end
+
+    context "when the sort preference is 'suit'" do
+      it 'groups cards by suit order (Clubs, Diamonds, Spades, Hearts), then by rank within suit' do
+        player.sort_preference = 'suit'
+
+        expect(player.cards).to eq [
+          three_of_clubs, seven_of_clubs,
+          ace_of_diamonds, three_of_diamonds, king_of_diamonds,
+          ace_of_spades, three_of_spades, five_of_spades,
+          two_of_hearts, three_of_hearts
+        ]
+      end
+    end
+  end
+
   describe '#melded?' do
     let(:meld) do
       Rummy::Meld.new([
@@ -253,6 +305,11 @@ RSpec.describe Rummy::Player, type: :model do
     it 'is not equal to nil' do
       expect(player).to_not eq nil
     end
+
+    it 'is equal when only sort_preference differs' do
+      other = described_class.new(1, hand: Rummy::CardCollection.new([card]), sort_preference: 'rank')
+      expect(player).to eq other
+    end
   end
 
   describe '#as_json, .from_json' do
@@ -278,6 +335,18 @@ RSpec.describe Rummy::Player, type: :model do
 
       restored = described_class.from_json(player.as_json.as_json)
       expect(restored).to eq player
+    end
+
+    it 'round-trips a sort preference' do
+      player.sort_preference = 'suit'
+
+      restored = described_class.from_json(player.as_json.as_json)
+      expect(restored.sort_preference).to eq 'suit'
+    end
+
+    it 'round-trips a nil sort preference' do
+      restored = described_class.from_json(player.as_json.as_json)
+      expect(restored.sort_preference).to be_nil
     end
 
     it 'restores melds as Rummy::Meld instances' do

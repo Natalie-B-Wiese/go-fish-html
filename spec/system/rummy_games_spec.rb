@@ -346,6 +346,73 @@ RSpec.describe 'Rummy Games', type: :system do
     end
   end
 
+  context 'sorting the hand' do
+    let(:game_name) { "Penelope's Game" }
+    let(:game) { Game.find_by(name: game_name) }
+    let(:king) { Rummy::Card.new('K', 'Diamonds') }
+    let(:three) { Rummy::Card.new('3', 'Clubs') }
+
+    before do
+      create :game, :rummy, :with_users, name: game_name, player_count: 2, users: [user1, user2]
+      visit show_game_path(game)
+
+      game.reload
+      game.game_state.current_player.hand.cards = [king, three]
+      game.game_state.deck.cards -= [king, three]
+      game.save!
+      visit show_game_path(game)
+    end
+
+    it 'shows Sort by Rank and Sort by Suit buttons in the hand panel' do
+      within('.game-view__hand') do
+        expect(page).to have_button('Sort by Rank')
+        expect(page).to have_button('Sort by Suit')
+      end
+    end
+
+    it 'reorders the hand by rank when Sort by Rank is clicked' do
+      within('.game-view__hand') { click_on 'Sort by Rank' }
+
+      within('.game-view__hand') do
+        srcs = page.all('img').map { |img| img[:src] }
+        expect(srcs.first).to include(File.basename(three.to_image_name, '.*'))
+        expect(srcs.last).to include(File.basename(king.to_image_name, '.*'))
+      end
+    end
+
+    it 'persists the chosen sort across a page reload' do
+      within('.game-view__hand') { click_on 'Sort by Rank' }
+
+      visit show_game_path(game)
+
+      within('.game-view__hand') do
+        srcs = page.all('img').map { |img| img[:src] }
+        expect(srcs.first).to include(File.basename(three.to_image_name, '.*'))
+      end
+    end
+
+    context 'when it is not the player’s turn' do
+      before do
+        game.reload
+        game.game_state.players_hash[user2.id].hand.cards = [king, three]
+        game.game_state.deck.cards -= [king, three]
+        game.save!
+        sign_out
+        sign_in_as(user2)
+        visit show_game_path(game)
+      end
+
+      it 'still sorts that player’s own hand' do
+        within('.game-view__hand') { click_on 'Sort by Rank' }
+
+        within('.game-view__hand') do
+          srcs = page.all('img').map { |img| img[:src] }
+          expect(srcs.first).to include(File.basename(three.to_image_name, '.*'))
+        end
+      end
+    end
+  end
+
   context 'showing the deck on the board' do
     let(:game_name) { "Penelope's Game" }
     let(:game) { Game.find_by(name: game_name) }

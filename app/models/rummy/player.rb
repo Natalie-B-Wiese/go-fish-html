@@ -1,16 +1,21 @@
 module Rummy
   class Player
     attr_reader :user_id
-    attr_accessor :hand, :melds
+    attr_accessor :hand, :melds, :sort_preference
 
-    def initialize(user_id, hand: nil, melds: [])
+    def initialize(user_id, hand: nil, melds: [], sort_preference: nil)
       @user_id = user_id
       @hand = hand || CardCollection.new
       @melds = melds
+      @sort_preference = sort_preference
     end
 
     def cards
-      hand.cards
+      case sort_preference
+      when 'rank' then sorted_by_rank
+      when 'suit' then sorted_by_suit
+      else hand.cards
+      end
     end
 
     def add_card(card)
@@ -56,13 +61,14 @@ module Rummy
     end
 
     def as_json
-      { user_id: user_id, hand: hand.as_json, melds: melds.map(&:as_json) }
+      { user_id: user_id, hand: hand.as_json, melds: melds.map(&:as_json), sort_preference: sort_preference }
     end
 
     def self.from_json(json)
       new(json['user_id'],
           hand: CardCollection.from_json(json['hand']),
-          melds: json['melds'].map { |meld_json| Meld.from_json(meld_json) })
+          melds: json['melds'].map { |meld_json| Meld.from_json(meld_json) },
+          sort_preference: json['sort_preference'])
     end
 
     private
@@ -71,6 +77,14 @@ module Rummy
       hand.cards -= meld_cards
       add_meld(meld)
       meld
+    end
+
+    def sorted_by_rank
+      hand.cards.sort_by { |card| [card.value, Card::SUITS.index(card.suit)] }
+    end
+
+    def sorted_by_suit
+      hand.cards.sort_by { |card| [Card::SUITS.index(card.suit), card.value] }
     end
   end
 end

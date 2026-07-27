@@ -32,3 +32,11 @@ On your turn:
 ## The turn feed
 
 Each `Rummy::TurnResult` renders feed bubbles for card draws, melds, and lay-offs.
+
+## Hand sorting
+
+A player can sort their own hand by rank or by suit, via buttons in the Hand panel
+(`Rummy::Player#sort_preference`, persisted per-player in `game_state`). It works regardless of
+whose turn it is. Both modes break ties using the same suit order — **Clubs, Diamonds, Spades,
+Hearts** (`Card::SUITS`) — so a "sort by rank" hand groups same-rank cards in that suit order, and
+a "sort by suit" hand groups suits in that order before sorting by rank within each suit.

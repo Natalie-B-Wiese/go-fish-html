@@ -3,5 +3,5 @@
 	= render 'rummy_games/turn_form', presenter: @presenter
 - else
 	= render 'game_feed', spacer: false, presenter: @presenter
-= render 'hand', cards: @presenter.my_implementation_player.cards
+= render 'hand', cards: @presenter.my_implementation_player.cards, show_sort: true, game: @presenter.game
 = render 'rummy_games/extra', opponent_users: @presenter.opponent_users, players_hash: @presenter.implementation_players_hash

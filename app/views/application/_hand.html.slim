@@ -1,8 +1,12 @@
-/ # locals: (cards:)
+/ # locals: (cards:, show_sort: false, game: nil)
 
 div.game-view__hand.panel.panel--secondary
-	header.panel__header
+	header.panel__header.op-split
 		h2 Hand
+		- if show_sort
+			div.flex.gap-xs
+				= button_to "Sort by Rank", sort_hand_path(game), params: { sort_by: "rank" }, class: "btn btn--primary btn--small"
+				= button_to "Sort by Suit", sort_hand_path(game), params: { sort_by: "suit" }, class: "btn btn--primary btn--small"
 	div.panel__content
 		div.cards-stacked.flex.margin-top-md
 			- cards.each do |card|
