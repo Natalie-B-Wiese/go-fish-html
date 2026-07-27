@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Rummy — Idea 2: Phase 2, Tabbed Board</title>
+<link rel="stylesheet" href="optics-css/optics+phosphor_icons.css">
+<link rel="stylesheet" href="mockup-extras.css">
+</head>
+<body>
+<div class="mock-flag">IDEA 2 — Phase 2: Melds tab active, three co-present forms, checkbox hand</div>
+
+<div class="game-view">
+
+  <div class="panel panel--padded game-view__game-board">
+    <header class="panel__header gap-xs">
+      <button class="btn btn--no-border btn--icon btn--small"><i class="ph ph-caret-left icon icon--large"></i></button>
+      <h2>Rummy Round 3</h2>
+    </header>
+
+    <div class="panel__content">
+      <div class="tab-group" style="margin-bottom: var(--op-space-medium);">
+        <a href="#" class="tab">Piles</a>
+        <a href="#" class="tab tab--active">Melds <span class="badge badge--primary">4</span></a>
+      </div>
+
+      <div class="melds-board">
+        <div class="meld meld--run-collapsed" title="Click to expand">
+          <div class="meld__label"><span>Meld 1 · Run</span><span class="badge">6 cards</span></div>
+          <div class="meld__cards">
+            <img src="cards/4_of_hearts.png" class="playing-card playing-card--sm">
+            <span class="meld__ellipsis">…</span>
+            <img src="cards/9_of_hearts.png" class="playing-card playing-card--sm">
+          </div>
+        </div>
+
+        <div class="meld">
+          <div class="meld__label"><span>Meld 2 · Set</span><span class="badge">3 cards</span></div>
+          <div class="meld__cards">
+            <img src="cards/king_of_spades.png" class="playing-card playing-card--sm">
+            <img src="cards/king_of_hearts.png" class="playing-card playing-card--sm">
+            <img src="cards/king_of_diamonds.png" class="playing-card playing-card--sm">
+          </div>
+        </div>
+
+        <div class="meld meld--run-collapsed" title="Click to expand">
+          <div class="meld__label"><span>Meld 3 · Run</span><span class="badge">3 cards</span></div>
+          <div class="meld__cards">
+            <img src="cards/2_of_clubs.png" class="playing-card playing-card--sm">
+            <span class="meld__ellipsis">…</span>
+            <img src="cards/4_of_clubs.png" class="playing-card playing-card--sm">
+          </div>
+        </div>
+
+        <div class="meld">
+          <div class="meld__label"><span>Meld 4 · Set</span><span class="badge">4 cards</span></div>
+          <div class="meld__cards">
+            <img src="cards/7_of_diamonds.png" class="playing-card playing-card--sm">
+            <img src="cards/7_of_clubs.png" class="playing-card playing-card--sm">
+            <img src="cards/7_of_spades.png" class="playing-card playing-card--sm">
+            <img src="cards/7_of_hearts.png" class="playing-card playing-card--sm">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-view__game-feed panel panel--padded panel--primary">
+    <header class="panel__header op-split">
+      <h2>Game Feed</h2>
+      <div class="badge badge--primary">Your Turn</div>
+    </header>
+
+    <div class="panel__content op-stack flex-grow-1 gap-none">
+      <div class="feed-collapsed feed-content op-stack gap-xs">
+        <div class="feed-bubble feed-bubble--action">
+          <div class="feed-bubble__content">You drew the 8 of Diamonds from the deck.</div>
+        </div>
+      </div>
+
+      <div class="turn-phase-forms">
+        <form class="game-actions">
+          <h4>Make a Meld</h4>
+          <p class="margin-top-none">Select 3+ cards in your hand, then submit.</p>
+          <div class="game-actions__options">
+            <button type="submit" class="btn btn--primary">Meld Selected (2)</button>
+          </div>
+        </form>
+
+        <form class="game-actions">
+          <h4>Lay Off</h4>
+          <div class="game-actions__options">
+            <select class="op-input">
+              <option>Which meld?</option>
+              <option>Meld 1 (4♥…9♥)</option>
+              <option selected>Meld 4 (7s)</option>
+            </select>
+            <button type="submit" class="btn btn--secondary">Lay Off Selected Card</button>
+          </div>
+        </form>
+
+        <form class="game-actions">
+          <h4>Discard</h4>
+          <p class="margin-top-none">Select exactly one card, then discard to end your turn.</p>
+          <div class="game-actions__options">
+            <button type="submit" class="btn btn--danger">Discard &amp; End Turn</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-view__hand panel panel--secondary">
+    <header class="panel__header"><h2>Hand</h2></header>
+    <div class="panel__content">
+      <div class="cards-stacked flex margin-top-md">
+        <label class="hand-card"><img src="cards/5_of_clubs.png" class="playing-card playing-card--lg playing-card--hover"><input type="checkbox"></label>
+        <label class="hand-card hand-card--selected"><img src="cards/ace_of_hearts.png" class="playing-card playing-card--lg playing-card--hover"><input type="checkbox" checked></label>
+        <label class="hand-card hand-card--selected"><img src="cards/ace_of_clubs.png" class="playing-card playing-card--lg playing-card--hover"><input type="checkbox" checked></label>
+        <label class="hand-card"><img src="cards/8_of_diamonds.png" class="playing-card playing-card--lg playing-card--hover"><input type="checkbox"></label>
+        <label class="hand-card"><img src="cards/3_of_hearts.png" class="playing-card playing-card--lg playing-card--hover"><input type="checkbox"></label>
+        <label class="hand-card"><img src="cards/queen_of_diamonds.png" class="playing-card playing-card--lg playing-card--hover"><input type="checkbox"></label>
+      </div>
+      <p class="margin-top-md" style="font-size: var(--op-font-x-small);">2 selected — melds as a pair of Aces if a 3rd Ace is laid off, or lay one off onto an existing meld.</p>
+    </div>
+  </div>
+
+  <div class="game-view__extra panel panel--secondary">
+    <header class="panel__header"><h2>Players</h2></header>
+    <div class="panel__content players">
+      <div class="players__hand op-stack gap-xs">
+        <details class="accordion">
+          <summary>
+            <div class="accordion__marker"><i class="ph ph-caret-right icon icon--small"></i></div>
+            <span class="accordion__header">Tony Stark</span>
+            <div>Cards: <strong>6</strong></div>
+          </summary>
+        </details>
+        <details class="accordion">
+          <summary>
+            <div class="accordion__marker"><i class="ph ph-caret-right icon icon--small"></i></div>
+            <span class="accordion__header">Natasha Romanova</span>
+            <div>Cards: <strong>9</strong></div>
+          </summary>
+        </details>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

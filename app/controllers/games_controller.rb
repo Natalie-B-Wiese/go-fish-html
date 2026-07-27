@@ -48,11 +48,20 @@ class GamesController < ApplicationController
     redirect_to show_game_path(game)
   end
 
+  def sort_hand
+    game = Game.find(params[:id])
+
+    game.game_state.players_hash[Current.user.id].sort_preference = params[:sort_by]
+    game.save!
+
+    redirect_to show_game_path(game)
+  end
+
   private
 
   # returns nil if user is user cannot play a card even though it's their turn
   def turn_params_hash
-    params.require(:turn).permit(:player, :rank, :card).to_h.symbolize_keys
+    params.require(:turn).permit(:player, :rank, :card, :source, :meld, cards: []).to_h.symbolize_keys
   rescue ActionController::ParameterMissing
     {}
   end

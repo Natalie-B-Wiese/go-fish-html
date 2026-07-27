@@ -1,0 +1,28 @@
+/ # locals: (game_name:, melds:, deck_count:, discard_pile:)
+
+div.panel.panel--padded.game-view__game-board
+	= render 'game_header', game_name: game_name
+	div.panel__content.op-stack.gap-xs
+		div.flex.gap-sm
+			- melds.each_with_index do |meld, index|
+				= render 'rummy_games/meld', meld: meld, index: index
+
+		div.flex.flex-no-wrap.justify-center.items-center.gap-xl
+			div.card-container
+				div.card-container__header
+					span
+						| Deck
+					span.badge
+						| #{deck_count} cards
+				div.card-container__content
+					= image_tag "cards/playing-card-back.jpg", alt: "Back of card", class: "playing-card playing-card--lg"
+
+			div.card-container
+				div.card-container__header
+					span
+						| Discard
+					span.badge
+						| #{discard_pile.card_count} cards
+				div.card-container__content
+					- if discard_pile.top_card
+						= image_tag "cards/#{discard_pile.top_card.to_image_name}", alt: discard_pile.top_card.to_s, class: "playing-card playing-card--lg"

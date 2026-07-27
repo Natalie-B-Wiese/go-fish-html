@@ -23,11 +23,11 @@ Constraints:
 ### `spec/models/player_spec.rb` (modify existing)
 
 #### validations
-- [ ] is invalid when the game already has its full number of players
-- [ ] is valid when the game has not yet reached its player count
+- [x] is invalid when the game already has its full number of players
+- [x] is valid when the game has not yet reached its player count
 
 ## Related specs (regression check)
 
-- `spec/system/games_spec.rb` — `join game flow` context: confirms joining an
+- [x] `spec/system/games_spec.rb` — `join game flow` context: confirms joining an
   unfull game still works, and that full games stay hidden/non-joinable in the UI
   for players not already in them.

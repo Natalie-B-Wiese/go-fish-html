@@ -22,6 +22,7 @@ Rails.application.routes.draw do
 
   post 'games/:id/join', to: 'games#join', as: 'join_game'
   post 'games/:id/play', to: 'games#play', as: 'play_turn'
+  post 'games/:id/sort_hand', to: 'games#sort_hand', as: 'sort_hand'
 
   get 'games/:id', to: 'games#show', as: 'show_game'
 

@@ -6,7 +6,7 @@ This project deliberately splits **persistence** (Active Record) from **game rul
 
 ### 1. Active Record layer (the lobby & persistence)
 
-- **`Game`** — STI base class (`app/models/game.rb`). Concrete types: **`GoFishGame`**, **`CrazyEightsGame`** (the `type` column). Tracks lobby state: `name`, `player_count`, `started_at`, `ended_at`, `archived_at`, `winner`, and the serialized `game_state` (jsonb).
+- **`Game`** — STI base class (`app/models/game.rb`). Concrete types: **`GoFishGame`**, **`CrazyEightsGame`**, **`RummyGame`** (the `type` column). Tracks lobby state: `name`, `player_count`, `started_at`, `ended_at`, `archived_at`, `winner`, and the serialized `game_state` (jsonb).
 - **`Player`** — join model between `User` and `Game`. This is *not* the in-game player; it just records "this user is in this game."
 - **`User`** — `has_secure_password`; `has_many :games, through: :players`.
 - **`Session`** / **`Current`** — hand-rolled cookie auth (see `app/controllers/concerns/authentication.rb`). `Current.user` / `Current.session` carry request-scoped identity.
@@ -15,14 +15,14 @@ The AR layer knows *almost* nothing about game rules. The one intentional except
 
 ### 2. Game engine layer (plain Ruby, no DB)
 
-Under `app/models/go_fish/` and `app/models/crazy_eights/`, each game has:
+Under `app/models/go_fish/`, `app/models/crazy_eights/`, and `app/models/rummy/`, each game has:
 
-- **`Implementation`** — the rules engine. `GoFish::Implementation` and `CrazyEights::Implementation` both subclass a shared **`::Implementation`** base (`app/models/implementation.rb`) that owns the common state (`players`, `deck`, `feed`, turn index) and shared behavior (serialization, `==`, `switch_turn`, dealing); subclasses add their own state (Crazy Eights' `discard_pile`) and fill in hooks. Exposes turn methods (`request_opponent_turn`, `draw_deck_turn`, `play_turn`), `game_over?`, `winning_player`, `current_user_id`.
-- **`Player`** (`GoFish::Player` / `CrazyEights::Player`) — an in-game player holding a hand. Linked to the AR `User`/`Player` **only by `user_id`**. There are deliberately two "Player" concepts; don't conflate them.
+- **`Implementation`** — the rules engine. `GoFish::Implementation`, `CrazyEights::Implementation`, and `Rummy::Implementation` all subclass a shared **`::Implementation`** base (`app/models/implementation.rb`) that owns the common state (`players`, `deck`, `feed`, turn index) and shared behavior (serialization, `==`, `switch_turn`, dealing); subclasses add their own state (Crazy Eights' `discard_pile`; Rummy's `discard_pile` plus `last_drawn_card` — the card drawn this turn, or `nil` before drawing — since a Rummy turn spans multiple submissions instead of one) and fill in hooks. Exposes turn methods (`request_opponent_turn`, `draw_deck_turn`, `play_turn`), `game_over?`, `winning_player`, `current_user_id`.
+- **`Player`** (`GoFish::Player` / `CrazyEights::Player` / `Rummy::Player`) — an in-game player holding a hand. Linked to the AR `User`/`Player` **only by `user_id`**. There are deliberately two "Player" concepts; don't conflate them. Validating and committing a card-group state change (forming a book, laying down a meld) is owned by `Player` itself via a `try_X` method (`GoFish::Player#try_make_book`, `Rummy::Player#try_create_meld`, `Rummy::Player#try_lay_off`) — it checks the cards are in hand, checks the grouping is valid, and moves hand → the new group in one call, returning `nil` on any failure with no state change. `Implementation#meld_turn` / card-drawing turn methods just guard turn-state (e.g. `drawn?`) and delegate; they don't re-implement the validation.
 - **`TurnResult`** — a record of what happened on one turn; used to render the game feed (see below).
-- Game-specific pieces: `GoFish::Book`, `CrazyEights::DiscardPile`.
+- Game-specific pieces: `GoFish::Book`, `CrazyEights::DiscardPile`, `Rummy::DiscardPile`.
 
-Shared primitives used by both engines: **`Card`**, **`CardCollection`**, **`Deck`** (all plain Ruby).
+Shared primitives used by all three engines: **`Card`**, **`CardCollection`**, **`Deck`** (all plain Ruby). A game can subclass any of these for its own card behavior — e.g. `Rummy::Card` overrides `#value` so an Ace counts as `1`. `CardCollection.card_class` (used by `.from_json`) and `Deck#sorted_deck` (used to build a fresh deck) both build via `self.class.card_class`, so a game only needs to override that one class method (see `Rummy::Deck`, `Rummy::CardCollection`).
 
 The engine knows nothing about the database.
 
@@ -41,7 +41,7 @@ end
 
 Every value object in the engine (`Player`, `Card`, `CardCollection`, `Deck`, `Book`, `TurnResult`, `Implementation`) implements a matching `as_json` / `self.from_json` pair.
 
-The shared `::Implementation` base implements the common half: `dump`/`load`, `as_json`, `from_json` (via an overridable `self.json_attributes` hook), and value `==`. A game with extra state *extends* rather than replaces these — Crazy Eights adds `discard_pile` by overriding `as_json` and `json_attributes` with `super.merge(discard_pile: …)` (hashes) and `==` with `super && discard_pile == other.discard_pile` (boolean). The per-game `self.player_class` / `self.turn_result_class` class methods tell the inherited `from_json` which objects to build.
+The shared `::Implementation` base implements the common half: `dump`/`load`, `as_json`, `from_json` (via an overridable `self.json_attributes` hook), and value `==`. A game with extra state *extends* rather than replaces these — Crazy Eights adds `discard_pile` by overriding `as_json` and `json_attributes` with `super.merge(discard_pile: …)` (hashes) and `==` with `super && discard_pile == other.discard_pile` (boolean). The per-game `self.player_class` / `self.turn_result_class` / `self.deck_class` class methods tell the inherited `from_json` which objects to build (`deck_class` defaults to `Deck` and only needs overriding if the game supplies its own `Deck` subclass, e.g. `Rummy::Implementation.deck_class` → `Rummy::Deck`).
 
 **The rule that bites people: if you add or change a field, update BOTH `as_json` and `from_json`.** A mismatch doesn't raise — the field silently fails to persist or round-trip. (In practice jsonb itself has caused no trouble as long as the two stay in sync.)
 
@@ -57,6 +57,12 @@ The shared `::Implementation` base implements the common half: `dump`/`load`, `a
 
 - **Crazy Eights:** one `TurnResult` → **one** feed bubble.
 - **Go Fish:** one `TurnResult` → **up to three** bubbles (`request_message`, `action_message`, `result_message`), fewer when a player has run out of cards.
+- **Rummy:** one `TurnResult` → **one** feed bubble (same shape as Crazy Eights —
+  `action_message`/`result_message` are always empty). Each turn action
+  (`draw_deck_turn`, `draw_discard_turn`, `meld_turn`, `lay_off_turn`, `discard_turn`)
+  pushes its own `TurnResult`. Deck-draw messages never name the card (hidden info);
+  every other message does, since those cards are already public (discard pile top,
+  or melds/lay-offs on the table).
 
 ## Live updates (Turbo Streams)
 
@@ -77,13 +83,37 @@ The game screen is a **4-panel CSS grid**, and its shared skeleton is factored i
   (one game-neutral waiting room showing the game name + player names). Plus the smaller shared
   bits already used across the app: `_game_header`, `_feed_content`, `_turn_badge`,
   `_play_turn_button`.
+  `_hand` also takes optional, defaulted locals (`show_sort: false`, `game: nil`) so a single game
+  can opt into extra chrome — e.g. Rummy passes `show_sort: true, game: @presenter.game` to get
+  sort-by-rank/sort-by-suit buttons in the panel header — without changing the other games that
+  don't pass them.
 - **Per-game region partials** in `app/views/<game>_games/` — `_game_board`, `_extra`,
   `_turn_form`, `_player_accordion`. These genuinely differ per game (e.g. Go Fish's `_extra` shows
-  your Books; Crazy Eights' shows the opponent list). Region partials **read `@presenter`
-  directly** rather than taking locals, which is what lets the shared feed render any game's turn
-  form generically.
+  your Books; Crazy Eights' shows the opponent list). Region partials take **strict locals**
+  (Rails' `# locals: (...)` magic comment), kept as narrow as possible — e.g. `_game_board` takes
+  `game_name:`/`melds:`/`deck_count:`/`discard_pile:`, not the whole presenter.
+- **Two deliberate exceptions stay non-strict / whole-presenter:**
+  - **Entry partials** (`_<game>_game.html.slim`) still read `@presenter` directly (no strict
+    locals at all). They're invoked via `render @presenter.game` — Rails' bare-object shorthand —
+    which always merges in an implicit local named after the object's `to_partial_path` basename
+    (e.g. `rummy_game:`) alongside any explicit locals. A strict-locals partial has a fixed keyword
+    signature and raises `ArgumentError: unknown local` on that extra key, so entry partials opt out
+    of strict locals entirely rather than fight the injection.
+  - **`_game_feed.html.slim`** and each game's **`_turn_form.html.slim`** take a whole `presenter:`
+    local (not narrowed). `_game_feed` dispatches to a per-game turn-form partial chosen dynamically
+    (`turn_form_partial:`), and each game's turn form pulls different, unrelated presenter methods —
+    there's no single narrow set of locals that would work for all three games, so the whole
+    presenter is handed through instead.
 - **Thin entry partial** — `_<game>_game.html.slim` is just the four renders in order:
-  `game_board`, `game_feed` (with `turn_form_partial:`), `hand`, `extra`.
+  `game_board`, `game_feed` (with `turn_form_partial:` and `presenter:`), `hand`, `extra`.
+
+**Rummy is an exception to this convention.** Instead of always rendering `game_feed`
+with a `turn_form_partial:` local, `_rummy_game.html.slim` branches on
+`@presenter.my_turn?`: the current player renders `rummy_games/turn_form` directly (no
+feed — their own move history isn't useful mid-turn), everyone else renders `game_feed`
+with no `turn_form_partial` local at all. This is why `_game_feed`'s final line guards on
+`turn_form_partial.present?` (the strict local defaults to `''`) rather than assuming the
+local is always passed.
 
 **The fork between lobby and board is in `games/show.html.slim`**, keyed on
 `@presenter.implementation?` (nil until the game starts): started → `render @presenter.game`
@@ -112,10 +142,15 @@ The index (`app/views/games/index.html.slim`) splits games into "Your Games" and
 The whole design exists to make this straightforward:
 
 1. Add a `NewGame < Game` STI subclass with `serialize :game_state, coder: NewGame::Implementation`, a `create_and_start_game`, and a `play_turn?`.
-2. Build the engine under `app/models/new_game/` (`Implementation`, `Player`, `TurnResult`, …). `NewGame::Implementation` **subclasses `::Implementation`** and implements the hooks it raises `NotImplementedError` for: `self.player_class`, `self.turn_result_class`, `start!`, `game_over?`, `winning_player`, and private `starting_hand_size`. It inherits `from_json`, `as_json`, `==`, `switch_turn`, and dealing — only override `as_json` + `self.json_attributes` + `==` (via `super`) if the game adds state beyond the shared `players`/`deck`/`feed`/`current_player_index`. Every value object still needs its own `as_json`/`from_json`.
+2. Build the engine under `app/models/new_game/` (`Implementation`, `Player`, `TurnResult`, …). `NewGame::Implementation` **subclasses `::Implementation`** and implements the hooks it raises `NotImplementedError` for: `self.player_class`, `self.turn_result_class`, `start!`, `game_over?`, `winning_player`, and private `starting_hand_size`. Optionally override `self.deck_class` (and give a `Card`/`CardCollection` subclass a `self.card_class` override) if the game needs its own card value logic. It inherits `from_json`, `as_json`, `==`, `switch_turn`, and dealing — only override `as_json` + `self.json_attributes` + `==` (via `super`) if the game adds state beyond the shared `players`/`deck`/`feed`/`current_player_index`. Every value object still needs its own `as_json`/`from_json`.
    **Validate turn input against actual game state before mutating** — mirror Go Fish's
    `valid_request_rank?`/`includes_card_with_rank?` guards before acting on a turn. Crazy Eights
    shipped without this and allowed playing a card not in the player's hand.
+   **`game_over?`/`winning_player` can't be deferred past `start!`** — `GamesController#show`
+   calls `game.game_over?` unconditionally on every request once `game_state` exists, not only
+   when a turn is played. A real win-condition engine can come later, but these two hooks must
+   return *something* (even a placeholder `false`/`nil`) the moment the game starts, or the show
+   page raises.
 3. Add it to `Game#types`, add a presenter, and specs mirroring `spec/models/new_game/`.
 4. For views, you only need the **region partials** under `app/views/new_game_games/`
    (`_game_board`, `_extra`, `_turn_form`, `_player_accordion`) plus a thin `_new_game_game.html.slim`
@@ -123,3 +158,8 @@ The whole design exists to make this straightforward:
    `app/views/application/`. See [Views & rendering](#views--rendering-the-board-shell).
 
 Keep every method (and every spec `it` block) to **7 lines or fewer** — see [conventions.md](conventions.md).
+
+> **One assumption to know:** every game here treats a turn as a *single* submission → one
+> `play_turn?` call. A game with a multi-step turn (e.g. draw → meld → discard) breaks that —
+> it needs mid-turn/phase state on the engine and multiple round-trips per turn. See
+> [plans/rummy-view-design.md](plans/rummy-view-design.md).

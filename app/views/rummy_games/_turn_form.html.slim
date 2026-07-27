@@ -1,0 +1,11 @@
+/ # locals: (presenter:)
+
+.game-view__game-feed.panel.panel--padded.panel--primary
+	header.panel__header.op-split
+		h2 Turn Action
+		= render 'turn_badge', classes: '', my_turn: presenter.my_turn?, current_user_name: presenter.implementation_current_user.name
+
+	.panel__content.op-stack.flex-grow-1.gap-none
+		= render 'rummy_games/phase1', can_draw: presenter.can_draw?, game: presenter.game
+		= render 'rummy_games/phase2', can_meld: presenter.can_meld?, game: presenter.game, meld_options: presenter.meld_options_h, hand_cards: presenter.hand_cards_h
+		= render 'rummy_games/phase3', can_discard: presenter.can_discard?, game: presenter.game, discardable_cards: presenter.discardable_cards_h

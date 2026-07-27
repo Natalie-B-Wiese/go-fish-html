@@ -14,6 +14,9 @@ main.op-page__main-content.op-stack.gap-xl
 			li
 				a href="#crazy_eights"
 					| Crazy Eights
+			li
+				a href="#rummy"
+					| Rummy
 
 	section#go_fish.op-stack.gap-xl.card.card--padded
 		h2 
@@ -78,4 +81,50 @@ main.op-page__main-content.op-stack.gap-xl
 			h3 Winner
 			p
 				| The game ends when a player runs out of cards. The first player without cards is the winner.
+
+	section#rummy.op-stack.gap-xl.card.card--padded
+		h2
+			| Rummy
+
+		.text-pair.text-pair--inline
+			span.text-pair__title
+				| Players:
+			span
+				| 2-6
+
+		div
+			h3
+				| Goal
+			p
+				| The goal is to be the first player to empty your hand by forming melds and laying off cards.
+
+		div
+			h3 Melds
+			p
+				| A meld is a group of three or more cards that form either a set or a run.
+			p
+				| A <strong>set</strong> is three or more cards of the same rank (for example: 7♠, 7♥, 7♣).
+			p
+				| A <strong>run</strong> is three or more consecutive cards of the same suit (for example: 5♥, 6♥, 7♥).
+
+		div
+			h3 Gameplay
+			p
+				| On your turn:
+			ol
+				li
+					| Draw a card from either the deck or the discard pile.
+				li
+					| Create melds from your hand and lay off cards onto existing melds. You can meld and lay off as many times as you like.
+				li
+					| Discard one card from your hand to the discard pile to end your turn. You cannot discard the card you just drew, unless it is your only remaining card.
+			p
+				| A <strong>lay-off</strong> is when you add one or more cards to an existing meld. You can only lay off cards after you have created at least one meld.
+			p
+				| If the deck runs out of cards, the discard pile is flipped over and becomes the new deck.
+
+		div
+			h3 Winner
+			p
+				| The game ends when a player runs out of cards. The first player to empty their hand is the winner.
 

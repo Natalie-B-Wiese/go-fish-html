@@ -5,5 +5,5 @@
 / Note: @presenter.implementation is nil if game is not started yet
 - if @presenter.implementation?
     = render @presenter.game
-- else 
-    = render 'application/lobby'
+- else
+    = render 'application/lobby', game: @presenter.game

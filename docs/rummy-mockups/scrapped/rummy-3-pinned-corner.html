@@ -1,0 +1,156 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Rummy — Idea 3: Pinned-corner board (no tabs)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@rolemodel/optics@2.4.0/dist/css/optics+phosphor_icons.css">
+<link rel="stylesheet" href="mockup-extras.css">
+</head>
+<body>
+<div class="mock-flag">IDEA 3 — Alternative to tabs: piles pinned in a corner, melds always visible</div>
+
+<div class="game-view">
+
+  <div class="panel panel--padded game-view__game-board">
+    <header class="panel__header gap-xs">
+      <button class="btn btn--no-border btn--icon btn--small"><i class="ph ph-caret-left icon icon--large"></i></button>
+      <h2>Rummy Round 3</h2>
+    </header>
+
+    <div class="panel__content">
+      <div class="pinned-pile">
+        <div>
+          <h4>Discard: 1</h4>
+          <img src="cards/8_of_spades.png" alt="8 of Spades" class="playing-card playing-card--sm">
+        </div>
+        <div>
+          <h4>Deck: 73</h4>
+          <img src="cards/playing-card-back.jpg" alt="Back of card" class="playing-card playing-card--sm">
+        </div>
+      </div>
+
+      <div class="melds-board">
+        <div class="meld meld--run-collapsed" title="Click to expand">
+          <div class="meld__label"><span>Meld 1 · Run</span><span class="badge">6 cards</span></div>
+          <div class="meld__cards">
+            <img src="cards/4_of_hearts.png" class="playing-card playing-card--sm">
+            <span class="meld__ellipsis">…</span>
+            <img src="cards/9_of_hearts.png" class="playing-card playing-card--sm">
+          </div>
+        </div>
+
+        <div class="meld">
+          <div class="meld__label"><span>Meld 2 · Set</span><span class="badge">3 cards</span></div>
+          <div class="meld__cards">
+            <img src="cards/king_of_spades.png" class="playing-card playing-card--sm">
+            <img src="cards/king_of_hearts.png" class="playing-card playing-card--sm">
+            <img src="cards/king_of_diamonds.png" class="playing-card playing-card--sm">
+          </div>
+        </div>
+
+        <div class="meld meld--run-collapsed" title="Click to expand">
+          <div class="meld__label"><span>Meld 3 · Run</span><span class="badge">3 cards</span></div>
+          <div class="meld__cards">
+            <img src="cards/2_of_clubs.png" class="playing-card playing-card--sm">
+            <span class="meld__ellipsis">…</span>
+            <img src="cards/4_of_clubs.png" class="playing-card playing-card--sm">
+          </div>
+        </div>
+
+        <div class="meld">
+          <div class="meld__label"><span>Meld 4 · Set</span><span class="badge">4 cards</span></div>
+          <div class="meld__cards">
+            <img src="cards/7_of_diamonds.png" class="playing-card playing-card--sm">
+            <img src="cards/7_of_clubs.png" class="playing-card playing-card--sm">
+            <img src="cards/7_of_spades.png" class="playing-card playing-card--sm">
+            <img src="cards/7_of_hearts.png" class="playing-card playing-card--sm">
+          </div>
+        </div>
+
+        <div class="meld">
+          <div class="meld__label"><span>Meld 5 · Set</span><span class="badge">3 cards</span></div>
+          <div class="meld__cards">
+            <img src="cards/jack_of_clubs.png" class="playing-card playing-card--sm">
+            <img src="cards/jack_of_diamonds.png" class="playing-card playing-card--sm">
+            <img src="cards/jack_of_spades.png" class="playing-card playing-card--sm">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-view__game-feed panel panel--padded panel--primary">
+    <header class="panel__header op-split">
+      <div class="badge badge--primary">Your Turn</div>
+    </header>
+
+    <div class="panel__content op-stack flex-grow-1 gap-none">
+      <div class="turn-phase-forms">
+        <form class="game-actions">
+          <h4><i class="ph ph-check-square icon icon--large"></i> Phase 1 — Draw</h4>
+          <div class="game-actions__options">
+            <button type="submit" class="btn btn--primary" disabled>Draw from Deck</button>
+            <button type="submit" class="btn btn--secondary" disabled>Take Discard (8♠)</button>
+          </div>
+        </form>
+        <div class="game-actions">
+          <h4>Phase 2 - Meld</h4>
+          <form>
+            <div class="game-actions__options">
+              <select class="op-input">
+                <option selected>New Meld</option>
+                <option>Meld 1 (4♥…9♥)</option>
+                <option>Meld 4 (7s)</option>
+              </select>
+            </div>
+            <div class="game-actions__options" style="margin-top: var(--op-space-small);">
+              <button type="submit" class="btn btn--primary">Meld/Lay-off Selected</button>
+            </div>
+          </form>
+        </div>
+        <form class="game-actions">
+          <h4>Phase 3 - End Turn</h4>
+          <div class="game-actions__options">
+            <button type="submit" class="btn btn--danger">Discard &amp; End Turn</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-view__hand panel panel--secondary">
+    <header class="panel__header"><h2>Hand</h2></header>
+    <div class="panel__content">
+      <div class="cards-stacked flex margin-top-md">
+        <label class="hand-card"><img src="cards/5_of_clubs.png" class="playing-card playing-card--lg playing-card--hover"><input type="checkbox"></label>
+        <label class="hand-card"><img src="cards/ace_of_hearts.png" class="playing-card playing-card--lg playing-card--hover"><input type="checkbox"></label>
+        <label class="hand-card"><img src="cards/ace_of_clubs.png" class="playing-card playing-card--lg playing-card--hover"><input type="checkbox"></label>
+        <label class="hand-card"><img src="cards/8_of_diamonds.png" class="playing-card playing-card--lg playing-card--hover"><input type="checkbox"></label>
+        <label class="hand-card"><img src="cards/3_of_hearts.png" class="playing-card playing-card--lg playing-card--hover"><input type="checkbox"></label>
+        <label class="hand-card"><img src="cards/queen_of_diamonds.png" class="playing-card playing-card--lg playing-card--hover"><input type="checkbox"></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-view__extra panel panel--secondary">
+    <header class="panel__header"><h2>Players</h2></header>
+    <div class="panel__content players">
+      <div class="players__hand op-stack gap-xs">
+        <details class="accordion">
+          <summary>
+            <div class="accordion__marker"><i class="ph ph-caret-right icon icon--small"></i></div>
+            <span class="accordion__header">Tony Stark</span>
+            <div>Cards: <strong>6</strong></div>
+          </summary>
+        </details>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p style="position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #ccc; font-size: 12px; padding: 4px 12px; margin:0;">
+  Note: with 5 melds on the table, this layout is already scrolling — compare against Idea 2's tabbed version, which keeps the board uncluttered at the cost of a click to switch.
+</p>
+</body>
+</html>

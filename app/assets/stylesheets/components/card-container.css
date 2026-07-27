@@ -1,0 +1,22 @@
+.card-container {
+    border: var(--op-border-width) solid var(--op-color-border);
+    padding: var(--op-space-medium);
+    padding-top: var(--op-space-x-small);
+    display: flex;
+    flex-flow: column;
+    gap: var(--op-space-x-small);
+    
+    .card-container__header {
+        display: flex;
+        flex-flow: row;
+        gap: var(--op-space-x-small);
+        justify-content: space-between;
+        align-items: baseline;
+
+        font-size: var(--op-font-small);
+        font-weight: bold;
+    }
+
+    .card-container__content {
+    }
+}

@@ -6,7 +6,7 @@ class Card
   class InvalidSuit < StandardError; end
 
   RANKS = %w[2 3 4 5 6 7 8 9 10 J Q K A].freeze
-  SUITS = %w[Spades Hearts Clubs Diamonds].freeze
+  SUITS = %w[Clubs Diamonds Spades Hearts].freeze
 
   RANK_NAMES = {
     'J' => 'Jack',
@@ -22,6 +22,13 @@ class Card
     'D' => 'Diamonds'
   }.freeze
 
+  SUIT_GLYPHS = {
+    'Spades' => '♠',
+    'Hearts' => '♥',
+    'Clubs' => '♣',
+    'Diamonds' => '♦'
+  }.freeze
+
   def key
     "#{rank}#{SUIT_SYMBOLS.invert[suit]}"
   end
@@ -33,7 +40,7 @@ class Card
     rank += key[1] if key.length > 2
 
     suit = SUIT_SYMBOLS[key[-1]]
-    Card.new(rank, suit)
+    new(rank, suit)
   end
 
   def initialize(rank, suit)
@@ -45,7 +52,14 @@ class Card
   end
 
   def ==(other)
+    return false if other.nil?
+
     rank == other.rank && suit == other.suit
+  end
+  alias eql? ==
+
+  def hash
+    [rank, suit].hash
   end
 
   def self.rank_to_value(rank)
@@ -58,6 +72,10 @@ class Card
 
   def to_s
     "#{rank} of #{suit}"
+  end
+
+  def to_short_s
+    "#{rank}#{SUIT_GLYPHS[suit]}"
   end
 
   def self.rank_to_s(rank)

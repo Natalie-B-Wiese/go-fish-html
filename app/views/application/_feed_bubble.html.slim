@@ -1,6 +1,4 @@
-/ Locals:
-/ turn_action (a Turn Result object)
-/ user_names_by_id (a {user_id => name} Hash)
+/ # locals: (turn_action:, user_names_by_id:)
 
 div.feed-bubble.feed-bubble--action
 	div.feed-bubble__content #{turn_action.request_message(user_names_by_id)}

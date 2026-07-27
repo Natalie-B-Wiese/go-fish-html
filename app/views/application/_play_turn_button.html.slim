@@ -1,11 +1,9 @@
-/ Locals:
-/ f: the form
-/ is_my_turn: a boolean
+/ # locals: (f:, is_my_turn:, updated_at:)
 
 - if is_my_turn
-	= f.button :button, data: {'autorun-turn_target': 'submitButton'} do 
+	= f.button :button, data: {'autorun-turn_target': 'submitButton'} do
 		| Play
-		= render 'timer', is_my_turn: is_my_turn, updated_at: @presenter.game.updated_at
+		= render 'timer', is_my_turn: is_my_turn, updated_at: updated_at
 
 - else 
 	= f.button :submit, 'Play', disabled: true

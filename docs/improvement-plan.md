@@ -164,6 +164,40 @@ small region partials." Fixes to shared layout/markup happen once, for every gam
 
 Captured so they aren't lost; each is a good standalone future task.
 
+- **Rummy (third game) — engine in progress, card by card.** View design:
+  `docs/plans/rummy-view-design.md`. Built outside-in on branch `phase3-rummy`, one thin
+  BRAVE-sized card at a time: draw-from-deck (`docs/plans/rummy-brave-breakdown-card-1.md`),
+  discard-pile + draw-from-discard (`docs/plans/rummy-brave-breakdown-card-2.md`),
+  discard-&-end-turn (`docs/plans/rummy-brave-breakdown-card-3.md`), and lay down melds — engine
+  only (`docs/plans/rummy-brave-breakdown-card-4.md`) — are done. `Implementation#melds` (a stable
+  cross-player ordered accessor) was scoped into card 4 but pushed later, since it's only needed
+  once a UI has to address a meld by array index. The melds UI — lay a new meld + render everyone's
+  melds on the board, incl. `Implementation#melds` (`docs/plans/rummy-brave-breakdown-card-5.md`,
+  4 pts) — is also done, as are lay-offs + the meld-selection dropdown
+  (`docs/plans/rummy-brave-breakdown-card-6.md`, 4 pts, engine + UI), as is the stock-runs-out
+  refill-from-discard (`docs/plans/rummy-brave-breakdown-card-8.md`, 2 pts, engine only). Card 7
+  (win condition — engine only) ✅ DONE. Implemented `game_over?` and `winning_player` by porting
+  from Crazy Eights. Deferred to a future card: when both stock and discard are empty, let the
+  player skip drawing and still meld/lay-off/discard (relaxes the `drawn?` gate).
+- **Rummy: game feed for non-current players — ✅ DONE.** BRAVE breakdown +
+  TDD'd (`docs/plans/completed/rummy-game-feed-brave-breakdown.md`,
+  `docs/plans/completed/rummy-game-feed-spec-plan.md`). Non-current players now see the
+  shared `application/_game_feed`; the current player still only sees their turn-action
+  forms (mutually exclusive by `my_turn?` — never both in the same grid slot). Deck-draw
+  messages stay generic (hidden card); discard-draw/meld/lay-off/discard name the actual
+  card(s), since those are already public. `_game_feed` now tolerates being rendered
+  without a `turn_form_partial` local (`if turn_form_partial.present?`, since strict
+  locals require a default — `''` — rather than an absent key).
+- **Rummy: no feedback on a rejected meld / lay-off / discard.** Every turn action returns `nil` with
+  no state change and no message (deliberate through card 6), so an invalid submission looks like a
+  dead button. Needs a user-facing surface — flash, inline form error, or a feed entry.
+- **`docs/rummy-rules.md` — ✅ DONE** Created after card 7 completion alongside Go Fish and Crazy
+  Eights rules-as-implemented docs (linked in AGENTS.md's Key context). Documents the win
+  condition + the stock-refill behavior from card 8.
+- **Restore the omakase inherit in `.rubocop.yml`.** The `inherit_gem` line is commented out, so
+  `bin/rubocop` runs default RuboCop instead of the house style the project claims — hence the ~686
+  offense baseline that makes the tool nearly useless as a gate. Uncommenting it is a small change
+  with a large diff of newly-clean/newly-flagged files, so it deserves its own card.
 - **Concurrency race on `game_state`** (`app/controllers/games_controller.rb#play`, `Game#start!`
   / `#end!`): read-modify-write with no lock. A double-submit or the auto-timer
   (`autorun_turn_controller.js`) firing alongside a manual submit can clobber a turn; `start!`/
@@ -204,6 +238,10 @@ Captured so they aren't lost; each is a good standalone future task.
   re-processes the full history. The N+1 query fix doesn't address this — a long-running game
   still means an ever-growing jsonb blob and linear per-render work. Candidate fix: cap/paginate
   the rendered feed (e.g. last N turns) or archive older entries out of the hot jsonb column.
+- **Convert `users/_form.html.slim` to strict locals.** The game-view strict-locals pass (this
+  session) covered `app/views/application/`, `app/views/<game>_games/`, and `games/show.html.slim`.
+  `users/_form.html.slim` still reads `@user` directly — unrelated to the game views, left out of
+  scope, worth a small standalone pass.
 
 ---
 
@@ -216,5 +254,8 @@ Captured so they aren't lost; each is a good standalone future task.
 - **Item 2:** `bundle exec rspec spec/system/go_fish_games_spec.rb spec/system/crazy_eights_games_spec.rb`
   stay green through the refactor. Manually run `bin/dev` and open a game in two browsers to eyeball
   the board.
-- **Whole pass:** `bundle exec rspec` (or `bin/turbo_tests`) clean, `bin/rubocop` clean (mind the
-  7-line method / 7-line `it`-block limits), `bin/ci` before merge.
+- **Whole pass:** `bundle exec rspec` (or `bin/turbo_tests`) clean, `bin/rubocop` showing **no new
+  offenses in the files you touched** (mind the 7-line method / 7-line `it`-block limits), `bin/ci`
+  before merge. `bin/rubocop` is *not* clean repo-wide: `.rubocop.yml`'s `inherit_gem` omakase line is
+  commented out, so plain default RuboCop runs and reports ~686 baseline offenses
+  (`Style/Documentation`, `Metrics/*`). Compare against the baseline rather than chasing a zero.

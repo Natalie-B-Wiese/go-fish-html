@@ -1,0 +1,7 @@
+/ # locals: (can_draw:, game:)
+
+- if can_draw
+	= simple_form_for :turn, url: play_turn_path(game), html: { class: "game-actions"} do |f|
+		div.flex.gap-sm.align-items-stretch.justify-center
+			= f.button :button, "Draw from Deck", name: "turn[source]", value: "deck"
+			= f.button :button, "Take from Discard", name: "turn[source]", value: "discard"

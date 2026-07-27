@@ -1,0 +1,12 @@
+/ # locals: (meld:, index:)
+
+div.card-container
+	div.card-container__header
+		span
+			| Meld #{index + 1} · #{meld.set? ? 'Set' : 'Run'}
+		span.badge
+			| #{meld.cards.length} cards
+	div.card-container__content
+		div.flex.cards-stacked
+			- meld.cards.each do |card|
+				= image_tag "cards/#{card.to_image_name}", alt: card.to_s, class: "playing-card playing-card--sm"

@@ -17,7 +17,8 @@ class Game < ApplicationRecord
 
   def types
     { 'Go Fish' => 'GoFishGame',
-      'Crazy Eights' => 'CrazyEightsGame' }
+      'Crazy Eights' => 'CrazyEightsGame',
+      'Rummy' => 'RummyGame' }
   end
 
   def presenter_class
@@ -85,7 +86,7 @@ class Game < ApplicationRecord
   end
 
   def add_game_to_index(user)
-    broadcast_append_later_to 'games', user,
+    Turbo::StreamsChannel.broadcast_append_later_to 'games', user,
                               target: 'all_games_list',
                               partial: 'application/game_card',
                               locals: { game: self }

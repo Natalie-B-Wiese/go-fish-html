@@ -1,0 +1,90 @@
+module Rummy
+  class Player
+    attr_reader :user_id
+    attr_accessor :hand, :melds, :sort_preference
+
+    def initialize(user_id, hand: nil, melds: [], sort_preference: nil)
+      @user_id = user_id
+      @hand = hand || CardCollection.new
+      @melds = melds
+      @sort_preference = sort_preference
+    end
+
+    def cards
+      case sort_preference
+      when 'rank' then sorted_by_rank
+      when 'suit' then sorted_by_suit
+      else hand.cards
+      end
+    end
+
+    def add_card(card)
+      hand.push_cards(card)
+    end
+
+    def take_card(rank, suit)
+      card_taken = cards.find { |card| card.rank == rank && card.suit == suit }
+      hand.cards -= [card_taken]
+      card_taken
+    end
+
+    def add_meld(meld)
+      melds.push(meld)
+    end
+
+    def melded?
+      melds.any?
+    end
+
+    def try_lay_off(meld, lay_off_cards)
+      return nil unless melded?
+      return nil unless lay_off_cards.all? { |card| cards.include?(card) }
+      return nil unless meld.try_add_cards(lay_off_cards)
+
+      hand.cards -= lay_off_cards
+      meld
+    end
+
+    def try_create_meld(meld_cards)
+      return nil unless meld_cards.all? { |card| cards.include?(card) }
+
+      meld = Meld.new(meld_cards)
+      return nil unless meld.valid?
+
+      make_meld(meld_cards, meld)
+    end
+
+    def ==(other)
+      return false if other.nil?
+
+      user_id == other.user_id && hand == other.hand && melds == other.melds
+    end
+
+    def as_json
+      { user_id: user_id, hand: hand.as_json, melds: melds.map(&:as_json), sort_preference: sort_preference }
+    end
+
+    def self.from_json(json)
+      new(json['user_id'],
+          hand: CardCollection.from_json(json['hand']),
+          melds: json['melds'].map { |meld_json| Meld.from_json(meld_json) },
+          sort_preference: json['sort_preference'])
+    end
+
+    private
+
+    def make_meld(meld_cards, meld)
+      hand.cards -= meld_cards
+      add_meld(meld)
+      meld
+    end
+
+    def sorted_by_rank
+      hand.cards.sort_by { |card| [card.value, Card::SUITS.index(card.suit)] }
+    end
+
+    def sorted_by_suit
+      hand.cards.sort_by { |card| [Card::SUITS.index(card.suit), card.value] }
+    end
+  end
+end

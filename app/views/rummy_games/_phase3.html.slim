@@ -1,0 +1,12 @@
+/ # locals: (can_discard:, game:, discardable_cards:)
+
+- if can_discard
+	= simple_form_for :turn, url: play_turn_path(game), html: { class: "game-actions"} do |f|
+		div.op-stack.gap-xs
+			= f.input :card,
+				as: :select,
+				collection: discardable_cards,
+				selected: discardable_cards.values.first
+
+			/ a button that does not apply 'btn--primary'
+			= button_tag "Discard and End Turn", name: "turn[source]", value: "discard", class: "btn btn--destructive"

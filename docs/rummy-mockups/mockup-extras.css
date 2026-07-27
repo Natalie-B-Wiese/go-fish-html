@@ -1,0 +1,456 @@
+/* Mockup-only styles: not yet in the real app, added here so these ideas render
+   legibly. If a direction is chosen, fold the relevant bits into
+   components/game-view.css / a new components/rummy.css. */
+
+body {
+  margin: 0;
+}
+
+.playing-card
+{
+  height: 100%;
+  aspect-ratio: 63.5 / 88.9;  /* official playing card */ 
+  box-shadow: var(--op-shadow-x-small);
+
+  &.playing-card--xl
+  {
+    height: calc(var(--op-size-unit)*65); /* 320 px */
+  }
+
+  &.playing-card--lg
+  {
+    height: calc(var(--op-size-unit)*38); /* 152 px */
+  }
+
+  &.playing-card--sm
+  {
+    height: calc(var(--op-size-unit)*30); /* 120px */
+  }
+
+  &.playing-card--hover:hover
+  {
+    margin-top: calc(var(--op-space-medium)*-1);
+  }
+}
+.game-view
+{
+  background-color: var(--op-color-neutral-plus-max);
+  color: var(--op-color-neutral-on-plus-max);
+  height: 100vh;
+  --gf-side-panel-width: calc(var(--op-size-unit) * 84); /* 336 pixels */
+  --gf-side-panel-height: calc(var(--op-size-unit) * 64); /* 256 pixels */
+
+  display: grid;
+  grid-template-rows: 1fr var(--gf-side-panel-height);
+  grid-template-columns: 1fr var(--gf-side-panel-width);
+  grid-template-areas:
+    "game-board game-feed"
+    "hand extra";
+
+  .game-view__game-board
+  {
+    grid-area: game-board;
+  }
+
+  .game-view__game-feed { 
+    grid-area: game-feed;
+    border-left: var(--op-border-width) solid var(--op-color-border);
+
+    .panel__content
+    {
+      /* overrides default padding of (--op-space-medium) */
+      padding: 0px !important;
+    }
+
+    .feed-content
+    {
+      padding: var(--op-space-medium);
+    }
+  }
+
+  .game-view__hand {
+    grid-area: hand; 
+  }
+
+  .game-view__extra {
+    grid-area: extra;
+    border-left: var(--op-border-width) solid var(--op-color-border);
+  }
+}
+
+
+/*
+Mobile Styles: Screens less than 768px
+--op-breakpoint-small
+*/
+@media (width<768px)
+{
+  .game-view {
+    --gf-side-panel-width: calc(var(--op-size-unit) * 84); /* 336 pixels */
+
+    overflow: auto;
+    
+    --gf-side-panel-height: calc(var(--op-size-unit) * 100); /* 400 pixels */
+
+    display: grid;
+    grid-template-rows: 400px 250px 200px 500px;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "game-board"
+      "hand"
+      "extra"
+      "game-feed"
+      ;
+  }
+}
+
+.mock-flag {
+  position: fixed;
+  top: var(--op-space-x-small);
+  left: var(--op-space-x-small);
+  z-index: 10;
+  font-size: var(--op-font-x-small);
+  font-weight: var(--op-font-weight-bold);
+  background: var(--op-color-neutral-on-plus-max);
+  color: var(--op-color-neutral-plus-max);
+  padding: var(--op-space-3x-small) var(--op-space-x-small);
+  border-radius: var(--op-radius-medium);
+  opacity: 0.85;
+}
+
+/* --- hand: checkbox-selectable cards --- */
+.hand-card {
+  position: relative;
+  display: inline-block;
+  height: 100%;
+}
+
+.hand-card input {
+  position: absolute;
+  top: var(--op-space-x-small);
+  left: var(--op-space-x-small);
+  width: calc(var(--op-size-unit) * 5);
+  height: calc(var(--op-size-unit) * 5);
+  accent-color: var(--op-color-primary-base);
+  cursor: pointer;
+}
+
+.hand-card.hand-card--selected img {
+  outline: var(--op-border-width-large) solid var(--op-color-primary-base);
+  outline-offset: -2px;
+  margin-top: calc(var(--op-space-medium) * -1);
+}
+
+/* --- meld board --- */
+.melds-board {
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--op-space-medium);
+  align-content: flex-start;
+  height: 100%;
+  overflow: auto;
+}
+
+.meld {
+  border: var(--op-border-width) solid var(--op-color-border);
+  border-radius: var(--op-radius-large);
+  padding: var(--op-space-small);
+  background-color: var(--op-color-neutral-plus-eight, #fafafa);
+  display: flex;
+  flex-flow: column;
+  gap: var(--op-space-2x-small);
+  min-width: calc(var(--op-size-unit) * 45);
+}
+
+.meld__label {
+  font-size: var(--op-font-x-small);
+  font-weight: var(--op-font-weight-bold);
+  color: var(--op-color-neutral-on-plus-eight, #555);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meld__cards {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.meld__cards > *:not(:first-child) {
+  margin-left: calc(var(--op-space-scale-unit) * -6);
+}
+
+.meld--run-collapsed {
+  cursor: pointer;
+}
+
+.meld--run-collapsed .meld__cards {
+  align-items: center;
+  gap: var(--op-space-3x-small);
+}
+
+.meld--run-collapsed .meld__cards > *:not(:first-child) {
+  margin-left: 0;
+}
+
+.meld--run-collapsed .meld__ellipsis {
+  font-size: var(--op-font-large);
+  font-weight: var(--op-font-weight-bold);
+  color: var(--op-color-neutral-on-plus-eight, #777);
+  padding-inline: var(--op-space-2x-small);
+}
+
+/* --- pinned pile corner (alternative to tabs) --- */
+.pinned-pile {
+  float: right;
+  display: flex;
+  gap: var(--op-space-medium);
+  background-color: var(--op-color-neutral-plus-max);
+  border: var(--op-border-width) solid var(--op-color-border);
+  border-radius: var(--op-radius-large);
+  padding: var(--op-space-small);
+  margin-left: var(--op-space-medium);
+  margin-bottom: var(--op-space-medium);
+}
+
+.pinned-pile h4 {
+  margin: 0 0 var(--op-space-2x-small) 0;
+  font-size: var(--op-font-x-small);
+}
+
+/* --- phase forms co-present --- */
+.turn-phase-forms {
+  display: flex;
+  flex-flow: column;
+  gap: var(--op-space-small);
+}
+
+.turn-phase-forms .game-actions h4 {
+  margin: 0 0 var(--op-space-2x-small) 0;
+  font-size: var(--op-font-x-small);
+  font-weight: var(--op-font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--op-letter-spacing-label);
+  color: var(--op-color-primary-on-plus-seven);
+  opacity: 0.75;
+}
+
+.feed-collapsed {
+  max-height: calc(var(--op-size-unit) * 30);
+  overflow: auto;
+  opacity: 0.7;
+  border-bottom: var(--op-border-width) solid var(--op-color-primary-plus-six);
+  margin-bottom: var(--op-space-small);
+  padding-bottom: var(--op-space-small);
+}
+
+.disabled-overlay {
+  opacity: 0.5;
+  pointer-events: none;
+  filter: grayscale(40%);
+}
+
+.cards-stacked>*:not(:first-child)
+{
+  &.playing-card--sm
+  {
+    margin-left: calc(var(--op-space-scale-unit)*-6);
+  }
+
+  &.playing-card--lg
+  {
+    margin-left: calc(var(--op-space-4x-large)*-1);
+  }
+  
+}
+
+/*
+Mobile Styles: Screens less than 768px
+--op-breakpoint-small
+*/
+@media (width<768px)
+{
+  .cards-stacked>*:not(:first-child)
+  {
+    &.playing-card--sm
+    {
+      margin-left: calc(var(--op-space-scale-unit)*-7);
+    }
+
+    &.playing-card--lg
+    {
+      margin-left: calc(var(--op-space-scale-unit)*-9);
+    }
+  }
+}
+.feed-bubble
+{
+    .feed-bubble__content
+    {
+        border-radius: var(--op-radius-x-large);
+        padding: var(--op-space-small);
+    }
+    
+    &.feed-bubble--action
+    {
+        margin-bottom: var(--op-space-2x-small);
+
+        .feed-bubble__content
+        {
+            background-color: var(--op-color-primary-plus-five);
+            color: var(--op-color-primary-on-plus-five-alt);
+            font-size: var(--op-font-medium); /* 16 px */
+        }
+    }
+
+    &.feed-bubble--response
+    {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: var(--op-space-2x-small);
+
+        .feed-bubble__content
+        {
+            flex-grow: 1;
+
+            background-color: var(--op-color-primary-plus-max);
+            color: var(--op-color-primary-on-plus-max);
+
+            border-width: var(--op-border-width);
+            border-color: var(--op-color-primary-plus-seven);
+            border-style: solid;
+
+            font-weight: var(--op-font-weight-semi-bold);
+            font-size: var(--op-font-x-small); /* 12 px */
+        }
+    }
+
+    &.feed-bubble--unsuccess
+    {
+        .feed-bubble__content
+        {
+            background-color: var(--op-color-alerts-warning-plus-seven);
+            border-color: var(--op-color-alerts-warning-plus-five);
+            color: var(--op-color-alerts-warning-on-plus-seven-alt);
+        }
+    }
+
+}
+.game-actions
+{
+  background-color: var(--op-color-primary-plus-seven);
+  border: var(--op-border-width) solid var(--op-color-primary-plus-six);
+  border-radius: var(--op-radius-x-large);
+  padding: var(--op-space-small);
+
+  display: flex;
+  flex-flow: column;
+  gap: var(--op-space-x-small);
+
+  .game-actions__options
+  {
+    display: flex;
+    flex-flow: row;
+    gap: var(--op-space-small);
+    
+    *
+    {
+      flex-grow: 1;
+    }
+  }
+}
+
+/*
+Mobile Styles: Screens less than 768px
+--op-breakpoint-small
+*/
+@media (width<768px)
+{
+  :root {
+    /* 164px*/
+    --game-actions-height: calc(var(--op-size-unit)*41);
+  }
+  
+  .game-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--game-actions-height);
+  }
+
+  /* The spacer is inside the feed and is the same height as game actions
+  This is so that the bottom messages can be seen when game-actions has a fixed position */
+  .game-actions-spacer {
+    flex-shrink: 0;
+    height: var(--game-actions-height);
+  }
+}
+.panel
+{
+  background-color: var(--op-color-neutral-plus-max);
+  color: var(--op-color-neutral-on-plus-max);
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-flow: column;
+  
+  h2 {
+    margin: 0;
+    font-size: calc(var(--op-font-scale-unit) * 1.8); /* 18 px */
+    font-weight: var(--op-font-weight-semi-bold);
+  }
+
+  &.panel--primary
+  {
+    background-color: var(--op-color-primary-plus-eight);
+    color: var(--op-color-primary-on-plus-eight-alt);
+    
+    h2
+    {
+      font-size: calc(var(--op-font-scale-unit) * 1.4); /* 14 px */
+    }
+  }
+
+  &.panel--secondary
+  {
+    background-color: var(--op-color-secondary, var(--op-color-neutral-plus-eight));
+    color: var(--op-color-secondary-on, var(--op-color-primary-on-neutral-eight-alt));
+    
+    h2
+    {
+      font-size: calc(var(--op-font-scale-unit) * 1.4); /* 14 px */
+    }
+  }
+
+  &.panel--padded .panel__header
+  {
+    --op-navbar-height: calc(var(--op-size-unit)*15); /* 60 px */
+    min-height: var(--op-navbar-height);
+  }
+
+  .panel__header
+  {
+    border-top: var(--op-border-width) solid var(--op-color-border);
+    border-bottom: var(--op-border-width) solid var(--op-color-border);
+
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    min-height: calc(var(--op-size-unit)*10); /* 40 px */
+
+    padding-top: var(--op-space-small);
+    padding-bottom: var(--op-space-x-small);
+    padding-right: var(--op-space-medium);
+    padding-left: var(--op-space-medium);
+  }  
+
+  .panel__content
+  {
+    padding: var(--op-space-medium);
+    overflow: auto;
+    height: 100%;
+  }
+}

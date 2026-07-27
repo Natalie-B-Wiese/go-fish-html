@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A web-based multiplayer card-game platform. Players sign up, create or join games in a lobby, and play turn-based card games (Go Fish, Crazy Eights) in real time. The UI updates live over WebSockets, and the app is installable as a PWA with offline support.
+A web-based multiplayer card-game platform. Players sign up, create or join games in a lobby, and play turn-based card games (Go Fish, Crazy Eights, and Rummy — in progress) in real time. The UI updates live over WebSockets, and the app is installable as a PWA with offline support.
 
 ## Tech stack
 
@@ -48,17 +48,17 @@ bin/ci               # runs setup + rubocop + audits together
 
 ## Architecture (big picture)
 
-**Persistence vs. game logic are deliberately separated.** `Game` (STI: `GoFishGame`, `CrazyEightsGame`) is the Active Record model that lives in the lobby and tracks players, turns started/ended, and the winner. The *actual game rules* live in plain Ruby objects under `app/models/go_fish/` and `app/models/crazy_eights/` — each has an `Implementation` (the game engine, subclassing a shared `::Implementation` base in `app/models/implementation.rb`), `Player`, `TurnResult`, and game-specific pieces (`Book`, `DiscardPile`). None of these are Active Record.
+**Persistence vs. game logic are deliberately separated.** `Game` (STI: `GoFishGame`, `CrazyEightsGame`, `RummyGame`) is the Active Record model that lives in the lobby and tracks players, turns started/ended, and the winner. The *actual game rules* live in plain Ruby objects under `app/models/go_fish/`, `app/models/crazy_eights/`, and `app/models/rummy/` — each has an `Implementation` (the game engine, subclassing a shared `::Implementation` base in `app/models/implementation.rb`), `Player`, `TurnResult`, and game-specific pieces (`Book`, `DiscardPile`). None of these are Active Record.
 
 The engine is stored in the `games.game_state` jsonb column and (de)serialized through Rails' `serialize` with a **custom coder**: each `Implementation` implements `self.dump`/`self.load` and every value object implements `as_json`/`self.from_json`. When adding a field to any game object, you must update both `as_json` and `from_json` or it silently won't persist.
 
-`Card`, `CardCollection`, and `Deck` are shared plain-Ruby primitives used by both games.
+`Card`, `CardCollection`, and `Deck` are shared plain-Ruby primitives used by all three games.
 
 **Request flow:** `GamesController#show` lazily starts a game once it's full (`game.start!`) and ends it when over. `#play` validates it's the caller's turn (`game.valid_turn?`) then delegates to the STI subclass's `play_turn?`, which calls into the `Implementation`. **Presenters** (`app/presenters/`) wrap a game + the current user for view rendering (whose turn, my hand vs. opponents).
 
 **Live updates:** models broadcast Turbo Streams (`broadcast_*_to`) on create/update to refresh lobby cards and game boards; there is no custom Action Cable channel beyond the connection.
 
-**View composition:** the board is a 4-panel CSS grid whose *shared* skeleton lives in `app/views/application/` (`_hand`, `_game_feed`, `_lobby`, plus `_game_header`, `_feed_content`, `_turn_badge`, `_play_turn_button`). A game supplies only its **region partials** in `app/views/<game>_games/` — `_game_board`, `_extra`, `_turn_form`, `_player_accordion` — and a thin entry partial (`_<game>_game.html.slim`) that renders those regions in order (passing its turn form to the shared feed as `render 'game_feed', turn_form_partial: '<game>_games/turn_form'`). Region partials read `@presenter` directly (no locals). `games/show.html.slim` forks on `@presenter.implementation?`: started → `render @presenter.game` (dispatched by `to_partial_path`) → the game's entry partial; not started → the shared `application/_lobby`. The layout (`layouts/application_game.slim`) sets the container class accordingly — `game-view` (the 4-panel grid: `game-board` / `game-feed` / `hand` / `extra`) when playing, `game-lobby` (a simple centered list, not a grid) in the lobby. Grid CSS is scoped under `.game-view` in `app/assets/stylesheets/components/game-view.css`; the lobby's in `game-lobby.css`.
+**View composition:** the board is a 4-panel CSS grid whose *shared* skeleton lives in `app/views/application/` (`_hand`, `_game_feed`, `_lobby`, plus `_game_header`, `_feed_content`, `_turn_badge`, `_play_turn_button`). A game supplies only its **region partials** in `app/views/<game>_games/` — `_game_board`, `_extra`, `_turn_form`, `_player_accordion` — and a thin entry partial (`_<game>_game.html.slim`) that renders those regions in order (passing its turn form to the shared feed as `render 'game_feed', turn_form_partial: '<game>_games/turn_form', presenter: @presenter`). Region partials take Rails **strict locals**, kept as narrow as possible (e.g. `_hand` takes `cards:`, not the whole presenter) — except the entry partials and `_game_feed`/`_turn_form`, which take the whole `presenter:` (see architecture.md for why). `games/show.html.slim` forks on `@presenter.implementation?`: started → `render @presenter.game` (dispatched by `to_partial_path`) → the game's entry partial; not started → the shared `application/_lobby`. The layout (`layouts/application_game.slim`) sets the container class accordingly — `game-view` (the 4-panel grid: `game-board` / `game-feed` / `hand` / `extra`) when playing, `game-lobby` (a simple centered list, not a grid) in the lobby. Grid CSS is scoped under `.game-view` in `app/assets/stylesheets/components/game-view.css`; the lobby's in `game-lobby.css`.
 
 ## Conventions worth knowing
 
@@ -79,3 +79,4 @@ See [docs/conventions.md](docs/conventions.md) for the full list. The ones you'l
 - [docs/conventions.md](docs/conventions.md) — house style and project rules (7-line limit, TDD, RESTful routes, serialization symmetry).
 - [docs/go-fish-rules.md](docs/go-fish-rules.md) — Go Fish rules as implemented.
 - [docs/crazy-eights-rules.md](docs/crazy-eights-rules.md) — Crazy Eights rules as implemented.
+- [docs/rummy-rules.md](docs/rummy-rules.md) — Rummy rules as implemented.
