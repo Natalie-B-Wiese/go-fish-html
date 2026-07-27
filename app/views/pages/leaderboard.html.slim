@@ -1,0 +1,48 @@
+- finished_games_for = ->(user) { user.games.where.not(ended_at: nil) }
+- users = User.all.select { |user| finished_games_for.call(user).any? }
+- users = users.sort_by do |user|
+	- finished_games_for.call(user).where(winner_id: user.id).count
+- users = users.reverse
+
+main.op-page__main-content
+	.op-stack.gap-xl
+		header.content-header
+			h2
+				| Leaderboard
+			div.divider
+		table.table.table--auto-layout.table--default-density.table--even-striped.table--sticky-header
+			thead
+				tr
+					th
+						| Name
+					th
+						| Total Games
+					th
+						| Games Won
+					th
+						| Total Time Played
+					th 
+						| Winning Percentage
+			tbody
+				- users.each do |user|
+					- finished_games = finished_games_for.call(user)
+					- total_games = finished_games.count
+					- games_won = finished_games.where(winner_id: user.id).count
+					- total_time_played = finished_games.sum { |game| game.ended_at - game.started_at }
+					- win_percentage = (games_won.to_f / total_games * 100).round(1)
+					tr
+						td
+							| #{user.name}
+						td
+							| #{total_games}
+						td
+							| #{games_won}
+						td
+							| #{(total_time_played / 60).round} min
+						td
+							| #{win_percentage}%
+				
+			tfoot
+				
+
+			

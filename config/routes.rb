@@ -30,6 +30,7 @@ Rails.application.routes.draw do
 
   get 'pages/rules', to: 'pages#rules'
   resources :pages, only: [:index]
+  get 'pages/leaderboard', to: 'pages#leaderboard'
 
   # Stats page ( stats#index ). Player stats (static/placeholder content for now), in a StatsController
   resources :stats, only: [:index]

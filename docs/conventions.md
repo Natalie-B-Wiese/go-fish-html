@@ -16,6 +16,9 @@ RoleModel house style and project-specific rules that you won't infer from readi
 - **Asserting on card images in system specs**: `img[src]` is fingerprinted by Propshaft
   (`name-hash.ext`), so a full-filename substring match breaks (`to_image_name` includes the
   extension). Match on the base name only: `File.basename(card.to_image_name, '.*')`.
+- **`page.within(selector)` only scopes a block — called without one it silently returns `nil`.**
+  `page.within('tbody').find_all('td')` raises `NoMethodError` on `nil`; the fix is
+  `page.within('tbody') { find_all('tr') }`. See `spec/system/leaderboard_spec.rb`.
 - **GoodJob broadcasts fire fine in `:js` specs as-is** — `broadcast_refresh_later_to` reaches an
   already-open page via GoodJob's default async execution; no test-env queue-adapter change or
   `perform_enqueued_jobs` is needed.
@@ -52,6 +55,10 @@ RoleModel house style and project-specific rules that you won't infer from readi
 ## Rails patterns
 
 - **Prefer RESTful routes.** Some existing routes (`games/:id/join`, `games/:id/play`, and the state-mutating `games#show`) are pragmatic exceptions, not the pattern to copy.
+- **A route can point at a controller action with no method defined** — Rails implicitly renders
+  the matching view (`app/views/<controller>/<action>.html.slim`) as long as the template exists.
+  `PagesController` (`rules`, `leaderboard`) relies on this: all the logic lives in the view/model
+  layer, not a controller method. Use this only for simple, non-branching pages.
 - **Avoid instance variables in plain Ruby objects** (the game engine, presenters, service-style classes) — lean on locals and passed-in arguments instead. Instance variables are **fine in controllers** (e.g. `@game`, `@presenter` in `ApplicationController` subclasses), which is the normal Rails way to hand data to views.
 - **Presenters** (`app/presenters/`) hold view-facing helper methods for reading engine data so views don't dig into `game.game_state` directly. There's no hard rule forbidding direct access — presenters just keep views clean.
 - **Same `name`, different `value` on submit buttons picks an action without JS or a hidden field.** When one form offers a choice between turn actions (e.g. Rummy's "Draw from Deck" vs. "Take from Discard"), give each `f.button` the same nested `name:` (e.g. `name: "turn[source]"`) and a distinct `value:` — only the clicked button's pair is submitted, so the controller reads the chosen action straight off the permitted param. See `app/views/rummy_games/_phase1.html.slim`.

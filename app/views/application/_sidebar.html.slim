@@ -22,6 +22,10 @@ div.op-page__sidebar id="sidebar" data-controller='sidebar-size'
 				i.ph.ph-ranking.icon.icon--large
 				| Stats
 
+			a.btn.btn--no-border href=pages_leaderboard_url class=class_names('btn--active' => request.path.include?('leaderboard'))
+				i.ph.ph-globe-hemisphere-west.icon.icon--large
+				| Leaderboard
+
 		div.sidebar__content.sidebar__content--end
 			div.divider
 			a.btn.btn--no-border href=users_profile_url class=class_names('btn--active' => (request.path==users_profile_path))
