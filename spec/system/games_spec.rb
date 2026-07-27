@@ -28,11 +28,8 @@ RSpec.describe 'Games', type: :system do
       expect(page).to have_content 'All Games'
     end
 
-    it 'does not show games already finished' do
+    it 'does not show finished or archived games' do
       expect(page).to_not have_content finished_game_name
-    end
-
-    it 'does not show archived games' do
       expect(page).to_not have_content archived_game_name
     end
 
@@ -134,11 +131,8 @@ RSpec.describe 'Games', type: :system do
       end
 
       context 'when player is already in game' do
-        it 'it shows view button' do
+        it 'lets user view the game after pushing view button' do
           expect(page).to have_button('View')
-        end
-
-        it 'clicking on button allows player to view the game' do
           click_on('View')
           expect(page.current_path).to eq show_game_path(game)
         end
@@ -195,11 +189,8 @@ RSpec.describe 'Games', type: :system do
       end
 
       context 'when player is already in game' do
-        it 'it shows enabled Play Now button' do
+        it 'it shows enabled Play Now button and lets player view the game' do
           expect(page).to have_button('Play Now')
-        end
-
-        it 'when clicked on play now, it allows player to view the game' do
           click_on 'Play Now'
           expect(page.current_path).to eq show_game_path(game)
         end
@@ -231,15 +222,13 @@ RSpec.describe 'Games', type: :system do
       create :game, :with_users, name: full_game_name, player_count: 3, users: [user1, user2, user3]
     end
 
-    it 'shows the game name' do
+    it 'shows the game name and players' do
       visit show_game_path(unfull_game)
       expect(page).to have_content unfull_game_name
 
       visit show_game_path(full_game)
       expect(page).to have_content full_game_name
-    end
 
-    it 'shows only the players in that game' do
       visit show_game_path(unfull_game)
 
       expect(page).to have_content user1.name
@@ -254,9 +243,6 @@ RSpec.describe 'Games', type: :system do
 
       it 'game is not started' do
         expect(unfull_game).to_not be_started
-      end
-
-      it 'shows waiting message' do
         expect(page).to have_content 'Waiting'
       end
 
@@ -416,17 +402,13 @@ RSpec.describe 'Games', type: :system do
         expect(page).to_not have_content 'Unfinished Game'
       end
 
-      it 'shows who played' do
+      it 'shows who played, date finished, and winner' do
         expect(page).to have_content user1.name + ', ' + user2.name
         expect(page).to have_content user1.name + ', ' + user3.name
-      end
 
-      it 'shows when it was finished' do
         expect(page).to have_content game1.ended_at.strftime('%b %d, %Y')
         expect(page).to have_content game4.ended_at.strftime('%b %d, %Y')
-      end
 
-      it 'show the winner' do
         expect(page).to have_content(user2.name).twice
         expect(page).to have_content(user3.name).twice
       end
@@ -437,12 +419,9 @@ RSpec.describe 'Games', type: :system do
         visit games_history_path
       end
 
-      it 'does not show table' do
-        expect(page).to_not have_css('table')
-      end
-
-      it 'shows a no games message' do
+      it 'shows a no games message and does not show table' do
         expect(page).to have_content 'no'
+        expect(page).to_not have_css('table')
       end
     end
   end
