@@ -1,6 +1,6 @@
 - user=Current.user
 - finished_games=Current.user.games.where.not(ended_at: nil)
-- win_count=finished_games.count{|game| game.winner.user==user}
+- win_count=finished_games.count{|game| game.winner==user}
 - lose_count=finished_games.count-win_count
 - win_percentage=(win_count.to_f/finished_games.count)*100
 

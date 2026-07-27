@@ -29,6 +29,6 @@ main.op-page__main-content.op-stack.gap-xl
 						td
 							= game.users.map{|user| user.name}.join(', ')
 						td
-							= game.winner.user.name
+							= game.winner.name
 						td
 							= game.ended_at.strftime("%b %d, %Y")

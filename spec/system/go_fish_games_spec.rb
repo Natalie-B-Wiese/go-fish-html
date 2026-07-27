@@ -252,7 +252,7 @@ RSpec.describe 'Games', type: :system do
 
     it 'records the winner' do
       expect(game.winner).to_not be_nil
-      expect(game.winner.user_id).to eq winning_player.user_id
+      expect(game.winner.id).to eq winning_player.user_id
     end
 
     it 'records an ended at date only once' do

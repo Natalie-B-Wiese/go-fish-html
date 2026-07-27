@@ -1063,6 +1063,7 @@ finished_fish_game = Game.find_or_create_by!(name: 'Spider vs Ironman Go Fish') 
   game.started_at = '2026-03-13 14:49:57.697838'
   game.updated_at = '2026-07-15 14:21:13.71925'
   game.ended_at = '2026-07-15 14:21:13.71925'
+  game.winner_id = ironman.id
   game.game_state =
     {
       deck: {
@@ -1751,10 +1752,8 @@ finished_fish_game = Game.find_or_create_by!(name: 'Spider vs Ironman Go Fish') 
     }
 end
 
-ironman_player = Player.find_or_create_by!(user: ironman, game: finished_fish_game)
+Player.find_or_create_by!(user: ironman, game: finished_fish_game)
 Player.find_or_create_by!(user: spiderman, game: finished_fish_game)
-finished_fish_game.winner_id = ironman_player.id
-finished_fish_game.save!
 
 finished_eights_game = Game.find_or_create_by!(name: 'Spider vs Ironman Crazy Eights') do |game|
   game.player_count = 2
@@ -1762,6 +1761,7 @@ finished_eights_game = Game.find_or_create_by!(name: 'Spider vs Ironman Crazy Ei
   game.updated_at = '2026-07-15 14:21:13.71925'
   game.ended_at = '2026-07-15 14:32:12.560472'
   game.type = 'CrazyEightsGame'
+  game.winner_id = spiderman.id
   game.game_state = {
     deck: {
       cards: [
@@ -3004,9 +3004,7 @@ Player.find_or_create_by!(user: ironman, game: finished_eights_game)
 Player.find_or_create_by!(user: spiderman, game: finished_eights_game)
 
 Player.find_or_create_by!(user: ironman, game: finished_eights_game)
-spiderman_player = Player.find_or_create_by!(user: spiderman, game: finished_eights_game)
-finished_eights_game.winner_id = spiderman_player.id
-finished_eights_game.save!
+Player.find_or_create_by!(user: spiderman, game: finished_eights_game)
 
 spiderman_ironman_rummy_game = Game.find_or_create_by!(name: 'Iron-Spider Rummy') do |game|
   game.player_count = 2
