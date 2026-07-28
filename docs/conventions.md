@@ -108,6 +108,10 @@ Every game-engine **value object** (`Card`, `Deck`, `CardCollection`, `Player`, 
 - **Marking the active sort button:** a plain helper (`LeaderboardsHelper#active_sort_class`) compares
   `query.sorts.first&.name` to the attribute name to decide whether to add `btn--active`. `sort_link` itself has
   no built-in "is this the current sort" hook for custom styling — you have to inspect `@q.sorts` yourself.
+- **`@q.result` calls `reorder` under the hood, wiping out any `.order` applied earlier in the chain.** A tiebreaker
+  sort (e.g. `order(user_id: :asc)` for stable pagination) has to be chained *after* `.result`, not before
+  `.ransack` — `.order` appended post-`.result` merges with whatever column the user picked, rather than
+  replacing it. See `LeaderboardsController#index`.
 - **A misspelled predicate suffix (e.g. `games_won_greg` instead of `games_won_gteq`) raises, not silently
   ignores the filter.** Ransack parses the field name as `<attribute>_<predicate>` at query time, so it's easy to
   typo the predicate half and not notice until the form errors.
