@@ -109,6 +109,28 @@ Every game-engine **value object** (`Card`, `Deck`, `CardCollection`, `Player`, 
   `query.sorts.first&.name` to the attribute name to decide whether to add `btn--active`. `sort_link` itself has
   no built-in "is this the current sort" hook for custom styling — you have to inspect `@q.sorts` yourself.
 
+## Pagination (Kaminari)
+
+- **`rails g kaminari:views` crashes on Rails 8.1** (`NoMethodError: private method 'warn' called for
+  class ActiveSupport::Deprecation`, from `kaminari-core`'s generator calling a deprecation API Rails 8.1
+  removed). The Optics-styled partials in `app/views/kaminari/` were hand-written from the gem's own
+  default templates instead of generated.
+- **Disabled pagination buttons (first/prev/next/last at the boundary) render as a non-link `<span>`
+  with `btn--disabled`, not Kaminari's default bare-text fallback.** `link_to_unless`'s disabled branch
+  just prints the content with no wrapping tag, which would drop the Optics `btn` classes entirely —
+  each partial branches explicitly instead so the disabled state keeps its button styling.
+- **`config/locales/en.yml` overrides `views.pagination.previous`/`next`** to plain "Prev"/"Next".
+  Kaminari's own default locale bakes in `&lsaquo;`/`&rsaquo;` arrow entities, which doubled up with the
+  Optics `ph-caret-*` icons already in those partials.
+- **Slim escapes HTML entities by default — unlike the gem's ERB originals, `t(...)` needs an explicit
+  `.html_safe`.** `_gap.html.slim`'s ellipsis (`t('views.pagination.truncate')`) printed literal
+  `&hellip;` text until `.html_safe` was added back; easy to drop when porting an ERB partial to Slim.
+- **`config/initializers/kaminari_config.rb`'s `default_per_page`/`max_per_page` are currently a no-op.**
+  `LeaderboardsController#index` calls `.per(10)` explicitly, and an explicit `.per` always wins over
+  `config.default_per_page`; `max_per_page` only matters if something (e.g. a `per_page` query param)
+  lets a caller request more than that. Neither applies until the hardcoded `.per(10)` is replaced with
+  a user-adjustable per-page value.
+
 ## Generated files — don't hand-edit
 
 - `db/schema.rb` — change via migrations.

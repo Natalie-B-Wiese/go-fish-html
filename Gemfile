@@ -104,3 +104,5 @@ end
 gem 'scenic'
 
 gem 'ransack'
+
+gem 'kaminari'

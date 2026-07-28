@@ -32,3 +32,7 @@ main.op-page__main-content
 						td
 							| #{leaderboard.win_percentage}%
 			tfoot
+				tr
+					td colspan="5"
+						.flex.justify-end
+							= paginate @leaderboards, window: 2
