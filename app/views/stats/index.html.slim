@@ -1,3 +1,5 @@
+/ - games_in = Current.user.games.includes(:users, :winner).select(&:finished?)
+
 - user=Current.user
 - finished_games=Current.user.games.where.not(ended_at: nil)
 - win_count=finished_games.count{|game| game.winner==user}

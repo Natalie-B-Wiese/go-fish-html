@@ -1,7 +1,7 @@
 = turbo_stream_from "games", Current.user
 
-- games = Game.where(ended_at: nil, archived_at: nil)
-- games_in = Current.user.games.where(ended_at: nil, archived_at: nil)
+- games = Game.where(ended_at: nil, archived_at: nil).includes(:players)
+- games_in = Current.user.games.where(ended_at: nil, archived_at: nil).includes(:players)
 
 - games_not_in = games - games_in
 

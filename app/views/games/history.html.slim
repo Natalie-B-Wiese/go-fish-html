@@ -1,4 +1,5 @@
-- games_in = Current.user.games.select(&:finished?)
+- games_in = Current.user.games.includes(:users, :winner).select(&:finished?)
+
 main.op-page__main-content.op-stack.gap-xl
 	header.content-header
 		h2
