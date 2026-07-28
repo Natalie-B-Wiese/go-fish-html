@@ -4329,3 +4329,34 @@ end
 
 Player.find_or_create_by!(user: ironman, game: adults_rummy_game)
 Player.find_or_create_by!(user: captain_america, game: adults_rummy_game)
+
+# randomly creates users
+random_users = 100.times.map do |i|
+  create_user(name: "Bob #{i}", email: "bob#{i}@example.com", password: 'password')
+end
+
+# creates random finished games
+100.times do |i|
+  finished_game_players = random_users.sample(rand(2..6))
+  winner = finished_game_players.sample
+
+  created_at = rand(30..90).days.ago
+  started_at = created_at + rand(1..30).minutes
+  ended_at = started_at + rand(10..60).minutes
+
+  finished_game = Game.find_or_create_by!(name: "Finished Game #{i}") do |game|
+    game.player_count = finished_game_players.size
+    game.winner_id = winner.id
+    game.type = 'RummyGame'
+    game.created_at = created_at
+    game.started_at = started_at
+    game.updated_at = ended_at
+    game.ended_at = ended_at
+  end
+
+  next unless finished_game.previously_new_record?
+
+  finished_game_players.each do |user|
+    Player.find_or_create_by!(user: user, game: finished_game)
+  end
+end
