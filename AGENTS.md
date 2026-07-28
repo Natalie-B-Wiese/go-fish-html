@@ -12,6 +12,7 @@ A web-based multiplayer card-game platform. Players sign up, create or join game
 - **Hotwire** (Turbo + Stimulus) for the front end — server-rendered HTML over the wire, no SPA framework
 - **Slim** templates, **SCSS** compiled with **esbuild** (`yarn build`), **@rolemodel/optics** design system
 - **GoodJob** for background jobs (backed by Postgres)
+- **Scenic** for SQL-backed database views (e.g. `Leaderboard`, a read-only reporting model)
 - **RSpec** + **FactoryBot** + **Capybara** with the **Playwright** driver for system tests
 - **Kamal** + Docker for deployment; **Propshaft** asset pipeline
 

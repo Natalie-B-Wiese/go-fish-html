@@ -100,3 +100,5 @@ gem 'data_for'
 group :development, :test do
   gem 'bullet'
 end
+
+gem 'scenic'

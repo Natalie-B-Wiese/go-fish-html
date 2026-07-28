@@ -18,10 +18,17 @@ RoleModel house style and project-specific rules that you won't infer from readi
   extension). Match on the base name only: `File.basename(card.to_image_name, '.*')`.
 - **`page.within(selector)` only scopes a block — called without one it silently returns `nil`.**
   `page.within('tbody').find_all('td')` raises `NoMethodError` on `nil`; the fix is
-  `page.within('tbody') { find_all('tr') }`. See `spec/system/leaderboard_spec.rb`.
+  `page.within('tbody') { find_all('tr') }`. See `spec/system/leaderboards_spec.rb`.
 - **GoodJob broadcasts fire fine in `:js` specs as-is** — `broadcast_refresh_later_to` reaches an
   already-open page via GoodJob's default async execution; no test-env queue-adapter change or
   `perform_enqueued_jobs` is needed.
+- **A system spec's `have_content` can false-positive match an error page.** System specs drive a
+  real browser against a real server, so a Ruby exception can't propagate back to RSpec — it
+  renders as an HTML error page instead, and the test still "passes" if the expected string is a
+  substring of that page's text. Bit us when `expect(page).to have_content 'Leaderboard'` matched
+  the routing-error page for a missing `LeaderboardsController#index` action, since `'Leaderboard'`
+  is a substring of `'LeaderboardsController'`. Assert on content specific enough that an error
+  page can't coincidentally contain it (e.g. a real column header, not the resource name).
 - **Assigning `game_state:` on an unsaved `Game` round-trips through the `serialize` coder's dump/load
   immediately** — `SomeGame.new(game_state: engine)` does *not* keep the object graph you passed in;
   `some_game.game_state` is a freshly deserialized copy. A model spec that builds `Player`/`Implementation`
@@ -57,7 +64,7 @@ RoleModel house style and project-specific rules that you won't infer from readi
 - **Prefer RESTful routes.** Some existing routes (`games/:id/join`, `games/:id/play`, and the state-mutating `games#show`) are pragmatic exceptions, not the pattern to copy.
 - **A route can point at a controller action with no method defined** — Rails implicitly renders
   the matching view (`app/views/<controller>/<action>.html.slim`) as long as the template exists.
-  `PagesController` (`rules`, `leaderboard`) relies on this: all the logic lives in the view/model
+  `PagesController#rules` relies on this: all the logic lives in the view/model
   layer, not a controller method. Use this only for simple, non-branching pages.
 - **Avoid instance variables in plain Ruby objects** (the game engine, presenters, service-style classes) — lean on locals and passed-in arguments instead. Instance variables are **fine in controllers** (e.g. `@game`, `@presenter` in `ApplicationController` subclasses), which is the normal Rails way to hand data to views.
 - **Presenters** (`app/presenters/`) hold view-facing helper methods for reading engine data so views don't dig into `game.game_state` directly. There's no hard rule forbidding direct access — presenters just keep views clean.
@@ -79,6 +86,19 @@ RoleModel house style and project-specific rules that you won't infer from readi
 Every game-engine **value object** (`Card`, `Deck`, `CardCollection`, `Player`, `Book`, `TurnResult`, …) implements a matching `as_json` / `self.from_json` pair. **If you touch one, touch the other** — a mismatch silently drops state rather than raising. See [architecture.md](architecture.md#serialization-the-jsonb-boundary).
 
 **`Implementation` subclasses are the exception — don't override `self.from_json`.** The `::Implementation` base owns `from_json` and rebuilds the game from `self.json_attributes` (a hash of constructor keywords). A game with extra state keeps `as_json` and `self.json_attributes` in sync instead — each *extends* the base with `super.merge(...)` (e.g. Crazy Eights' `discard_pile`), and `==` extends with `super && ...`. Don't reference a per-game constant (e.g. `SMALL_GAME_CARDS`) from a method defined on the base: Ruby resolves constants *lexically*, not by the runtime subclass, so the base won't see the subclass's value — expose per-game values through an overridable method hook instead (see `starting_hand_size`). The flip side works in your favor for *classes*: an unqualified `Card`, `Deck`, or `CardCollection` reference inside a game's own module (e.g. bare `Deck.new` in `Rummy::Implementation`) resolves to that game's same-named subclass automatically, once one is defined — no explicit wiring needed. That's what makes the `card_class`/`deck_class` hooks above work without every call site needing to know which game it's in.
+
+## Database views (Scenic)
+
+- **Postgres `interval` columns come back as `ActiveSupport::Duration`, not a plain number.** A
+  view column like `SUM(games.ended_at - games.started_at)` is cast automatically by the `pg`
+  adapter/ActiveRecord. Use `.in_minutes`, `.in_hours`, or `.to_i` (seconds) rather than assuming
+  a raw numeric — see `Leaderboard#total_time_played`.
+- **Hand-editing a new versioned view SQL file (e.g. `db/views/foo_v02.sql`) without running the
+  generator confuses the next `rails generate scenic:view` call.** It detects the highest existing
+  version file and assumes a migration for it already exists, so it skips straight to `v03` —
+  producing a duplicate file and a migration for the wrong version range. Either always use the
+  generator to create the next version file, or hand-write the `update_view` migration yourself
+  (`version: N, revert_to_version: N-1`) to match a manually-created SQL file.
 
 ## Generated files — don't hand-edit
 

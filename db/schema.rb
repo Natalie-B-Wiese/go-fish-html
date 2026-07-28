@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_27_175052) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_27_232407) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -162,4 +162,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_27_175052) do
   add_foreign_key "players", "games"
   add_foreign_key "players", "users"
   add_foreign_key "sessions", "users"
+
+  create_view "leaderboards", sql_definition: <<-SQL
+      WITH user_stats AS (
+           SELECT users.id AS user_id,
+              users.name AS user_name,
+              count(games.id) AS total_games,
+              count(
+                  CASE
+                      WHEN (games.winner_id = users.id) THEN 1
+                      ELSE NULL::integer
+                  END) AS games_won,
+              sum((games.ended_at - games.started_at)) AS total_time_played
+             FROM ((users
+               JOIN players ON ((players.user_id = users.id)))
+               JOIN games ON (((players.game_id = games.id) AND (games.ended_at IS NOT NULL))))
+            GROUP BY users.id
+          )
+   SELECT user_id,
+      user_name,
+      total_games,
+      games_won,
+      total_time_played,
+      round(((((games_won)::numeric * 1.0) / (total_games)::numeric) * (100)::numeric), 1) AS win_percentage
+     FROM user_stats;
+  SQL
 end

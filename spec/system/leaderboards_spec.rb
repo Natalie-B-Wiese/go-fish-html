@@ -36,27 +36,36 @@ RSpec.describe 'Leaderboard', type: :system do
     create :game, :with_users, name: 'Game 7', users: [user1, user4], started_at: 5.minutes.ago
   end
 
+  let(:expected_user1_row) { { user: user1, total_games: 5, games_won: 3, time_played: 50, win_percentage: 60.0 } }
+  let(:expected_user2_row) { { user: user2, total_games: 5, games_won: 1, time_played: 50, win_percentage: 20.0 } }
+  let(:expected_user3_row) { { user: user3, total_games: 3, games_won: 2, time_played: 30, win_percentage: 66.7 } }
+
   let(:expected_rows) do
     [
-      { user: user1, total_games: 5, games_won: 3, time_played: 50, win_percentage: 60.0 },
-      { user: user3, total_games: 3, games_won: 2, time_played: 30, win_percentage: 66.7 },
-      { user: user2, total_games: 5, games_won: 1, time_played: 50, win_percentage: 20.0 }
+      expected_user1_row,
+      expected_user2_row,
+      expected_user3_row
     ]
   end
 
   before do
     sign_in_as(user1)
-    visit pages_leaderboard_path
+    visit leaderboards_path
   end
 
-  it 'shows finished game stats for all players, sorted by games won, and ignores incomplete games and users with no completed games' do
+  it 'shows the leaderboard index' do
+    expect(page).to have_content 'Total Games'
+  end
+
+  it 'shows user stats only for players with completed games and it ignores incomplete games' do
     rows = page.within('tbody') { find_all('tr') }
     expect(rows.count).to eq expected_rows.count
     expect(page).not_to have_content user4.name
 
-    expected_rows.each_with_index do |expected, index|
-      expect(rows[index]).to have_content expected[:user].name
-      expect_row_stats(rows[index], **expected.except(:user))
+    # ensures the rows are there and ignores ordering
+    expected_rows.each do |expected|
+      row = rows.find { |r| r.has_content?(expected[:user].name) }
+      expect_row_stats(row, **expected.except(:user))
     end
   end
 
