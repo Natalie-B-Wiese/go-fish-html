@@ -14,4 +14,8 @@ class User < ApplicationRecord
 
   # turn empty string to nil
   normalizes :state, :country, with: ->(value) { value.presence }
+
+  def self.ransackable_attributes(auth_object = nil)
+    ['country']
+  end
 end

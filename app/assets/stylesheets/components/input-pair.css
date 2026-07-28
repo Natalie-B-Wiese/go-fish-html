@@ -1,0 +1,16 @@
+.input__pair
+{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--op-space-medium);
+  margin-block: 0;
+  margin-inline: 0;
+
+  > .form-group
+  {
+    flex: 1 1 0;
+    min-inline-size: 0;
+  }
+}

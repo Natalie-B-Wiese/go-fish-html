@@ -1,0 +1,20 @@
+fieldset
+{
+  border: var(--op-border-width) solid var(--op-color-border);
+  border-radius: var(--op-radius-small);
+  /* padding: var(--op-space-small) var(--op-space-large);
+  margin-inline: 0; */
+  padding: 0px var(--op-space-small);
+  display: flex;
+  flex-flow: column;
+
+  legend
+  {
+    text-align: center;
+    padding-inline: var(--op-space-small);
+    margin: 0px;
+    font-weight: var(--op-font-weight-normal);
+    font-size: var(--op-font-small);
+  }
+
+}

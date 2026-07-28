@@ -1,0 +1,34 @@
+= search_form_for @q, url: leaderboards_path, builder: SimpleForm::FormBuilder, html: { class: 'op-stack gap-lg' } do |f|
+	div.text-center
+		| Filters
+	.divider
+
+	fieldset
+		legend 
+			| User
+		= f.input :user_name_cont, label: 'Name', input_html: { class: 'form-control--small' }
+		= f.input :user_country_eq, label: 'Country', collection: Data::Country.all, include_blank: true, input_html: { class: 'form-control--small' }
+
+	fieldset
+		legend 
+			| Total Games
+		div.input__pair
+			= f.input :total_games_gteq, label: 'Min', as: :integer, input_html: { class: 'form-control--small' }
+			= f.input :total_games_lteq, label: 'Max', as: :integer, input_html: { class: 'form-control--small' }
+
+	fieldset 
+		legend 
+			| Games Won
+		div.input__pair
+			= f.input :games_won_gteq, label: 'Min', as: :integer, input_html: { class: 'form-control--small' }
+			= f.input :games_won_lteq, label: 'Max', as: :integer, input_html: { class: 'form-control--small' }
+
+	fieldset 
+		legend 
+			| Win Percentage
+
+		div.input__pair
+			= f.input :win_percentage_gteq, label: 'Min', as: :integer, input_html: { class: 'form-control--small' }
+			= f.input :win_percentage_lteq, label: 'Max', as: :integer, input_html: { class: 'form-control--small' }
+
+	= f.button :submit, 'Filter'

@@ -100,7 +100,7 @@ Every game-engine **value object** (`Card`, `Deck`, `CardCollection`, `Player`, 
   generator to create the next version file, or hand-write the `update_view` migration yourself
   (`version: N, revert_to_version: N-1`) to match a manually-created SQL file.
 
-## Sorting (Ransack)
+## Sorting & filtering (Ransack)
 
 - **Ransack 4+ raises unless the model whitelists columns.** Define `self.ransackable_attributes(_auth_object = nil)`
   returning only the columns you actually want sortable/searchable — see `Leaderboard`. Omitting the method entirely
@@ -108,6 +108,13 @@ Every game-engine **value object** (`Card`, `Deck`, `CardCollection`, `Player`, 
 - **Marking the active sort button:** a plain helper (`LeaderboardsHelper#active_sort_class`) compares
   `query.sorts.first&.name` to the attribute name to decide whether to add `btn--active`. `sort_link` itself has
   no built-in "is this the current sort" hook for custom styling — you have to inspect `@q.sorts` yourself.
+- **A misspelled predicate suffix (e.g. `games_won_greg` instead of `games_won_gteq`) raises, not silently
+  ignores the filter.** Ransack parses the field name as `<attribute>_<predicate>` at query time, so it's easy to
+  typo the predicate half and not notice until the form errors.
+- **`search_form_for` accepts `builder: SimpleForm::FormBuilder`**, which pulls in this app's existing
+  simple_form config (`form-group`/`form-label`, `btn btn--primary` defaults from
+  `config/initializers/simple_form.rb`) instead of hand-writing Optics wrapper markup — see the leaderboard
+  filter form in `app/views/leaderboards/index.html.slim`.
 
 ## Pagination (Kaminari)
 
@@ -130,6 +137,28 @@ Every game-engine **value object** (`Card`, `Deck`, `CardCollection`, `Player`, 
   `config.default_per_page`; `max_per_page` only matters if something (e.g. a `per_page` query param)
   lets a caller request more than that. Neither applies until the hardcoded `.per(10)` is replaced with
   a user-adjustable per-page value.
+
+## Optics / CSS
+
+- **The Optics CDN import in `application.css` is a hand-written version string, separate from
+  `yarn.lock`.** `node_modules`/`yarn.lock` can be ahead of the pinned CDN URL (found this at 2.3.1
+  vs. 2.4.0 in `node_modules`) — if a utility class documented in Optics docs seems to do nothing,
+  check both versions agree before assuming a markup bug.
+- **`stylesheet_link_tag :app` auto-links every file under `app/assets/stylesheets/**` individually**
+  (Propshaft convention, no manifest/`@import` needed) — dropping a new `.css` file under
+  `components/` is enough for it to load on the next request.
+- **A right sidebar that stays fixed while the page scrolls is `.op-page__sidebar.op-page__sidebar--right`**,
+  Optics' own grid area (`position: sticky`, `block-size: 100dvh`) — not something you need to hand-roll
+  with custom `position: fixed` CSS. It expects a `.side-panel` (or similar) as its child.
+- **`.side-panel`'s width is a public CSS custom property (`--_op-side-panel-width`), meant to be
+  overridden inline per instance** rather than via a new CSS rule — e.g.
+  `style="--_op-side-panel-width: calc(56 * var(--op-size-unit));"` to narrow one specific sidebar
+  without affecting other `.side-panel` usages.
+- **`.op-split`'s `flex-wrap` decision is based on children's unwrapped (max-content) width, not
+  their shrunk size** — two fields with long labels will wrap onto separate lines even in a wide
+  container, and even with small inputs, because the label text alone doesn't fit unwrapped. Fix by
+  giving the children `flex: 1 1 0; min-inline-size: 0` so they can shrink and let the label wrap
+  inside its half — see `.input__pair` in `app/assets/stylesheets/components/input-pair.css`.
 
 ## Generated files — don't hand-edit
 

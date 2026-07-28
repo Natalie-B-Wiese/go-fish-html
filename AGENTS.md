@@ -13,7 +13,7 @@ A web-based multiplayer card-game platform. Players sign up, create or join game
 - **Slim** templates, **SCSS** compiled with **esbuild** (`yarn build`), **@rolemodel/optics** design system
 - **GoodJob** for background jobs (backed by Postgres)
 - **Scenic** for SQL-backed database views (e.g. `Leaderboard`, a read-only reporting model)
-- **Ransack** for query building (currently: sortable leaderboard columns), **Kaminari** for pagination
+- **Ransack** for query building (sortable and filterable leaderboard columns), **Kaminari** for pagination
 - **RSpec** + **FactoryBot** + **Capybara** with the **Playwright** driver for system tests
 - **Kamal** + Docker for deployment; **Propshaft** asset pipeline
 
@@ -74,6 +74,7 @@ See [docs/conventions.md](docs/conventions.md) for the full list. The ones you'l
 - **Shared board partials live in `app/views/application/`.** Don't copy the board skeleton per game — a new game adds only its region partials (`_game_board`, `_extra`, `_turn_form`, `_player_accordion`) and a thin entry partial. See the View composition note above.
 - **Never hand-edit `db/schema.rb`** (use migrations) or `app/javascript/controllers/index.js` (regenerate with `bin/rails stimulus:manifest:update`).
 - Authentication is a hand-rolled `Session`/`Current` cookie scheme (`app/controllers/concerns/authentication.rb`), not Devise. `Current.user` / `Current.session` carry request-scoped identity.
+- **A page can opt into a fixed right sidebar** via `content_for :sidebar_right` in the view, yielded in `layouts/application.html.slim` into `.op-page__sidebar.op-page__sidebar--right` — see the leaderboard filter form. Optics gotchas around this live in [docs/conventions.md](docs/conventions.md).
 
 ## Key context
 
