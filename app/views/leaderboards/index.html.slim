@@ -8,12 +8,7 @@ main.op-page__main-content
 		header.content-header
 			h2
 				| Leaderboard
-			div.divider
-		.btn-group
-			= render 'sort_link_btn', query: @q, attribute: :total_games, label: 'Total Games'
-			= render 'sort_link_btn', query: @q, attribute: :games_won, label: 'Games Won'
-			= render 'sort_link_btn', query: @q, attribute: :total_time_played, label: 'Total Time Played'
-			= render 'sort_link_btn', query: @q, attribute: :win_percentage, label: 'Winning Percentage'
+			div.divider		
 
 		table.table.table--auto-layout.table--default-density.table--even-striped.table--sticky-header
 			thead
@@ -21,13 +16,13 @@ main.op-page__main-content
 					th
 						| Name
 					th
-						| Total Games
+						= render 'sort_link_btn', query: @q, attribute: :total_games, label: 'Total Games'
 					th
-						| Games Won
+						= render 'sort_link_btn', query: @q, attribute: :games_won, label: 'Games Won'
 					th
-						| Total Time Played
+						= render 'sort_link_btn', query: @q, attribute: :total_time_played, label: 'Total Time Played'
 					th
-						| Winning Percentage
+						= render 'sort_link_btn', query: @q, attribute: :win_percentage, label: 'Winning Percentage'
 			tbody
 				- @leaderboards.each do |leaderboard|
 					tr
