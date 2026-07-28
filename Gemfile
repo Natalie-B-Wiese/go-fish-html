@@ -102,3 +102,5 @@ group :development, :test do
 end
 
 gem 'scenic'
+
+gem 'ransack'

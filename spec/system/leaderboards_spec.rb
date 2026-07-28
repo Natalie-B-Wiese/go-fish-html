@@ -69,6 +69,28 @@ RSpec.describe 'Leaderboard', type: :system do
     end
   end
 
+  it 'sorts ascending by total games when the sort button is clicked' do
+    click_link 'Total Games'
+
+    rows = page.within('tbody') { find_all('tr') }
+    names = rows.map { |r| r.find_all('td').first.text }
+
+    expect(names.first).to eq user3.name
+    expect(names.last(2)).to contain_exactly(user1.name, user2.name)
+  end
+
+  it 'marks the clicked sort button as active and leaves the others inactive' do
+    click_link 'Total Games'
+
+    expect(page).to have_css('a.btn--active', text: 'Total Games')
+    expect(page).to have_no_css('a.btn--active', text: 'Games Won')
+
+    click_link 'Games Won'
+
+    expect(page).to have_css('a.btn--active', text: 'Games Won')
+    expect(page).to have_no_css('a.btn--active', text: 'Total Games')
+  end
+
   def expect_row_stats(row, total_games:, games_won:, time_played:, win_percentage:)
     cells = row.find_all('td')
     expect(cells[1]).to have_content total_games

@@ -100,6 +100,15 @@ Every game-engine **value object** (`Card`, `Deck`, `CardCollection`, `Player`, 
   generator to create the next version file, or hand-write the `update_view` migration yourself
   (`version: N, revert_to_version: N-1`) to match a manually-created SQL file.
 
+## Sorting (Ransack)
+
+- **Ransack 4+ raises unless the model whitelists columns.** Define `self.ransackable_attributes(_auth_object = nil)`
+  returning only the columns you actually want sortable/searchable — see `Leaderboard`. Omitting the method entirely
+  fails closed (raises), not open.
+- **Marking the active sort button:** a plain helper (`LeaderboardsHelper#active_sort_class`) compares
+  `query.sorts.first&.name` to the attribute name to decide whether to add `btn--active`. `sort_link` itself has
+  no built-in "is this the current sort" hook for custom styling — you have to inspect `@q.sorts` yourself.
+
 ## Generated files — don't hand-edit
 
 - `db/schema.rb` — change via migrations.

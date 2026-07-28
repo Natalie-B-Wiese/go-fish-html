@@ -4,6 +4,11 @@ main.op-page__main-content
 			h2
 				| Leaderboard
 			div.divider
+		.btn-group
+			= render 'sort_link_btn', query: @q, attribute: :total_games, label: 'Total Games'
+			= render 'sort_link_btn', query: @q, attribute: :games_won, label: 'Games Won'
+			= render 'sort_link_btn', query: @q, attribute: :total_time_played, label: 'Total Time Played'
+			= render 'sort_link_btn', query: @q, attribute: :win_percentage, label: 'Winning Percentage'
 		table.table.table--auto-layout.table--default-density.table--even-striped.table--sticky-header
 			thead
 				tr
@@ -15,7 +20,7 @@ main.op-page__main-content
 						| Games Won
 					th
 						| Total Time Played
-					th 
+					th
 						| Winning Percentage
 			tbody
 				- @leaderboards.each do |leaderboard|

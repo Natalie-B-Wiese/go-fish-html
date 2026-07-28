@@ -1,5 +1,6 @@
 class LeaderboardsController < ApplicationController
   def index
-    @leaderboards = Leaderboard.all
+    @q = Leaderboard.ransack(params[:q])
+    @leaderboards = @q.result
   end
 end
