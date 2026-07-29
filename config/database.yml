@@ -78,8 +78,9 @@ test:
 # Read https://guides.rubyonrails.org/configuring.html#configuring-a-database
 # for a full overview on how database connection configuration can be specified.
 #
+# Hosting providers (Fly.io, Heroku, etc.) supply the full connection string in
+# DATABASE_URL. Rails merges it over the values below, so it is the only source
+# of truth for host, database, user, and password in production.
 production:
   <<: *default
-  database: game_platform_production
-  username: game_platform
-  password: <%= ENV["GAME_PLATFORM_DATABASE_PASSWORD"] %>
+  url: <%= ENV['DATABASE_URL'] %>

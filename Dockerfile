@@ -8,7 +8,7 @@
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
-ARG RUBY_VERSION=3.4.9
+ARG RUBY_VERSION=4.0.5
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
@@ -30,10 +30,30 @@ ENV RAILS_ENV="production" \
 # Throw-away build stage to reduce size of final image
 FROM base AS build
 
-# Install packages needed to build gems
+# Install packages needed to build gems and node modules
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libpq-dev libvips libyaml-dev pkg-config && \
+    apt-get install --no-install-recommends -y build-essential git libpq-dev libvips libyaml-dev node-gyp pkg-config python-is-python3 && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Install JavaScript dependencies (versions match .node-version and package.json packageManager)
+ARG NODE_VERSION=24.12.0
+ARG YARN_VERSION=4.17.1
+ENV PATH=/usr/local/node/bin:$PATH
+RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
+    /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
+    rm -rf /tmp/node-build-master
+
+# Yarn 4 isn't published to npm — it ships as the vendored release that
+# .yarnrc.yml's `yarnPath` points at. This shim puts it on PATH so that
+# `yarn build` works during assets:precompile.
+RUN printf '#!/bin/sh\nexec node /rails/.yarn/releases/yarn-%s.cjs "$@"\n' "$YARN_VERSION" > /usr/local/bin/yarn && \
+    chmod +x /usr/local/bin/yarn
+
+# Install node modules. Playwright is only needed for system specs, so skip its
+# browser download to keep the image small.
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn/releases ./.yarn/releases
+RUN PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 yarn install --immutable
 
 # Install application gems
 COPY vendor/* ./vendor/

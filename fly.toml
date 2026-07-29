@@ -1,0 +1,76 @@
+# fly.toml — Fly.io deployment config.
+# Docs: https://fly.io/docs/reference/configuration/
+#
+# NOTE: `app` must be globally unique across all of Fly.io. If `fly apps create`
+# says the name is taken, pick another one and update APP_HOST below to match.
+
+app = 'wiese-game-platform'
+primary_region = 'iad'
+
+# `fly console` opens a Rails console on a throwaway Machine.
+console_command = '/rails/bin/rails console'
+
+# 512MB is snug for Rails; a little swap keeps a memory spike from killing the
+# Machine outright.
+swap_size_mb = 512
+
+[build]
+
+# Runs on a temporary Machine after the image is built and before the new
+# release goes live. If migrations fail, the deploy aborts and the old release
+# keeps serving.
+#
+# Deliberately `db:migrate`, not `db:prepare`: db:prepare also runs db/seeds.rb
+# when it creates the database, and this app's seeds take longer than Fly's
+# 5-minute release_command timeout. Seed by hand instead:
+#   fly ssh console -C "/rails/bin/rails db:seed"
+[deploy]
+  release_command = './bin/rails db:migrate'
+
+# Two process groups from one image: the web server, and the GoodJob worker
+# (the production equivalent of the `web` and `worker` lines in Procfile.dev).
+[processes]
+  app = './bin/thrust ./bin/rails server'
+  worker = 'bundle exec good_job start'
+
+[env]
+  # Thruster defaults to port 80, but the image runs as a non-root user and Fly
+  # Machines don't allow binding privileged ports, so move it above 1024.
+  # Thruster still starts Puma on TARGET_PORT (3000) behind it.
+  HTTP_PORT = '8080'
+  # Puma threads. config/database.yml sizes the Active Record pool from this.
+  RAILS_MAX_THREADS = '5'
+  # Used by Action Mailer's default_url_options.
+  APP_HOST = 'wiese-game-platform.fly.dev'
+
+[http_service]
+  # Thruster's listen port, set via HTTP_PORT above — not Rails' 3000.
+  internal_port = 8080
+  force_https = true
+  # Games hold open WebSocket connections, so we keep one Machine up at all
+  # times rather than letting the proxy stop it when idle.
+  auto_stop_machines = 'off'
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ['app']
+
+  [http_service.concurrency]
+    type = 'requests'
+    soft_limit = 200
+
+  [[http_service.checks]]
+    interval = '15s'
+    timeout = '2s'
+    grace_period = '10s'
+    method = 'GET'
+    path = '/up'
+
+[[vm]]
+  size = 'shared-cpu-1x'
+  memory = '512mb'
+  processes = ['app']
+
+[[vm]]
+  size = 'shared-cpu-1x'
+  memory = '512mb'
+  processes = ['worker']
