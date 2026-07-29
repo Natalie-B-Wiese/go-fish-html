@@ -1,0 +1,39 @@
+= content_for :sidebar_right do
+	.side-panel.side-panel--border-left style="--_op-side-panel-width: calc(56 * var(--op-size-unit));"
+		.side-panel__body.side-panel__body--padded
+			= render 'search_form'
+
+main.op-page__main-content
+	.op-stack.gap-xl
+		header.content-header
+			h2
+				| Leaderboard
+			div.divider		
+
+		table.table.table--auto-layout.table--default-density.table--even-striped.table--sticky-header
+			thead
+				tr
+					th
+						| Name
+					th
+						= render 'sort_link_btn', query: @q, attribute: :total_games, label: 'Total Games'
+					th
+						= render 'sort_link_btn', query: @q, attribute: :games_won, label: 'Games Won'
+					th
+						= render 'sort_link_btn', query: @q, attribute: :total_time_played, label: 'Total Time Played'
+					th
+						= render 'sort_link_btn', query: @q, attribute: :win_percentage, label: 'Winning Percentage'
+			tbody
+				- @leaderboards.each do |leaderboard|
+					tr
+						td = leaderboard.user_name
+						td = leaderboard.total_games
+						td = leaderboard.games_won
+						td = "#{leaderboard.total_time_played.in_minutes.round} min"
+						td
+							| #{leaderboard.win_percentage}%
+			tfoot
+				tr
+					td colspan="5"
+						.flex.justify-end
+							= paginate @leaderboards, window: 2

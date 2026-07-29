@@ -6,7 +6,7 @@ This project deliberately splits **persistence** (Active Record) from **game rul
 
 ### 1. Active Record layer (the lobby & persistence)
 
-- **`Game`** — STI base class (`app/models/game.rb`). Concrete types: **`GoFishGame`**, **`CrazyEightsGame`**, **`RummyGame`** (the `type` column). Tracks lobby state: `name`, `player_count`, `started_at`, `ended_at`, `archived_at`, `winner`, and the serialized `game_state` (jsonb).
+- **`Game`** — STI base class (`app/models/game.rb`). Concrete types: **`GoFishGame`**, **`CrazyEightsGame`**, **`RummyGame`** (the `type` column). Tracks lobby state: `name`, `player_count`, `started_at`, `ended_at`, `archived_at`, `winner` (a direct reference to the winning `User`, not a `Player`), and the serialized `game_state` (jsonb).
 - **`Player`** — join model between `User` and `Game`. This is *not* the in-game player; it just records "this user is in this game."
 - **`User`** — `has_secure_password`; `has_many :games, through: :players`.
 - **`Session`** / **`Current`** — hand-rolled cookie auth (see `app/controllers/concerns/authentication.rb`). `Current.user` / `Current.session` carry request-scoped identity.

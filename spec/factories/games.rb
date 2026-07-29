@@ -6,7 +6,7 @@ FactoryBot.define do
     ended_at { nil }
     updated_at { Time.zone.now }
     type { 'GoFishGame' }
-    association :winner, factory: :player, strategy: :null
+    association :winner, factory: :user, strategy: :null
     archived_at { nil }
 
     trait :go_fish do
@@ -43,8 +43,8 @@ FactoryBot.define do
       after(:create) do |game, evaluator|
         game.player_count = evaluator.users.count
         evaluator.users.each do |user|
-          player = create(:player, game: game, user: user)
-          game.update!(winner: player) if user == evaluator.user_won
+          create(:player, game: game, user: user)
+          game.update!(winner: user) if user == evaluator.user_won
         end
         game.reload
       end

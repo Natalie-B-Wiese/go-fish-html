@@ -16,9 +16,19 @@ RoleModel house style and project-specific rules that you won't infer from readi
 - **Asserting on card images in system specs**: `img[src]` is fingerprinted by Propshaft
   (`name-hash.ext`), so a full-filename substring match breaks (`to_image_name` includes the
   extension). Match on the base name only: `File.basename(card.to_image_name, '.*')`.
+- **`page.within(selector)` only scopes a block — called without one it silently returns `nil`.**
+  `page.within('tbody').find_all('td')` raises `NoMethodError` on `nil`; the fix is
+  `page.within('tbody') { find_all('tr') }`. See `spec/system/leaderboards_spec.rb`.
 - **GoodJob broadcasts fire fine in `:js` specs as-is** — `broadcast_refresh_later_to` reaches an
   already-open page via GoodJob's default async execution; no test-env queue-adapter change or
   `perform_enqueued_jobs` is needed.
+- **A system spec's `have_content` can false-positive match an error page.** System specs drive a
+  real browser against a real server, so a Ruby exception can't propagate back to RSpec — it
+  renders as an HTML error page instead, and the test still "passes" if the expected string is a
+  substring of that page's text. Bit us when `expect(page).to have_content 'Leaderboard'` matched
+  the routing-error page for a missing `LeaderboardsController#index` action, since `'Leaderboard'`
+  is a substring of `'LeaderboardsController'`. Assert on content specific enough that an error
+  page can't coincidentally contain it (e.g. a real column header, not the resource name).
 - **Assigning `game_state:` on an unsaved `Game` round-trips through the `serialize` coder's dump/load
   immediately** — `SomeGame.new(game_state: engine)` does *not* keep the object graph you passed in;
   `some_game.game_state` is a freshly deserialized copy. A model spec that builds `Player`/`Implementation`
@@ -52,6 +62,10 @@ RoleModel house style and project-specific rules that you won't infer from readi
 ## Rails patterns
 
 - **Prefer RESTful routes.** Some existing routes (`games/:id/join`, `games/:id/play`, and the state-mutating `games#show`) are pragmatic exceptions, not the pattern to copy.
+- **A route can point at a controller action with no method defined** — Rails implicitly renders
+  the matching view (`app/views/<controller>/<action>.html.slim`) as long as the template exists.
+  `PagesController#rules` relies on this: all the logic lives in the view/model
+  layer, not a controller method. Use this only for simple, non-branching pages.
 - **Avoid instance variables in plain Ruby objects** (the game engine, presenters, service-style classes) — lean on locals and passed-in arguments instead. Instance variables are **fine in controllers** (e.g. `@game`, `@presenter` in `ApplicationController` subclasses), which is the normal Rails way to hand data to views.
 - **Presenters** (`app/presenters/`) hold view-facing helper methods for reading engine data so views don't dig into `game.game_state` directly. There's no hard rule forbidding direct access — presenters just keep views clean.
 - **Same `name`, different `value` on submit buttons picks an action without JS or a hidden field.** When one form offers a choice between turn actions (e.g. Rummy's "Draw from Deck" vs. "Take from Discard"), give each `f.button` the same nested `name:` (e.g. `name: "turn[source]"`) and a distinct `value:` — only the clicked button's pair is submitted, so the controller reads the chosen action straight off the permitted param. See `app/views/rummy_games/_phase1.html.slim`.
@@ -72,6 +86,83 @@ RoleModel house style and project-specific rules that you won't infer from readi
 Every game-engine **value object** (`Card`, `Deck`, `CardCollection`, `Player`, `Book`, `TurnResult`, …) implements a matching `as_json` / `self.from_json` pair. **If you touch one, touch the other** — a mismatch silently drops state rather than raising. See [architecture.md](architecture.md#serialization-the-jsonb-boundary).
 
 **`Implementation` subclasses are the exception — don't override `self.from_json`.** The `::Implementation` base owns `from_json` and rebuilds the game from `self.json_attributes` (a hash of constructor keywords). A game with extra state keeps `as_json` and `self.json_attributes` in sync instead — each *extends* the base with `super.merge(...)` (e.g. Crazy Eights' `discard_pile`), and `==` extends with `super && ...`. Don't reference a per-game constant (e.g. `SMALL_GAME_CARDS`) from a method defined on the base: Ruby resolves constants *lexically*, not by the runtime subclass, so the base won't see the subclass's value — expose per-game values through an overridable method hook instead (see `starting_hand_size`). The flip side works in your favor for *classes*: an unqualified `Card`, `Deck`, or `CardCollection` reference inside a game's own module (e.g. bare `Deck.new` in `Rummy::Implementation`) resolves to that game's same-named subclass automatically, once one is defined — no explicit wiring needed. That's what makes the `card_class`/`deck_class` hooks above work without every call site needing to know which game it's in.
+
+## Database views (Scenic)
+
+- **Postgres `interval` columns come back as `ActiveSupport::Duration`, not a plain number.** A
+  view column like `SUM(games.ended_at - games.started_at)` is cast automatically by the `pg`
+  adapter/ActiveRecord. Use `.in_minutes`, `.in_hours`, or `.to_i` (seconds) rather than assuming
+  a raw numeric — see `Leaderboard#total_time_played`.
+- **Hand-editing a new versioned view SQL file (e.g. `db/views/foo_v02.sql`) without running the
+  generator confuses the next `rails generate scenic:view` call.** It detects the highest existing
+  version file and assumes a migration for it already exists, so it skips straight to `v03` —
+  producing a duplicate file and a migration for the wrong version range. Either always use the
+  generator to create the next version file, or hand-write the `update_view` migration yourself
+  (`version: N, revert_to_version: N-1`) to match a manually-created SQL file.
+
+## Sorting & filtering (Ransack)
+
+- **Ransack 4+ raises unless the model whitelists columns.** Define `self.ransackable_attributes(_auth_object = nil)`
+  returning only the columns you actually want sortable/searchable — see `Leaderboard`. Omitting the method entirely
+  fails closed (raises), not open.
+- **Marking the active sort button:** a plain helper (`LeaderboardsHelper#active_sort_class`) compares
+  `query.sorts.first&.name` to the attribute name to decide whether to add `btn--active`. `sort_link` itself has
+  no built-in "is this the current sort" hook for custom styling — you have to inspect `@q.sorts` yourself.
+- **`@q.result` calls `reorder` under the hood, wiping out any `.order` applied earlier in the chain.** A tiebreaker
+  sort (e.g. `order(user_id: :asc)` for stable pagination) has to be chained *after* `.result`, not before
+  `.ransack` — `.order` appended post-`.result` merges with whatever column the user picked, rather than
+  replacing it. See `LeaderboardsController#index`.
+- **A misspelled predicate suffix (e.g. `games_won_greg` instead of `games_won_gteq`) raises, not silently
+  ignores the filter.** Ransack parses the field name as `<attribute>_<predicate>` at query time, so it's easy to
+  typo the predicate half and not notice until the form errors.
+- **`search_form_for` accepts `builder: SimpleForm::FormBuilder`**, which pulls in this app's existing
+  simple_form config (`form-group`/`form-label`, `btn btn--primary` defaults from
+  `config/initializers/simple_form.rb`) instead of hand-writing Optics wrapper markup — see the leaderboard
+  filter form in `app/views/leaderboards/index.html.slim`.
+
+## Pagination (Kaminari)
+
+- **`rails g kaminari:views` crashes on Rails 8.1** (`NoMethodError: private method 'warn' called for
+  class ActiveSupport::Deprecation`, from `kaminari-core`'s generator calling a deprecation API Rails 8.1
+  removed). The Optics-styled partials in `app/views/kaminari/` were hand-written from the gem's own
+  default templates instead of generated.
+- **Disabled pagination buttons (first/prev/next/last at the boundary) render as a non-link `<span>`
+  with `btn--disabled`, not Kaminari's default bare-text fallback.** `link_to_unless`'s disabled branch
+  just prints the content with no wrapping tag, which would drop the Optics `btn` classes entirely —
+  each partial branches explicitly instead so the disabled state keeps its button styling.
+- **`config/locales/en.yml` overrides `views.pagination.previous`/`next`** to plain "Prev"/"Next".
+  Kaminari's own default locale bakes in `&lsaquo;`/`&rsaquo;` arrow entities, which doubled up with the
+  Optics `ph-caret-*` icons already in those partials.
+- **Slim escapes HTML entities by default — unlike the gem's ERB originals, `t(...)` needs an explicit
+  `.html_safe`.** `_gap.html.slim`'s ellipsis (`t('views.pagination.truncate')`) printed literal
+  `&hellip;` text until `.html_safe` was added back; easy to drop when porting an ERB partial to Slim.
+- **`config/initializers/kaminari_config.rb`'s `default_per_page`/`max_per_page` are currently a no-op.**
+  `LeaderboardsController#index` calls `.per(10)` explicitly, and an explicit `.per` always wins over
+  `config.default_per_page`; `max_per_page` only matters if something (e.g. a `per_page` query param)
+  lets a caller request more than that. Neither applies until the hardcoded `.per(10)` is replaced with
+  a user-adjustable per-page value.
+
+## Optics / CSS
+
+- **The Optics CDN import in `application.css` is a hand-written version string, separate from
+  `yarn.lock`.** `node_modules`/`yarn.lock` can be ahead of the pinned CDN URL (found this at 2.3.1
+  vs. 2.4.0 in `node_modules`) — if a utility class documented in Optics docs seems to do nothing,
+  check both versions agree before assuming a markup bug.
+- **`stylesheet_link_tag :app` auto-links every file under `app/assets/stylesheets/**` individually**
+  (Propshaft convention, no manifest/`@import` needed) — dropping a new `.css` file under
+  `components/` is enough for it to load on the next request.
+- **A right sidebar that stays fixed while the page scrolls is `.op-page__sidebar.op-page__sidebar--right`**,
+  Optics' own grid area (`position: sticky`, `block-size: 100dvh`) — not something you need to hand-roll
+  with custom `position: fixed` CSS. It expects a `.side-panel` (or similar) as its child.
+- **`.side-panel`'s width is a public CSS custom property (`--_op-side-panel-width`), meant to be
+  overridden inline per instance** rather than via a new CSS rule — e.g.
+  `style="--_op-side-panel-width: calc(56 * var(--op-size-unit));"` to narrow one specific sidebar
+  without affecting other `.side-panel` usages.
+- **`.op-split`'s `flex-wrap` decision is based on children's unwrapped (max-content) width, not
+  their shrunk size** — two fields with long labels will wrap onto separate lines even in a wide
+  container, and even with small inputs, because the label text alone doesn't fit unwrapped. Fix by
+  giving the children `flex: 1 1 0; min-inline-size: 0` so they can shrink and let the label wrap
+  inside its half — see `.input__pair` in `app/assets/stylesheets/components/input-pair.css`.
 
 ## Generated files — don't hand-edit
 

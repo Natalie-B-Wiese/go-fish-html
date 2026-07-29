@@ -95,3 +95,14 @@ gem 'good_job', '~> 4.19'
 
 gem 'country_select'
 gem 'data_for'
+# gem 'xmpp4r'
+
+group :development, :test do
+  gem 'bullet'
+end
+
+gem 'scenic'
+
+gem 'ransack'
+
+gem 'kaminari'

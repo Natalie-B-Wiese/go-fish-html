@@ -5,7 +5,7 @@ class Game < ApplicationRecord
   has_many :players
   has_many :users, through: :players
 
-  belongs_to :winner, class_name: 'Player', optional: true
+  belongs_to :winner, class_name: 'User', optional: true
 
   validates :name, uniqueness: { case_sensitive: true, message: 'A game with that name already exists!' }
   validates :name, presence: true
@@ -53,7 +53,7 @@ class Game < ApplicationRecord
   end
 
   def end!
-    update!(ended_at: Time.zone.now, winner: players.find_by(user_id: game_state.winning_player.user_id))
+    update!(ended_at: Time.zone.now, winner_id: game_state.winning_player.user_id)
     save!
   end
 
